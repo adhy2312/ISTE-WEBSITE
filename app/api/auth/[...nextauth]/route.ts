@@ -1,6 +1,3 @@
-import NextAuth from 'next-auth';
-import { authOptions } from '@/lib/auth';
-
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+// This route is intentionally empty.
+// Authentication is handled by Supabase SSR — see utils/supabase/server.ts
+export const runtime = 'edge';
