@@ -1,5 +1,6 @@
 import { draftMode } from 'next/headers'
 import { getClient } from '@/lib/sanity/client'
+import Image from 'next/image'
 import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import TeamCard from '@/app/components/TeamCard'
@@ -124,7 +125,7 @@ export default async function Home() {
       <div className="c-ring" id="cring"></div>
 
       <nav id="navbar">
-        <a href="#hero" className="nav-logo">ISTE&nbsp;<span>MBCET</span></a>
+        <a href="#hero" className="nav-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" /><span>ISTE SC MBCET™</span></a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
           <li><a href="#who">Who We Are</a></li>
@@ -404,7 +405,7 @@ export default async function Home() {
       <footer>
         <div className="footer-top">
           <div>
-            <div className="footer-logo">ISTE MBCET</div>
+            <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET™" width={80} height={80} className="footer-logo-img" /></div>
             <div className="footer-tagline">
               Indian Society for Technical Education — Mar Baselios College of Engineering and Technology Student Chapter, Kerala.
             </div>
