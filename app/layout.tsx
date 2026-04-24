@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
+import { headers } from 'next/headers';
 import './globals.css';
 import GeminiChat from './components/GeminiChat';
 
@@ -12,16 +13,23 @@ export const metadata: Metadata = {
   description: "Empowering engineering students through innovation, technology, and excellence at Mar Baselios College of Engineering and Technology.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const pathname = headersList.get('next-url') || '';
+  const isStudio = pathname.startsWith('/studio');
+
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} ${orbitron.variable} font-sans`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${playfair.variable} ${orbitron.variable} font-sans`}
+        suppressHydrationWarning
+      >
         {children}
-        <GeminiChat />
+        {!isStudio && <GeminiChat />}
       </body>
     </html>
   );
