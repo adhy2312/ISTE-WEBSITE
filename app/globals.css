@@ -8,25 +8,22 @@
 @tailwind utilities;
 
 :root {
-      --black:    #000000;
-      --white:    #ffffff;
-      --off-white:#f5f5f5;
-      --g100: #e8e8e8;
-      --g200: #cccccc;
-      --g400: #888888;
-      --g600: #444444;
-      --g800: #1a1a1a;
-      --g900: #0d0d0d;
-      --border:       rgba(255,255,255,0.10);
-      --border-light: rgba(255,255,255,0.06);
-      --font-serif: 'Playfair Display', Georgia, serif;
-      --font-sans:  'Inter', system-ui, sans-serif;
-      --font-mono:  'Orbitron', monospace;
+      --black:    #0f172a;
+      --white:    #f8fafc;
+      --off-white:#f1f5f9;
+      --g100: #e2e8f0;
+      --g200: #cbd5e1;
+      --g400: #94a3b8;
+      --g600: #64748b;
+      --g800: #1e293b;
+      --g900: #0f172a;
+      --border:       rgba(255,255,255,0.12);
+      --border-light: rgba(255,255,255,0.08);
+      --font-serif: var(--font-serif), 'Playfair Display', Georgia, serif;
+      --font-sans:  var(--font-sans), 'Inter', system-ui, sans-serif;
+      --font-mono:  var(--font-mono), 'Orbitron', monospace;
       --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-
-    .font-anton { font-family: var(--font-anton), sans-serif !important; }
-    .font-jakarta { font-family: var(--font-jakarta), sans-serif !important; }
 
     body {
       background: var(--black);
@@ -367,7 +364,7 @@
       border-top: 0px solid var(--border);
     }
     .team-card.open .team-subs {
-      max-height: 300px; opacity: 1;
+      max-height: 1200px; opacity: 1;
       border-top: 1px solid var(--border);
     }
     .sub-member {
@@ -496,6 +493,110 @@
     .footer-socials { display:flex; gap:22px; }
     .footer-socials a { font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--g600); text-decoration:none; transition:color .3s; }
     .footer-socials a:hover { color:var(--white); }
+
+    /* ===================== TESTIMONIALS MARQUEE ===================== */
+    .testimonials-section {
+      padding: 120px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .testi-header {
+      text-align: center;
+      margin-bottom: 20px;
+      max-width: 600px;
+      padding: 0 20px;
+    }
+    .testi-header h2 {
+      font-family: var(--font-serif);
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .marquee-wrapper {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      padding: 40px 0 60px;
+      /* Alpha mask on edges for slow fade out */
+      -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    }
+    
+    .marquee-content {
+      display: flex;
+      width: max-content;
+      animation: marquee 30s linear infinite;
+    }
+    
+    .marquee-content:hover {
+      animation-play-state: paused;
+    }
+
+    .testi-card {
+      width: 380px;
+      padding: 40px;
+      margin: 0 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .testi-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-5px);
+    }
+    .testi-quote-icon {
+      font-family: serif;
+      font-size: 5rem;
+      color: rgba(255, 255, 255, 0.1);
+      line-height: 0.5;
+      margin-bottom: 20px;
+      margin-top: 10px;
+    }
+    .testi-text {
+      font-size: 1.05rem;
+      color: var(--white);
+      line-height: 1.6;
+      font-weight: 500;
+      flex-grow: 1;
+    }
+    .testi-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .testi-author img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    .testi-name {
+      font-weight: 600;
+      color: var(--white);
+      font-size: .95rem;
+      margin-bottom: 2px;
+    }
+    .testi-role {
+      font-size: .85rem;
+      color: var(--g400);
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
 
     /* ===================== RESPONSIVE ===================== */
     @media (max-width:1024px) {

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Anton, Plus_Jakarta_Sans, Orbitron } from 'next/font/google';
+import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
 import './globals.css';
 import GeminiChat from './components/GeminiChat';
 
-const anton = Anton({ subsets: ['latin'], weight: '400', variable: '--font-anton' });
-const plusJakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' });
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-mono', weight: ['400', '700', '900'] });
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${plusJakarta.variable} ${anton.variable} ${orbitron.variable} font-jakarta`}>
+      <body className={`${inter.variable} ${playfair.variable} ${orbitron.variable} font-sans`}>
         {children}
         <GeminiChat />
       </body>

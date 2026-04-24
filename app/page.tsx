@@ -203,7 +203,7 @@ export default function Home() {
         <div className="section-inner about-grid">
           <div>
             <div className="section-tag reveal">About Us</div>
-            <h2 className="section-title reveal d1">Shaping <em>Engineers</em><br/>of Tomorrow</h2>
+            <h2 className="section-title reveal d1">Shaping <em>Engineers</em><br />of Tomorrow</h2>
             <p className="section-body reveal d2" style={{ marginTop: 24 }}>
               ISTE — the Indian Society for Technical Education — is India's premier national teachers association working
               to enhance the quality of technical education. The MBCET Student Chapter brings this vision to life at
@@ -218,7 +218,7 @@ export default function Home() {
           <div className="about-visual reveal d2">
             <div className="about-box-main">
               <div className="about-code-label">Chapter Identifier</div>
-              <div className="about-code-big">KE<br/>065</div>
+              <div className="about-code-big">KE<br />065</div>
               <div className="about-code-sub">MBCET &nbsp;&middot;&nbsp; Kerala</div>
             </div>
             <div className="about-box-inner"></div>
@@ -230,7 +230,7 @@ export default function Home() {
         <div className="section-inner">
           <div className="who-header">
             <div className="section-tag reveal">Who Are We</div>
-            <h2 className="section-title reveal d1">Built on Three<br/><em>Core Pillars</em></h2>
+            <h2 className="section-title reveal d1">Built on Three<br /><em>Core Pillars</em></h2>
           </div>
           <div className="who-grid">
             <div className="who-card reveal">
@@ -256,17 +256,17 @@ export default function Home() {
         <div className="section-inner">
           <div className="stats-grid">
             <div className="stat-item reveal">
-              <div className="stat-number"><span className="countup" data-to="500">0</span><span className="stat-plus">+</span></div>
+              <div className="stat-number"><span className="countup" data-to="300">0</span><span className="stat-plus">+</span></div>
               <div className="stat-bar"></div>
               <div className="stat-label">Active Members</div>
             </div>
             <div className="stat-item reveal d2">
-              <div className="stat-number"><span className="countup" data-to="40">0</span><span className="stat-plus">+</span></div>
+              <div className="stat-number"><span className="countup" data-to="50">0</span><span className="stat-plus">+</span></div>
               <div className="stat-bar"></div>
               <div className="stat-label">Events Conducted</div>
             </div>
             <div className="stat-item reveal d3">
-              <div className="stat-number"><span className="countup" data-to="12">0</span><span className="stat-plus">+</span></div>
+              <div className="stat-number"><span className="countup" data-to="5">0</span><span className="stat-plus">+</span></div>
               <div className="stat-bar"></div>
               <div className="stat-label">Industry Partners</div>
             </div>
@@ -282,7 +282,7 @@ export default function Home() {
       <section id="benefits">
         <div className="section-inner">
           <div className="section-tag reveal">Member Benefits</div>
-          <h2 className="section-title reveal d1">Why Join<br/><em>ISTE MBCET?</em></h2>
+          <h2 className="section-title reveal d1">Why Join<br /><em>ISTE MBCET?</em></h2>
           <div className="benefits-grid">
             <div className="benefit-card reveal">
               <span className="benefit-icon">⚡</span>
@@ -321,19 +321,33 @@ export default function Home() {
       <section id="execom">
         <div className="section-inner">
           <div className="section-tag reveal">Leadership 2024–25</div>
-          <h2 className="section-title reveal d1">Executive<br/><em>Committee</em></h2>
+          <h2 className="section-title reveal d1">Executive<br /><em>Committee</em></h2>
 
-          <div className="execom-sub-label reveal">Faculty Mentors</div>
-          <div className="execom-core" style={{gridTemplateColumns:'repeat(2,1fr)', maxWidth: 560}}>
+          <div className="execom-sub-label reveal">Faculty Advisors</div>
+          <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
+            <div className="execom-card reveal">
+              <div className="execom-avatar">MJ</div>
+              <div className="execom-name">Melvin Jacob</div>
+              <div className="execom-role">Faculty Advisor</div>
+            </div>
+            <div className="execom-card reveal d1">
+              <div className="execom-avatar">S</div>
+              <div className="execom-name">Dr. Soumya A V</div>
+              <div className="execom-role">Faculty Advisor</div>
+            </div>
+          </div>
+
+          <div className="execom-sub-label reveal">Student Mentors</div>
+          <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
             <div className="execom-card reveal">
               <div className="execom-avatar">KB</div>
               <div className="execom-name">Kiran Biju</div>
-              <div className="execom-role">Faculty Mentor</div>
+              <div className="execom-role">Student Mentor</div>
             </div>
             <div className="execom-card reveal d1">
               <div className="execom-avatar">KP</div>
               <div className="execom-name">Krishna Prashanth</div>
-              <div className="execom-role">Faculty Mentor</div>
+              <div className="execom-role">Student Mentor</div>
             </div>
           </div>
 
@@ -365,12 +379,12 @@ export default function Home() {
           <div className="execom-sub-label reveal">Team Leads</div>
           <div className="execom-teams">
             {[
-              { id: 'EM', name: '[Event Management Lead]', team: 'Event Management Team' },
-              { id: 'DT', name: '[Design Lead]', team: 'Design Team', delay: 'd1' },
-              { id: 'ST', name: '[Sponsorship Lead]', team: 'Sponsorship Team', delay: 'd2' },
-              { id: 'PR', name: '[PR & Media Lead]', team: 'PR and Media Team', delay: 'd1' },
-              { id: 'CD', name: '[Content Lead]', team: 'Content & Documentation Team', delay: 'd2' },
-              { id: 'SH', name: '[SHE Team Lead]', team: 'SHE Team', delay: 'd3' },
+              { id: 'EM', name: 'Jenza Mary Jose', team: 'Event Management Team', subs: [{ id: 'AM', name: 'Adithyan M S' }, { id: 'DK', name: 'Dhiya K' }, { id: 'AA', name: 'Avantika Ajaykumar' }, { id: 'DU', name: 'Devanandan P Unnithan' }, { id: 'FM', name: 'Firose Muhammed S' }] },
+              { id: 'DT', name: '[Design Lead]', team: 'Design Team', delay: 'd1', subs: [{ id: 'DS', name: 'Devananda S R' }, { id: 'NN', name: 'Neha Nevin' }] },
+              { id: 'ST', name: 'Neil Philip Koshy', team: 'Sponsorship Team', delay: 'd2', subs: [{ id: 'AS', name: 'Abhishek S S' }, { id: 'CG', name: 'Christopher George' }] },
+              { id: 'PR', name: 'Adhithya Mohan S', team: 'PR and Media Team', delay: 'd1', subs: [{ id: 'RD', name: 'Rohin Daniel John' }, { id: 'RG', name: 'Rogin' }, { id: 'AS', name: 'Abhishek S' }, { id: 'VP', name: 'Vishwabala P' }] },
+              { id: 'CD', name: 'Aparna Rajagopal', team: 'Content & Documentation Team', delay: 'd2', subs: [{ id: 'AN', name: 'Angelina R Nambiar' }, { id: 'DA', name: 'Devikrishna A R' }, { id: 'SO', name: 'Sneha A Oommen' }] },
+              { id: 'SH', name: 'Angel Rose Prince', team: 'SHE Team', delay: 'd3', subs: [{ id: 'AA', name: 'Adia Ani' }, { id: 'AB', name: 'Aishwarya Balakrishnan Menon' }, { id: 'AS', name: 'Anagha S' }] },
             ].map((team, idx) => (
               <div key={idx} className={`team-card reveal ${team.delay || ''}`} onClick={toggleTeam}>
                 <div className="team-head">
@@ -384,14 +398,12 @@ export default function Home() {
                   <div className="team-toggle">▾</div>
                 </div>
                 <div className="team-subs">
-                  <div className="sub-member">
-                    <div className="sub-avatar">S1</div>
-                    <div><div className="sub-name">[Sub-head Name]</div><div className="sub-role">Sub-head</div></div>
-                  </div>
-                  <div className="sub-member">
-                    <div className="sub-avatar">S2</div>
-                    <div><div className="sub-name">[Sub-head Name]</div><div className="sub-role">Sub-head</div></div>
-                  </div>
+                  {team.subs.map((sub, sIdx) => (
+                    <div key={sIdx} className="sub-member">
+                      <div className="sub-avatar">{sub.id}</div>
+                      <div><div className="sub-name">{sub.name}</div><div className="sub-role">Sub-head</div></div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -400,18 +412,18 @@ export default function Home() {
           <div className="execom-sub-label reveal">Junior ExeCom</div>
           <div className="junior-grid">
             {[
-              { id: 'GW', name: 'Govind Warrier',         role: 'Event Management Team' },
-              { id: 'AP', name: 'S. Abarna Prasad',        role: 'Event Management Team' },
-              { id: 'RV', name: 'R. Vishakh',              role: 'Design Team' },
-              { id: 'CB', name: 'Charu B. Eshwar',         role: 'Design Team' },
-              { id: 'GJ', name: 'Gopika J.R.',             role: 'PR & Media Team' },
-              { id: 'EM', name: 'Eshan M.S.',              role: 'PR & Media Team' },
-              { id: 'RH', name: 'R. Hari Krishnan',        role: 'PR & Media Team' },
-              { id: 'SB', name: 'Sona Biju',               role: 'PR & Media Team' },
-              { id: 'GP', name: 'Gourilekshmi Prashanth',  role: 'PR & Media Team' },
-              { id: 'AN', name: 'Ashiya Noufal',           role: 'SHE Team' },
-              { id: 'SK', name: 'Sreya Krishna',           role: 'SHE Team' },
-              { id: 'GA', name: 'Ganga A.B.',              role: 'Content & Documentation' },
+              { id: 'GW', name: 'Govind Warrier', role: 'Event Management Team' },
+              { id: 'AP', name: 'S. Abarna Prasad', role: 'Event Management Team' },
+              { id: 'RV', name: 'R. Vishakh', role: 'Design Team' },
+              { id: 'CB', name: 'Charu B. Eshwar', role: 'Design Team' },
+              { id: 'GJ', name: 'Gopika J.R.', role: 'PR & Media Team' },
+              { id: 'EM', name: 'Eshan M.S.', role: 'PR & Media Team' },
+              { id: 'RH', name: 'R. Hari Krishnan', role: 'PR & Media Team' },
+              { id: 'SB', name: 'Sona Biju', role: 'PR & Media Team' },
+              { id: 'GP', name: 'Gourilekshmi Prashanth', role: 'PR & Media Team' },
+              { id: 'AN', name: 'Ashiya Noufal', role: 'SHE Team' },
+              { id: 'SK', name: 'Sreya Krishna', role: 'SHE Team' },
+              { id: 'GA', name: 'Ganga A.B.', role: 'Content & Documentation' },
             ].map((m, i) => (
               <div key={i} className={`junior-card reveal ${['', 'd1', 'd2', 'd3', 'd1', 'd2', 'd3', 'd4', '', 'd1', 'd2', 'd3'][i]}`}>
                 <div className="junior-avatar">{m.id}</div>
@@ -426,23 +438,79 @@ export default function Home() {
       <section id="events">
         <div className="section-inner">
           <div className="section-tag reveal">Events</div>
-          <h2 className="section-title reveal d1">Recent &amp;<br/><em>Upcoming</em></h2>
+          <h2 className="section-title reveal d1">Recent &amp;<br /><em>Upcoming</em></h2>
           <div className="events-list">
             <div className="event-row reveal">
-              <div className="event-date">APR 2025</div>
+              <div className="event-date">MAR 2026</div>
               <div>
-                <div className="event-title">TechFusion 2025</div>
-                <div className="event-type">Annual Technical Symposium</div>
+                <div className="event-title">Engineering your own Path</div>
+                <div className="event-type">IEEE Collab &middot;</div>
               </div>
               <div className="event-arrow">→</div>
             </div>
             <div className="event-row reveal">
-              <div className="event-date">MAR 2025</div>
+              <div className="event-date">MAR 2026</div>
               <div>
-                <div className="event-title">AI & Machine Learning Bootcamp</div>
-                <div className="event-type">Workshop &middot; 2 Days</div>
+                <div className="event-title">Unseen Problem</div>
+                <div className="event-type">IEEE Collab &middot;</div>
               </div>
               <div className="event-arrow">→</div>
+            </div>
+            <div className="event-row reveal">
+              <div className="event-date">MAR 2026</div>
+              <div>
+                <div className="event-title">Lumera</div>
+                <div className="event-type">IEEE Collab &middot;</div>
+              </div>
+              <div className="event-arrow">→</div>
+            </div>
+            <div className="event-row reveal">
+              <div className="event-date">MAR 2026</div>
+              <div>
+                <div className="event-title">From dropshipping to building AI</div>
+                <div className="event-type">IEEE Collab &middot;</div>
+              </div>
+              <div className="event-arrow">→</div>
+            </div>
+            <div className="event-row reveal">
+              <div className="event-date">MAR 2026</div>
+              <div>
+                <div className="event-title">SKILL MAAYA- 3 Day Learning Bootcamp</div>
+                <div className="event-type">3 Day Interactive Online Workshop &middot;</div>
+              </div>
+              <div className="event-arrow">→</div>
+            </div>
+            <div className="event-row reveal">
+              <div className="event-date">JAN 2026</div>
+              <div>
+                <div className="event-title">Nexora 26'</div>
+                <div className="event-type">All Kerala Annual ISTE Student's Convention &middot;</div>
+              </div>
+              <div className="event-arrow">→</div>
+            </div>
+            <div className="event-row reveal">
+              <div className="event-date">NOV 2025</div>
+              <div>
+                <div className="event-title">Through My Younger Eyes Poster Challenge</div>
+                <div className="event-type">Competition &middot;</div>
+              </div>
+              <div className="event-arrow">→</div>
+            </div>
+            <div className="event-row reveal">
+              <div className="event-date">OCT 2025</div>
+              <div>
+                <div className="event-title">Rising Tuskers</div>
+                <div className="event-type">A Footbal based Fun event in collab with Kombans Fanatics &middot;</div>
+              </div>
+              <div className="event-arrow">→</div>
+            </div>
+            <div className="event-row reveal">
+              <div className="event-date">OCT 2025</div>
+              <div>
+                <div className="event-title">ISTE CONNECT</div>
+                <div className="event-type">An Interactive session with new ISTE Members &middot;</div>
+              </div>
+              <div className="event-arrow">&rarr;</div>
             </div>
             <div className="event-row reveal">
               <div className="event-date">FEB 2025</div>
@@ -450,7 +518,7 @@ export default function Home() {
                 <div className="event-title">KeralaHack 2025</div>
                 <div className="event-type">24-Hour Hackathon</div>
               </div>
-              <div className="event-arrow">→</div>
+              <div className="event-arrow">&rarr;</div>
             </div>
             <div className="event-row reveal">
               <div className="event-date">JAN 2025</div>
@@ -458,15 +526,7 @@ export default function Home() {
                 <div className="event-title">Industry Connect — ISRO Alumni Talk</div>
                 <div className="event-type">Speaker Session</div>
               </div>
-              <div className="event-arrow">→</div>
-            </div>
-            <div className="event-row reveal">
-              <div className="event-date">DEC 2024</div>
-              <div>
-                <div className="event-title">PCB Design & IoT Workshop</div>
-                <div className="event-type">Workshop &middot; 3 Days</div>
-              </div>
-              <div className="event-arrow">→</div>
+              <div className="event-arrow">&rarr;</div>
             </div>
           </div>
         </div>
@@ -475,7 +535,7 @@ export default function Home() {
       <section id="membership">
         <div className="section-inner">
           <div className="section-tag reveal">Enroll Now</div>
-          <h2 className="section-title reveal d1">Grab Your<br/><em>Membership</em></h2>
+          <h2 className="section-title reveal d1">Grab Your<br /><em>Membership</em></h2>
           <div className="mem-grid">
             <div>
               <p className="mem-body reveal">
@@ -517,9 +577,10 @@ export default function Home() {
                     <label htmlFor="dp">Department</label>
                     <select id="dp" required>
                       <option value="">Select</option>
-                      <option>Computer Science</option>
-                      <option>Information Technology</option>
+                      <option>Computer Science Engineering</option>
+                      <option>CSE with AI</option>
                       <option>Electronics &amp; Communication</option>
+                      <option>Electrical &amp; Computer Engineering</option>
                       <option>Electrical Engineering</option>
                       <option>Mechanical Engineering</option>
                       <option>Civil Engineering</option>
@@ -550,6 +611,116 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="testimonials" className="testimonials-section">
+        <div className="testi-header">
+          <h2>Testimonials</h2>
+        </div>
+
+        <div className="marquee-wrapper">
+          <div className="marquee-content">
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"Performance is key for us, and joining ISTE was the best decision. Highly recommended for exposure."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Emily" alt="Emily Watson" />
+                <div>
+                  <div className="testi-name">Emily Watson</div>
+                  <div className="testi-role">3rd Year CSE</div>
+                </div>
+              </div>
+            </div>
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"The aesthetics are top-notch. It gives my college experience a premium look without hiring a designer."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=David" alt="David Park" />
+                <div>
+                  <div className="testi-name">David Park</div>
+                  <div className="testi-role">Indie Hacker</div>
+                </div>
+              </div>
+            </div>
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"Finally, a community that actually considers accessibility and growth as a first-class citizen. A joy to be in."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica" alt="Jessica Li" />
+                <div>
+                  <div className="testi-name">Jessica Li</div>
+                  <div className="testi-role">UX Researcher</div>
+                </div>
+              </div>
+            </div>
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"The peer-to-peer learning environment helped me land my first tech internship. Invaluable network."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun" alt="Arjun M" />
+                <div>
+                  <div className="testi-name">Arjun M</div>
+                  <div className="testi-role">Tech Lead</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Duplicates for infinite scroll */}
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"Performance is key for us, and joining ISTE was the best decision. Highly recommended for exposure."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Emily" alt="Emily Watson" />
+                <div>
+                  <div className="testi-name">Emily Watson</div>
+                  <div className="testi-role">3rd Year CSE</div>
+                </div>
+              </div>
+            </div>
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"The aesthetics are top-notch. It gives my college experience a premium look without hiring a designer."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=David" alt="David Park" />
+                <div>
+                  <div className="testi-name">David Park</div>
+                  <div className="testi-role">Indie Hacker</div>
+                </div>
+              </div>
+            </div>
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"Finally, a community that actually considers accessibility and growth as a first-class citizen. A joy to be in."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica" alt="Jessica Li" />
+                <div>
+                  <div className="testi-name">Jessica Li</div>
+                  <div className="testi-role">UX Researcher</div>
+                </div>
+              </div>
+            </div>
+            <div className="testi-card">
+              <div className="testi-quote-icon">“</div>
+              <div className="testi-text">"The peer-to-peer learning environment helped me land my first tech internship. Invaluable network."</div>
+              <div className="testi-divider"></div>
+              <div className="testi-author">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun" alt="Arjun M" />
+                <div>
+                  <div className="testi-name">Arjun M</div>
+                  <div className="testi-role">Tech Lead</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       <footer>
         <div className="footer-top">
           <div>
@@ -573,17 +744,14 @@ export default function Home() {
           <div>
             <div className="footer-col-title">Follow Us</div>
             <ul className="footer-links">
-              <li><a href="#">Instagram</a></li>
-              <li><a href="#">LinkedIn</a></li>
-              <li><a href="#">Twitter / X</a></li>
-              <li><a href="#">YouTube</a></li>
-              <li><a href="#">GitHub</a></li>
+              <li><a href="https://www.instagram.com/iste_mbcet/">Instagram</a></li>
+              <li><a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a></li>
             </ul>
           </div>
           <div>
             <div className="footer-col-title">Contact</div>
             <ul className="footer-links">
-              <li><a href="mailto:iste@mbcet.ac.in">iste@mbcet.ac.in</a></li>
+              <li><a href="mailto:istestudentchapter@mbcet.ac.in">istestudentchapter@mbcet.ac.in</a></li>
               <li><a href="#">MBCET, Nalanchira</a></li>
               <li><a href="#">Thiruvananthapuram</a></li>
               <li><a href="#">Kerala — 695 015</a></li>
@@ -591,11 +759,10 @@ export default function Home() {
           </div>
         </div>
         <div className="footer-bottom">
-          <div className="footer-copy">© 2025 ISTE MBCET Student's Chapter &nbsp;&middot;&nbsp; KE065. All rights reserved.</div>
+          <div className="footer-copy">© 2026 ISTE MBCET Student's Chapter &nbsp;&middot;&nbsp; KE065. All rights reserved.</div>
           <div className="footer-socials">
-            <a href="#">Instagram</a>
-            <a href="#">LinkedIn</a>
-            <a href="#">Twitter</a>
+            <a href="https://www.instagram.com/iste_mbcet/">Instagram</a>
+            <a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a>
           </div>
         </div>
       </footer>
