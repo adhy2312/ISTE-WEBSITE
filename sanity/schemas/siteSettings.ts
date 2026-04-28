@@ -8,6 +8,18 @@ export const siteSettingsSchema = defineType({
   __experimental_actions: ['update', 'publish'],
   fields: [
     defineField({
+      name: 'heroHeadline',
+      title: 'Hero Headline',
+      description: 'The main big cinematic text.',
+      type: 'string',
+    }),
+    defineField({
+      name: 'heroDescription',
+      title: 'Hero Description',
+      description: 'The subtext under the cinematic headline.',
+      type: 'string',
+    }),
+    defineField({
       name: 'heroSubtitle',
       title: 'Hero Subtitle',
       description: 'Shown below the animated heading. e.g. "Innovation · Technology · Excellence"',

@@ -57,6 +57,8 @@ export const testimonialsQuery = groq`
 
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings"][0] {
+    heroHeadline,
+    heroDescription,
     heroSubtitle,
     heroTypedText,
     aboutTitle,
@@ -68,6 +70,45 @@ export const siteSettingsQuery = groq`
   }
 `
 
+export const internshipsQuery = groq`
+  *[_type == "internship"] | order(order asc, deadline asc) {
+    _id,
+    company,
+    role,
+    type,
+    domain,
+    stipend,
+    duration,
+    deadline,
+    deadlineLabel,
+    description,
+    applyLink,
+    status,
+    featured,
+    order,
+    logo {
+      asset->,
+      hotspot,
+      crop,
+    },
+  }
+`
+
+export const featuredInternshipsQuery = groq`
+  *[_type == "internship" && featured == true && status == "open"] | order(order asc) [0...3] {
+    _id,
+    company,
+    role,
+    type,
+    domain,
+    stipend,
+    duration,
+    deadlineLabel,
+    applyLink,
+    status,
+  }
+`
+
 export const homePageQuery = groq`
   {
     "events": ${eventsQuery},
@@ -75,5 +116,6 @@ export const homePageQuery = groq`
     "stats": ${statsQuery},
     "testimonials": ${testimonialsQuery},
     "settings": ${siteSettingsQuery},
+    "featuredInternships": ${featuredInternshipsQuery},
   }
 `

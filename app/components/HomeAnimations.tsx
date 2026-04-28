@@ -69,6 +69,41 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Mobile hamburger menu
+  useEffect(() => {
+    const hamburger = document.getElementById('hamburger')
+    const mobMenu   = document.getElementById('mob-menu')
+    const mobClose  = document.getElementById('mob-close')
+    if (!hamburger || !mobMenu || !mobClose) return
+
+    const open = () => {
+      mobMenu.classList.add('open')
+      document.body.style.overflow = 'hidden'
+    }
+    const close = () => {
+      mobMenu.classList.remove('open')
+      document.body.style.overflow = ''
+    }
+
+    hamburger.addEventListener('click', open)
+    mobClose.addEventListener('click', close)
+
+    // Close on any mob-link click
+    const links = mobMenu.querySelectorAll('.mob-link, .mob-cta')
+    links.forEach(l => l.addEventListener('click', close))
+
+    // Close on backdrop click
+    mobMenu.addEventListener('click', (e) => {
+      if (e.target === mobMenu) close()
+    })
+
+    return () => {
+      hamburger.removeEventListener('click', open)
+      mobClose.removeEventListener('click', close)
+      links.forEach(l => l.removeEventListener('click', close))
+    }
+  }, [])
+
   // Hero Typing
   useEffect(() => {
     const typedSpan = document.getElementById('typed-out') as HTMLSpanElement | null

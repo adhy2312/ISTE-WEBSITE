@@ -3,6 +3,7 @@ import { execomMemberSchema } from './execomMember'
 import { statSchema } from './stat'
 import { testimonialSchema } from './testimonial'
 import { siteSettingsSchema } from './siteSettings'
+import { internshipSchema } from './internship'
 
 export const schemaTypes = [
   eventSchema,
@@ -10,4 +11,5 @@ export const schemaTypes = [
   statSchema,
   testimonialSchema,
   siteSettingsSchema,
+  internshipSchema,
 ]

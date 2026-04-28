@@ -1,6 +1,7 @@
 import { draftMode } from 'next/headers'
 import { getClient } from '@/lib/sanity/client'
 import Image from 'next/image'
+import Link from 'next/link'
 import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import TeamCard from '@/app/components/TeamCard'
@@ -92,6 +93,7 @@ export default async function Home() {
   const stats = sanityData?.stats?.length ? sanityData.stats : FALLBACK_STATS
   const testimonials = sanityData?.testimonials?.length ? sanityData.testimonials : FALLBACK_TESTIMONIALS
   const settings = sanityData?.settings || {}
+  const featuredInternships: any[] = sanityData?.featuredInternships || []
 
   const heroSubtitle = settings.heroSubtitle || 'Innovation · Technology · Excellence'
   const heroTypedText = settings.heroTypedText || "ISTE MBCET STUDENT'S CHAPTER"
@@ -125,19 +127,40 @@ export default async function Home() {
       <div className="c-ring" id="cring"></div>
 
       <nav id="navbar">
-        <a href="#hero" className="nav-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" /><span>ISTE SC MBCET™</span></a>
+        <a href="#hero" className="nav-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" /><span>ISTE SC MBCET</span></a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
           <li><a href="#who">Who We Are</a></li>
           <li><a href="#benefits">Benefits</a></li>
           <li><a href="#execom">ExeCom</a></li>
           <li><a href="#events">Events</a></li>
+          <li><Link href="/internships" className="nav-link-highlight">Launchpad ✦</Link></li>
         </ul>
         <a href="#membership" className="nav-cta">Join Now</a>
         <div className="nav-hamburger" id="hamburger">
           <span></span><span></span><span></span>
         </div>
       </nav>
+
+      {/* ===== MOBILE MENU OVERLAY ===== */}
+      <div className="mob-menu" id="mob-menu">
+        <div className="mob-menu-inner">
+          <button className="mob-close" id="mob-close" aria-label="Close menu">✕</button>
+          <nav className="mob-nav">
+            <a href="#about"    className="mob-link" id="ml-1">About</a>
+            <a href="#who"      className="mob-link" id="ml-2">Who We Are</a>
+            <a href="#benefits" className="mob-link" id="ml-3">Benefits</a>
+            <a href="#execom"   className="mob-link" id="ml-4">ExeCom</a>
+            <a href="#events"   className="mob-link" id="ml-5">Events</a>
+            <Link href="/internships" className="mob-link mob-link--accent" id="ml-6">Internship Launchpad ✦</Link>
+          </nav>
+          <a href="#membership" className="mob-cta">Join Now →</a>
+          <div className="mob-footer">
+            <a href="https://www.instagram.com/iste_mbcet/">Instagram</a>
+            <a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a>
+          </div>
+        </div>
+      </div>
 
       <section id="hero">
         <div className="hero-content">
@@ -402,10 +425,70 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ===================== INTERNSHIP LAUNCHPAD TEASER ===================== */}
+      <section id="launchpad" style={{ background: 'var(--black)', borderTop: '1px solid var(--border)' }}>
+        <div className="section-inner">
+          <div className="section-tag reveal">Member Resources</div>
+          <div className="launchpad-teaser-grid">
+            <div>
+              <h2 className="section-title reveal d1">Internship<br /><em>Launchpad</em></h2>
+              <p className="section-body reveal d2" style={{ marginTop: '24px' }}>
+                Curated internship opportunities, verified and posted by the ISTE MBCET team — exclusively for our members.
+              </p>
+              <Link href="/internships" className="launchpad-cta reveal d3">
+                Explore All Opportunities →
+              </Link>
+            </div>
+            <div className="launchpad-preview">
+              {featuredInternships.length > 0 ? (
+                featuredInternships.map((intern: any, i: number) => (
+                  <a
+                    key={intern._id}
+                    href={intern.applyLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`launchpad-preview-card reveal ${['d1','d2','d3'][i]}`}
+                  >
+                    <div className="lp-role">{intern.role}</div>
+                    <div className="lp-company">{intern.company}</div>
+                    <div className="lp-meta">
+                      {intern.type && <span>{intern.type}</span>}
+                      {intern.stipend && <span>{intern.stipend}</span>}
+                    </div>
+                    <div className="lp-arrow">→</div>
+                  </a>
+                ))
+              ) : (
+                <>
+                  <div className="launchpad-preview-card reveal d1">
+                    <div className="lp-role">Software Engineering Intern</div>
+                    <div className="lp-company">TechCorp India</div>
+                    <div className="lp-meta"><span>Remote</span><span>₹15,000/mo</span></div>
+                    <div className="lp-arrow">→</div>
+                  </div>
+                  <div className="launchpad-preview-card reveal d2">
+                    <div className="lp-role">UI/UX Design Intern</div>
+                    <div className="lp-company">DesignHub Studios</div>
+                    <div className="lp-meta"><span>Hybrid</span><span>₹10,000/mo</span></div>
+                    <div className="lp-arrow">→</div>
+                  </div>
+                  <div className="launchpad-preview-card reveal d3">
+                    <div className="lp-role">Data Science Intern</div>
+                    <div className="lp-company">DataWave Analytics</div>
+                    <div className="lp-meta"><span>Remote</span><span>₹12,000/mo</span></div>
+                    <div className="lp-arrow">→</div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <footer>
         <div className="footer-top">
           <div>
-            <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET™" width={80} height={80} className="footer-logo-img" /></div>
+            <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={80} height={80} className="footer-logo-img" /></div>
             <div className="footer-tagline">
               Indian Society for Technical Education — Mar Baselios College of Engineering and Technology Student Chapter, Kerala.
             </div>
@@ -419,6 +502,7 @@ export default async function Home() {
               <li><a href="#benefits">Benefits</a></li>
               <li><a href="#execom">ExeCom</a></li>
               <li><a href="#events">Events</a></li>
+              <li><Link href="/internships">Internship Launchpad</Link></li>
               <li><a href="#membership">Join Now</a></li>
             </ul>
           </div>
