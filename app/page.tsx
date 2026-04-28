@@ -400,7 +400,8 @@ export default async function Home() {
 
       <section id="testimonials" className="testimonials-section">
         <div className="testi-header">
-          <h2>Testimonials</h2>
+          <div className="section-tag">Member Voices</div>
+          <h2 className="section-title">What Our<br /><em>Members Say</em></h2>
         </div>
         <div className="marquee-wrapper">
           <div className="marquee-content">
