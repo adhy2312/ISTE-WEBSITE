@@ -30,6 +30,11 @@ export const execomMembersQuery = groq`
     subMembers[] {
       name,
       initials,
+      photo {
+        asset->,
+        hotspot,
+        crop,
+      },
     }
   }
 `

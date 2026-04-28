@@ -321,7 +321,7 @@
     }
 
     /* Photo mode — real image from Sanity */
-    .execom-avatar--photo { background: var(--g900); border-color: rgba(255,255,255,0.18); }
+    .execom-avatar--photo { background: var(--g900); border-color: rgba(255,255,255,0.35); box-shadow: 0 0 0 2px rgba(255,255,255,0.07); }
     .execom-avatar--photo img {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
@@ -335,8 +335,8 @@
 
     /* Placeholder mode — silhouette + initials */
     .execom-avatar--placeholder {
-      background: linear-gradient(135deg, var(--g800) 0%, rgba(255,255,255,0.04) 100%);
-      border: 1px dashed rgba(255,255,255,0.18);
+      background: linear-gradient(135deg, var(--g800) 0%, rgba(255,255,255,0.06) 100%);
+      border: 1px dashed rgba(255,255,255,0.25);
       flex-direction: column; gap: 0;
     }
     .execom-avatar--placeholder svg {

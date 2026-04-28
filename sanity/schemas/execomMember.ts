@@ -63,12 +63,19 @@ export const execomMemberSchema = defineType({
       of: [
         {
           type: 'object',
+          name: 'subMember',
           fields: [
             defineField({ name: 'name', title: 'Name', type: 'string' }),
             defineField({ name: 'initials', title: 'Initials', type: 'string' }),
+            defineField({
+              name: 'photo',
+              title: 'Photo (optional)',
+              type: 'image',
+              options: { hotspot: true },
+            }),
           ],
           preview: {
-            select: { title: 'name', subtitle: 'initials' },
+            select: { title: 'name', subtitle: 'initials', media: 'photo' },
           },
         },
       ],

@@ -48,8 +48,8 @@ export default function ExecomAvatar({ photo, photoUrl, initials, name, size = '
   return (
     <div className={`execom-avatar execom-avatar--placeholder execom-avatar--${size}`} title="Upload photo in Sanity Studio">
       <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="40" cy="30" r="16" fill="currentColor" opacity="0.35" />
-        <path d="M10 72c0-16.569 13.431-30 30-30s30 13.431 30 30" fill="currentColor" opacity="0.25" />
+        <circle cx="40" cy="30" r="16" fill="currentColor" opacity="0.6" />
+        <path d="M10 72c0-16.569 13.431-30 30-30s30 13.431 30 30" fill="currentColor" opacity="0.45" />
       </svg>
       <span className="execom-avatar__initials">{initials}</span>
     </div>

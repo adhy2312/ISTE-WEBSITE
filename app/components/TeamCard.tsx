@@ -5,6 +5,7 @@ import ExecomAvatar from './ExecomAvatar'
 interface SubMember {
   name: string
   initials: string
+  photo?: any
 }
 
 interface TeamCardProps {
@@ -39,7 +40,7 @@ export default function TeamCard({ id, name, team, delay, subs, photo }: TeamCar
       <div className="team-subs">
         {subs.map((sub, sIdx) => (
           <div key={sIdx} className="sub-member">
-            <ExecomAvatar photoUrl={null} initials={sub.initials} name={sub.name} size="sm" />
+            <ExecomAvatar photo={sub.photo ?? null} initials={sub.initials} name={sub.name} size="sm" />
             <div>
               <div className="sub-name">{sub.name}</div>
               <div className="sub-role">Sub-head</div>
