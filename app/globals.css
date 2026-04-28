@@ -97,8 +97,11 @@
     }
     .nav-cta:hover { background: var(--g200); }
 
-    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-    .nav-hamburger span { width: 24px; height: 1px; background: var(--white); transition: .3s; }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px; cursor: pointer;
+      padding: 8px; margin: -8px; /* enlarge tap target */
+    }
+    .nav-hamburger span { width: 22px; height: 1.5px; background: var(--white); transition: .3s; display:block; }
 
     /* ===================== HERO ===================== */
     #hero {
@@ -833,61 +836,113 @@
     }
 
     @media (max-width:768px) {
-      section { padding:70px 24px; }
-      nav, nav.scrolled { padding-left:20px; padding-right:20px; }
-      footer { padding:50px 24px 28px; }
-      .nav-links, .nav-cta { display:none !important; }
-      .nav-hamburger { display:flex; }
-      .who-grid, .benefits-grid { grid-template-columns:1fr; }
-      .execom-core, .execom-teams { grid-template-columns:repeat(2,1fr); gap:12px; }
-      .junior-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
-      .internship-grid { grid-template-columns:1fr; }
-      .launchpad-teaser-grid { grid-template-columns:1fr; gap:40px; }
-      .footer-top { grid-template-columns:1fr; gap:32px; }
-      .footer-bottom { flex-direction:column; gap:18px; text-align:center; }
-      .event-row { grid-template-columns:80px 1fr; gap:16px; }
-      .event-arrow { display:none; }
-      .hero-headline { font-size:1.5rem; letter-spacing:.03em; }
-      .hero-badge { font-size:.58rem; letter-spacing:.22em; padding:5px 16px; }
-      .about-grid { grid-template-columns:1fr; gap:40px; }
-      .about-visual { height:220px; }
-      .about-code-big { font-size:4rem; }
-      .stats-grid { grid-template-columns:repeat(2,1fr); gap:28px; }
-      .stat-number { font-size:clamp(2.5rem,8vw,3.5rem); }
-      .mem-grid { grid-template-columns:1fr; gap:40px; }
-      .mem-form { padding:32px 24px; }
-      .form-row { grid-template-columns:1fr; }
-      .intern-footer { flex-direction:column; gap:12px; align-items:flex-start; }
-      .intern-apply-btn { width:100%; text-align:center; }
-      .section-title { font-size:clamp(1.8rem,6vw,2.8rem); }
-      .testi-card { width:300px; padding:28px 24px; }
-      body { cursor:auto; }
-      .c-dot, .c-ring { display:none; }
+      /* Prevent any horizontal overflow */
+      html, body { overflow-x: hidden; }
+
+      section { padding: 64px 20px; }
+      nav, nav.scrolled { padding: 16px 20px; }
+      footer { padding: 50px 20px 28px; }
+
+      /* Nav: hide desktop items, show hamburger */
+      .nav-links, .nav-cta { display: none !important; }
+      .nav-hamburger { display: flex; }
+
+      /* Nav logo — tighter on small screen */
+      .nav-logo { font-size: .72rem; letter-spacing: .1em; gap: 8px; }
+      .logo-img { width: 32px !important; height: 32px !important; }
+
+      /* Hero */
+      .hero-headline { font-size: 1.4rem; letter-spacing: .03em; }
+      .hero-badge { font-size: .56rem; letter-spacing: .18em; padding: 5px 14px; }
+
+      /* Section titles */
+      .section-title { font-size: clamp(1.7rem, 5.5vw, 2.6rem); }
+      .section-body { font-size: .9rem; }
+
+      /* About */
+      .about-grid { grid-template-columns: 1fr; gap: 36px; }
+      .about-visual { height: 200px; }
+      .about-code-big { font-size: 3.5rem; }
+
+      /* Stats */
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 0; }
+      #stats { padding: 80px 20px; }
+      .stat-number { font-size: clamp(2.2rem, 7vw, 3rem); }
+
+      /* Who/Benefits — stack to single column */
+      .who-grid { grid-template-columns: 1fr; }
+      .benefits-grid { grid-template-columns: 1fr; gap: 16px; }
+      .benefit-card { padding: 28px 22px; }
+
+      /* ExeCom */
+      .execom-core { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .execom-teams { grid-template-columns: 1fr; gap: 10px; }
+      .junior-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .execom-card { padding: 22px 14px; }
+      .junior-card { padding: 16px 12px; }
+
+      /* Events */
+      .event-row { grid-template-columns: 72px 1fr; gap: 14px; padding: 22px 0; }
+      .event-arrow { display: none; }
+      .event-title { font-size: 1rem; }
+
+      /* Membership */
+      .mem-grid { grid-template-columns: 1fr; gap: 36px; }
+      .mem-form { padding: 28px 20px; }
+      .form-row { grid-template-columns: 1fr; }
+
+      /* Launchpad teaser */
+      .launchpad-teaser-grid { grid-template-columns: 1fr; gap: 36px; }
+      .launchpad-preview-card { padding: 18px 18px; }
+
+      /* Internship full page */
+      .internship-grid { grid-template-columns: 1fr; }
+      .internship-card { padding: 24px 18px; }
+      .intern-footer { flex-direction: column; gap: 10px; align-items: flex-start; }
+      .intern-apply-btn { width: 100%; text-align: center; padding: 14px; }
+
+      /* Testimonials marquee */
+      .testi-card { width: 280px; padding: 24px 20px; }
+
+      /* Footer */
+      .footer-top { grid-template-columns: 1fr; gap: 28px; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+
+      /* Disable expensive effects */
+      body { cursor: auto; }
+      .c-dot, .c-ring { display: none; }
     }
 
-    @media (max-width:480px) {
-      section { padding:60px 18px; }
-      footer { padding:44px 18px 24px; }
-      nav, nav.scrolled { padding-left:16px; padding-right:16px; }
-      .hero-headline { font-size:1.2rem; }
-      .section-title { font-size:1.65rem; }
-      .about-code-big { font-size:3rem; }
-      .execom-core, .execom-teams, .junior-grid { grid-template-columns:1fr; }
-      .stats-grid { grid-template-columns:1fr 1fr; gap:20px; }
-      .stat-number { font-size:2.8rem; }
-      .execom-card { padding:24px 16px; }
-      .junior-card { padding:18px 14px; }
-      .team-head { padding:18px 18px; }
-      .sub-member { padding:12px 18px; }
-      .event-row { grid-template-columns:64px 1fr; gap:10px; padding:18px 0; }
-      .event-title { font-size:1rem; }
-      .benefit-card { padding:32px 24px; }
-      .launchpad-preview-card { padding:18px 20px; }
-      .lp-role { font-size:.9rem; }
-      .internship-card { padding:24px 20px; }
-      .footer-top { gap:28px; }
-      .who-card { padding:36px 28px; }
-      .mob-link { font-size:1.3rem; }
-      .mob-menu-inner { padding:28px 24px 40px; }
+    @media (max-width: 480px) {
+      section { padding: 56px 16px; }
+      nav, nav.scrolled { padding: 14px 16px; }
+      footer { padding: 40px 16px 24px; }
+
+      .hero-headline { font-size: 1.15rem; }
+      .section-title { font-size: 1.55rem; }
+      .about-code-big { font-size: 2.8rem; }
+
+      /* ExeCom to 1 column */
+      .execom-core, .execom-teams, .junior-grid { grid-template-columns: 1fr; }
+
+      /* Stats 2 column */
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 18px; }
+      .stat-number { font-size: 2.5rem; }
+
+      /* Events tighter */
+      .event-row { grid-template-columns: 60px 1fr; gap: 10px; padding: 18px 0; }
+      .event-date { font-size: .6rem; }
+
+      /* Mobile menu tweaks */
+      .mob-menu-inner { padding: 24px 22px 36px; width: 88vw; }
+      .mob-link { font-size: 1.25rem; padding: 12px 0; }
+      .mob-close { margin-bottom: 36px; }
+
+      /* Launchpad */
+      .lp-role { font-size: .88rem; }
+      .launchpad-preview-card { padding: 16px; }
+
+      /* Who grid */
+      .who-card { padding: 32px 22px; }
     }
 

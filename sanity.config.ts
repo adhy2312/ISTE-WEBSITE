@@ -32,6 +32,8 @@ export default defineConfig({
             S.documentTypeListItem('execomMember').title('ExeCom Members'),
             S.documentTypeListItem('stat').title('Stats'),
             S.documentTypeListItem('testimonial').title('Testimonials'),
+            S.divider(),
+            S.documentTypeListItem('internship').title('Internship Launchpad'),
           ]),
     }),
     visionTool(), // GROQ query tester — dev only
