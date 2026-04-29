@@ -107,8 +107,7 @@ export default async function InternshipsPage() {
       {/* Hero */}
       <section id="hero">
         <div className="hero-content">
-          <div className="hero-badge">
-            <div className="badge-dot"></div>
+          <div className="hero-badge reveal">
             ISTE MBCET &nbsp;·&nbsp; Member Resource
           </div>
           <h1 className="hero-headline">
@@ -118,10 +117,7 @@ export default async function InternshipsPage() {
           <div className="hero-divider" id="hero-div"></div>
           <p className="hero-sub" id="hero-sub">Curated opportunities, updated live by the chapter team</p>
         </div>
-        <div className="hero-scroll">
-          <div className="scroll-line"></div>
-          Scroll
-        </div>
+
       </section>
 
       {/* Main Content */}
@@ -144,7 +140,7 @@ export default async function InternshipsPage() {
           ) : (
             <div className="internship-grid">
               {open.map((intern: any, i: number) => (
-                <div key={intern._id} className={`internship-card reveal ${['d1','d2','d3','d4'][i % 4]}`}>
+                <div key={intern._id} className={`internship-card reveal ${['d1', 'd2', 'd3', 'd4'][i % 4]}`}>
                   <div className="intern-card-top">
                     <div className="intern-logo-wrap">
                       {intern.logo?.asset ? (
@@ -205,7 +201,7 @@ export default async function InternshipsPage() {
                 {other.map((intern: any, i: number) => {
                   const statusInfo = STATUS_LABELS[intern.status] || { label: intern.status, color: '#888' }
                   return (
-                    <div key={intern._id} className={`internship-card internship-card--dim reveal ${['d1','d2','d3'][i % 3]}`}>
+                    <div key={intern._id} className={`internship-card internship-card--dim reveal ${['d1', 'd2', 'd3'][i % 3]}`}>
                       <div className="intern-card-top">
                         <div className="intern-logo-wrap">
                           <div className="intern-logo-placeholder">{intern.company.charAt(0)}</div>

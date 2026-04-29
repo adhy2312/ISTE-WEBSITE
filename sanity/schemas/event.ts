@@ -58,6 +58,12 @@ export const eventSchema = defineType({
       type: 'url',
     }),
     defineField({
+      name: 'registrationLink',
+      title: 'Registration Link',
+      description: 'Link for "Register Now" button (only shows for upcoming events)',
+      type: 'url',
+    }),
+    defineField({
       name: 'order',
       title: 'Display Order',
       type: 'number',
@@ -68,6 +74,16 @@ export const eventSchema = defineType({
       title: 'Event Description',
       type: 'array',
       of: [{ type: 'block' }],
+    }),
+    defineField({
+      name: 'fullReport',
+      title: 'Full Event Report',
+      description: 'Post-event detailed report/summary (only shows for past events)',
+      type: 'array',
+      of: [
+        { type: 'block' },
+        { type: 'image', options: { hotspot: true } }
+      ],
     }),
     defineField({
       name: 'gallery',

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
-import GeminiChat from './components/GeminiChat';
+
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' });
@@ -29,7 +29,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         {children}
-        {!isStudio && <GeminiChat />}
+
       </body>
     </html>
   );

@@ -82,6 +82,14 @@ export default async function EventPage({ params }: { params: { slug: string } }
             <span style={{ color: 'var(--g600)' }}>•</span>
             <span style={{ color: event.status === 'upcoming' ? '#4f6ef7' : 'var(--g400)' }}>{event.status === 'upcoming' ? 'UPCOMING' : 'PAST EVENT'}</span>
           </div>
+          {event.status === 'upcoming' && event.registrationLink && (
+            <div className="reveal d2" style={{ marginTop: '32px' }}>
+              <a href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="hero-btn-primary" style={{ display: 'inline-flex' }}>
+                Register Now
+                <span className="hero-btn-arrow">→</span>
+              </a>
+            </div>
+          )}
         </div>
 
         {event.description && (
@@ -101,6 +109,13 @@ export default async function EventPage({ params }: { params: { slug: string } }
                 />
               </div>
             ))}
+          </div>
+        )}
+
+        {event.status === 'past' && event.fullReport && (
+          <div className="event-body-content reveal d4" style={{ marginTop: '20px' }}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', marginBottom: '32px', color: 'var(--white)', borderTop: '1px solid var(--border)', paddingTop: '60px' }}>Full Event Report</h2>
+            <PortableText value={event.fullReport} />
           </div>
         )}
       </main>

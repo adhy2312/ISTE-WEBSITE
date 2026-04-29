@@ -25,7 +25,9 @@ export const eventBySlugQuery = groq`
     eventType,
     status,
     link,
+    registrationLink,
     description,
+    fullReport,
     gallery
   }
 `

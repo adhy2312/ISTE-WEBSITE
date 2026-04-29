@@ -136,6 +136,20 @@
       display: flex; flex-direction: column; align-items: center;
       gap: 24px; padding: 120px 24px 100px; max-width: 860px;
     }
+    
+    .hero-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--g400);
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 100px;
+      margin-bottom: 8px;
+    }
 
     .hero-headline {
       font-family: var(--font-mono);
