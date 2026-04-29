@@ -26,8 +26,14 @@ export const testimonialSchema = defineType({
     defineField({
       name: 'avatarSeed',
       title: 'Avatar Seed',
-      description: 'Used for Dicebear avatar generation. Use the author\'s first name.',
+      description: 'Used for Dicebear avatar generation if photo is not provided.',
       type: 'string',
+    }),
+    defineField({
+      name: 'photo',
+      title: 'Photo (optional)',
+      type: 'image',
+      options: { hotspot: true },
     }),
     defineField({
       name: 'order',

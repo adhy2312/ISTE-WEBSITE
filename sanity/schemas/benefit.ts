@@ -1,0 +1,46 @@
+import { defineField, defineType } from 'sanity'
+
+export const benefitSchema = defineType({
+  name: 'benefit',
+  title: 'Benefit',
+  type: 'document',
+  fields: [
+    defineField({
+      name: 'icon',
+      title: 'Icon (Emoji)',
+      type: 'string',
+      description: 'e.g. "⚡", "🏆", "🌐"',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'body',
+      title: 'Body Text',
+      type: 'text',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+    }),
+  ],
+  orderings: [
+    {
+      title: 'Display Order',
+      name: 'orderAsc',
+      by: [{ field: 'order', direction: 'asc' }],
+    },
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'icon',
+    },
+  },
+})

@@ -32,6 +32,24 @@ export const siteSettingsSchema = defineType({
       type: 'string',
     }),
     defineField({
+      name: 'heroPrimaryCtaLabel',
+      title: 'Hero Primary CTA Label',
+      description: 'e.g. "Become a Member"',
+      type: 'string',
+    }),
+    defineField({
+      name: 'heroSecondaryCtaLabel',
+      title: 'Hero Secondary CTA Label',
+      description: 'e.g. "Explore Events"',
+      type: 'string',
+    }),
+    defineField({
+      name: 'tickerItems',
+      title: 'Ticker Strip Items',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
       name: 'aboutTitle',
       title: 'About Section Title',
       type: 'string',
@@ -41,6 +59,23 @@ export const siteSettingsSchema = defineType({
       title: 'About Body Paragraphs',
       type: 'array',
       of: [{ type: 'text' }],
+    }),
+    defineField({
+      name: 'membershipPerks',
+      title: 'Membership Perks',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'navCtaLabel',
+      title: 'Navbar CTA Label',
+      description: 'e.g. "Join Now"',
+      type: 'string',
+    }),
+    defineField({
+      name: 'footerTagline',
+      title: 'Footer Tagline',
+      type: 'text',
     }),
     defineField({
       name: 'chapterCode',

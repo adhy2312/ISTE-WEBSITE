@@ -12,6 +12,16 @@ export const eventSchema = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'dateLabel',
       title: 'Date Label',
       description: 'e.g. "MAR 2026" — shown on the website',
@@ -52,6 +62,21 @@ export const eventSchema = defineType({
       title: 'Display Order',
       type: 'number',
       description: 'Lower number = shown first',
+    }),
+    defineField({
+      name: 'description',
+      title: 'Event Description',
+      type: 'array',
+      of: [{ type: 'block' }],
+    }),
+    defineField({
+      name: 'gallery',
+      title: 'Event Gallery',
+      type: 'array',
+      of: [{ type: 'image', options: { hotspot: true } }],
+      options: {
+        layout: 'grid',
+      },
     }),
   ],
   orderings: [

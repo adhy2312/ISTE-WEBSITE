@@ -4,12 +4,29 @@ export const eventsQuery = groq`
   *[_type == "event"] | order(order asc, date desc) {
     _id,
     title,
+    "slug": slug.current,
     dateLabel,
     date,
     eventType,
     status,
     link,
     order,
+    "galleryTeaser": gallery[0...3]
+  }
+`
+
+export const eventBySlugQuery = groq`
+  *[_type == "event" && slug.current == $slug][0] {
+    _id,
+    title,
+    "slug": slug.current,
+    dateLabel,
+    date,
+    eventType,
+    status,
+    link,
+    description,
+    gallery
   }
 `
 
@@ -56,6 +73,11 @@ export const testimonialsQuery = groq`
     authorName,
     authorRole,
     avatarSeed,
+    photo {
+      asset->,
+      hotspot,
+      crop,
+    },
     order,
   }
 `
@@ -66,8 +88,14 @@ export const siteSettingsQuery = groq`
     heroDescription,
     heroSubtitle,
     heroTypedText,
+    heroPrimaryCtaLabel,
+    heroSecondaryCtaLabel,
+    tickerItems,
     aboutTitle,
     aboutBody,
+    membershipPerks,
+    navCtaLabel,
+    footerTagline,
     chapterCode,
     contactEmail,
     instagramUrl,
@@ -114,6 +142,24 @@ export const featuredInternshipsQuery = groq`
   }
 `
 
+export const pillarsQuery = groq`
+  *[_type == "pillar"] | order(order asc) {
+    _id,
+    number,
+    title,
+    body,
+  }
+`
+
+export const benefitsQuery = groq`
+  *[_type == "benefit"] | order(order asc) {
+    _id,
+    icon,
+    title,
+    body,
+  }
+`
+
 export const homePageQuery = groq`
   {
     "events": ${eventsQuery},
@@ -122,5 +168,7 @@ export const homePageQuery = groq`
     "testimonials": ${testimonialsQuery},
     "settings": ${siteSettingsQuery},
     "featuredInternships": ${featuredInternshipsQuery},
+    "pillars": ${pillarsQuery},
+    "benefits": ${benefitsQuery},
   }
 `

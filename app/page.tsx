@@ -2,6 +2,7 @@ import { draftMode } from 'next/headers'
 import { getClient } from '@/lib/sanity/client'
 import Image from 'next/image'
 import Link from 'next/link'
+import { urlForImage } from '@/lib/sanity/image'
 import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import TeamCard from '@/app/components/TeamCard'
@@ -94,9 +95,35 @@ export default async function Home() {
   const testimonials = sanityData?.testimonials?.length ? sanityData.testimonials : FALLBACK_TESTIMONIALS
   const settings = sanityData?.settings || {}
   const featuredInternships: any[] = sanityData?.featuredInternships || []
+  const pillars: any[] = sanityData?.pillars || []
+  const benefits: any[] = sanityData?.benefits || []
 
   const heroSubtitle = settings.heroSubtitle || 'Innovation · Technology · Excellence'
   const heroTypedText = settings.heroTypedText || "ISTE MBCET STUDENT'S CHAPTER"
+  const heroDescription = settings.heroDescription || "The official student chapter of the Indian Society for Technical Education at Mar Baselios College of Engineering and Technology — where engineers build the future, faster."
+  const heroPrimaryCta = settings.heroPrimaryCtaLabel || "Become a Member"
+  const heroSecondaryCta = settings.heroSecondaryCtaLabel || "Explore Events"
+  const navCta = settings.navCtaLabel || "Join Now"
+  const footerTagline = settings.footerTagline || "Indian Society for Technical Education — Mar Baselios College of Engineering and Technology Student Chapter, Kerala."
+
+  // Default ticker array if not provided in Sanity
+  const tickerItems = settings.tickerItems?.length ? settings.tickerItems : [
+    'Indian Society for Technical Education',
+    'KE065',
+    'Mar Baselios College of Engineering and Technology',
+    'Innovate.',
+    'Engineer.',
+    'Inspire.'
+  ]
+
+  // Default perks if not provided in Sanity
+  const membershipPerks = settings.membershipPerks?.length ? settings.membershipPerks : [
+    'Official ISTE membership card — valid nationally',
+    'Priority access to all chapter events and workshops',
+    'ISTE journals, research publications & digital resources',
+    'Exclusive internship & placement referral network',
+    'Certificates of participation for every ISTE event'
+  ]
 
   // Build execom lists from Sanity or fallback
   const members = sanityData?.execomMembers || []
@@ -126,6 +153,14 @@ export default async function Home() {
       <div className="c-dot" id="cdot"></div>
       <div className="c-ring" id="cring"></div>
 
+      <div className="grid-lines">
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+      </div>
+
       <nav id="navbar">
         <a href="#hero" className="nav-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" /><span>ISTE SC MBCET</span></a>
         <ul className="nav-links">
@@ -136,7 +171,7 @@ export default async function Home() {
           <li><a href="#events">Events</a></li>
           <li><Link href="/internships" className="nav-link-highlight">Launchpad ✦</Link></li>
         </ul>
-        <a href="#membership" className="nav-cta">Join Now</a>
+        <a href="#membership" className="nav-cta">{navCta}</a>
         <div className="nav-hamburger" id="hamburger">
           <span></span><span></span><span></span>
         </div>
@@ -147,14 +182,14 @@ export default async function Home() {
         <div className="mob-menu-inner">
           <button className="mob-close" id="mob-close" aria-label="Close menu">✕</button>
           <nav className="mob-nav">
-            <a href="#about"    className="mob-link" id="ml-1">About</a>
-            <a href="#who"      className="mob-link" id="ml-2">Who We Are</a>
+            <a href="#about" className="mob-link" id="ml-1">About</a>
+            <a href="#who" className="mob-link" id="ml-2">Who We Are</a>
             <a href="#benefits" className="mob-link" id="ml-3">Benefits</a>
-            <a href="#execom"   className="mob-link" id="ml-4">ExeCom</a>
-            <a href="#events"   className="mob-link" id="ml-5">Events</a>
+            <a href="#execom" className="mob-link" id="ml-4">ExeCom</a>
+            <a href="#events" className="mob-link" id="ml-5">Events</a>
             <Link href="/internships" className="mob-link mob-link--accent" id="ml-6">Internship Launchpad ✦</Link>
           </nav>
-          <a href="#membership" className="mob-cta">Join Now →</a>
+          <a href="#membership" className="mob-cta">{navCta} →</a>
           <div className="mob-footer">
             <a href="https://www.instagram.com/iste_mbcet/">Instagram</a>
             <a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a>
@@ -164,20 +199,40 @@ export default async function Home() {
 
       <section id="hero">
         <div className="hero-content">
-          <div className="hero-badge">
-            <div className="badge-dot"></div>
-            Student Chapter Code &nbsp;KE065
-          </div>
           <h1 className="hero-headline" id="hero-headline">
             <span id="typed-out"></span>
             <span className="type-cursor" id="tcursor"></span>
           </h1>
           <div className="hero-divider" id="hero-div"></div>
-          <p className="hero-sub" id="hero-sub">{heroSubtitle}</p>
+          <p className="hero-sub" id="hero-sub">
+            {heroDescription}
+          </p>
+          <div className="hero-dot-sep"><div className="badge-dot"></div></div>
+          <div className="hero-ctas">
+            <a href="#membership" className="hero-btn-primary">
+              {heroPrimaryCta}
+              <span className="hero-btn-arrow">→</span>
+            </a>
+            <a href="#events" className="hero-btn-secondary">
+              {heroSecondaryCta} <span>→</span>
+            </a>
+          </div>
         </div>
-        <div className="hero-scroll">
-          <div className="scroll-line"></div>
-          Scroll
+
+        {/* Ever-looping Marquee Strip */}
+        <div className="hero-ticker">
+          <div className="hero-ticker-track">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="hero-ticker-set">
+                {tickerItems.map((item: string, idx: number) => (
+                  <span key={idx}>
+                    <span className={`ticker-item ${idx % 2 === 0 ? 'ticker-italic' : ''}`}>{item}</span>
+                    <span className="ticker-dash">—</span>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -185,17 +240,28 @@ export default async function Home() {
         <div className="section-inner about-grid">
           <div>
             <div className="section-tag reveal">About Us</div>
-            <h2 className="section-title reveal d1">Shaping <em>Engineers</em><br />of Tomorrow</h2>
-            <p className="section-body reveal d2" style={{ marginTop: 24 }}>
-              ISTE — the Indian Society for Technical Education — is India&apos;s premier national teachers association working
-              to enhance the quality of technical education. The MBCET Student Chapter brings this vision to life at
-              Mar Baselios College of Engineering and Technology, Nalanchira, Thiruvananthapuram.
-            </p>
-            <p className="section-body reveal d3" style={{ marginTop: 16 }}>
-              Founded with a mission to bridge the gap between academic knowledge and industry demands, our chapter equips
-              students with the skills, networks, and opportunities that transcend the classroom — cultivating a generation
-              of technically excellent and professionally ready engineers.
-            </p>
+            <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.aboutTitle || 'Shaping <em>Engineers</em><br />of Tomorrow' }}></h2>
+
+            {settings.aboutBody?.length ? (
+              settings.aboutBody.map((block: any, i: number) => (
+                <p key={i} className={`section-body reveal ${i === 0 ? 'd2' : 'd3'}`} style={{ marginTop: i === 0 ? 24 : 16 }}>
+                  {block.children?.[0]?.text || ''}
+                </p>
+              ))
+            ) : (
+              <>
+                <p className="section-body reveal d2" style={{ marginTop: 24 }}>
+                  ISTE — the Indian Society for Technical Education — is India&apos;s premier national teachers association working
+                  to enhance the quality of technical education. The MBCET Student Chapter brings this vision to life at
+                  Mar Baselios College of Engineering and Technology, Nalanchira, Thiruvananthapuram.
+                </p>
+                <p className="section-body reveal d3" style={{ marginTop: 16 }}>
+                  Founded with a mission to bridge the gap between academic knowledge and industry demands, our chapter equips
+                  students with the skills, networks, and opportunities that transcend the classroom — cultivating a generation
+                  of technically excellent and professionally ready engineers.
+                </p>
+              </>
+            )}
           </div>
           <div className="about-visual reveal d2">
             <div className="about-box-main">
@@ -215,21 +281,33 @@ export default async function Home() {
             <h2 className="section-title reveal d1">Built on Three<br /><em>Core Pillars</em></h2>
           </div>
           <div className="who-grid">
-            <div className="who-card reveal">
-              <div className="who-num">01</div>
-              <h3 className="who-card-title">Community of Innovators</h3>
-              <p className="who-card-body">A dynamic collective of engineering students passionate about technology, problem-solving, and creating real-world impact through collaborative projects, events, and challenges.</p>
-            </div>
-            <div className="who-card reveal d2">
-              <div className="who-num">02</div>
-              <h3 className="who-card-title">Bridge to Industry</h3>
-              <p className="who-card-body">We connect students directly with industry professionals, alumni networks, and research organizations — providing exposure that transforms theoretical knowledge into professional competence.</p>
-            </div>
-            <div className="who-card reveal d3">
-              <div className="who-num">03</div>
-              <h3 className="who-card-title">Platform for Growth</h3>
-              <p className="who-card-body">From technical workshops and hackathons to leadership programs and national competitions, ISTE MBCET is your launchpad for holistic personal and professional excellence.</p>
-            </div>
+            {pillars.length > 0 ? (
+              pillars.map((pillar: any, i: number) => (
+                <div key={pillar._id} className={`who-card reveal ${i > 0 ? `d${i + 1}` : ''}`}>
+                  <div className="who-num">{pillar.number}</div>
+                  <h3 className="who-card-title">{pillar.title}</h3>
+                  <p className="who-card-body">{pillar.body}</p>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="who-card reveal">
+                  <div className="who-num">01</div>
+                  <h3 className="who-card-title">Community of Innovators</h3>
+                  <p className="who-card-body">A dynamic collective of engineering students passionate about technology, problem-solving, and creating real-world impact through collaborative projects, events, and challenges.</p>
+                </div>
+                <div className="who-card reveal d2">
+                  <div className="who-num">02</div>
+                  <h3 className="who-card-title">Bridge to Industry</h3>
+                  <p className="who-card-body">We connect students directly with industry professionals, alumni networks, and research organizations — providing exposure that transforms theoretical knowledge into professional competence.</p>
+                </div>
+                <div className="who-card reveal d3">
+                  <div className="who-num">03</div>
+                  <h3 className="who-card-title">Platform for Growth</h3>
+                  <p className="who-card-body">From technical workshops and hackathons to leadership programs and national competitions, ISTE MBCET is your launchpad for holistic personal and professional excellence.</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -256,43 +334,55 @@ export default async function Home() {
           <div className="section-tag reveal">Member Benefits</div>
           <h2 className="section-title reveal d1">Why Join<br /><em>ISTE MBCET?</em></h2>
           <div className="benefits-grid">
-            <div className="benefit-card reveal">
-              <span className="benefit-icon">⚡</span>
-              <h3 className="benefit-title">Technical Workshops</h3>
-              <p className="benefit-body">Hands-on workshops on cutting-edge technologies — AI/ML, Web Development, IoT, Robotics, Embedded Systems — taught by industry experts.</p>
-            </div>
-            <div className="benefit-card reveal d1">
-              <span className="benefit-icon">🏆</span>
-              <h3 className="benefit-title">National Competitions</h3>
-              <p className="benefit-body">Represent MBCET at ISTE national-level contests, project expos, and hackathons. Build a portfolio that stands out to recruiters and graduate schools.</p>
-            </div>
-            <div className="benefit-card reveal d2">
-              <span className="benefit-icon">🌐</span>
-              <h3 className="benefit-title">Industry Networking</h3>
-              <p className="benefit-body">Connect with industry leaders, senior alumni, and professionals through exclusive events, guest talks, and company visits curated for our members.</p>
-            </div>
-            <div className="benefit-card reveal d1">
-              <span className="benefit-icon">📜</span>
-              <h3 className="benefit-title">Official ISTE Card</h3>
-              <p className="benefit-body">Receive a nationally recognized ISTE membership card, unlocking access to ISTE resources, academic journals, and nationwide student benefits.</p>
-            </div>
-            <div className="benefit-card reveal d2">
-              <span className="benefit-icon">🎓</span>
-              <h3 className="benefit-title">Leadership Development</h3>
-              <p className="benefit-body">Step into committee roles, lead cross-functional teams, and organize large-scale events that build real leadership, communication, and managerial skills.</p>
-            </div>
-            <div className="benefit-card reveal d3">
-              <span className="benefit-icon">🤝</span>
-              <h3 className="benefit-title">Internships &amp; Placements</h3>
-              <p className="benefit-body">Exclusive access to referrals, internship opportunities, and placement-drive invites shared within our trusted network of members and alumni.</p>
-            </div>
+            {benefits.length > 0 ? (
+              benefits.map((benefit: any, i: number) => (
+                <div key={benefit._id} className={`benefit-card reveal ${i > 0 ? `d${i % 4}` : ''}`}>
+                  <span className="benefit-icon">{benefit.icon}</span>
+                  <h3 className="benefit-title">{benefit.title}</h3>
+                  <p className="benefit-body">{benefit.body}</p>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="benefit-card reveal">
+                  <span className="benefit-icon">⚡</span>
+                  <h3 className="benefit-title">Technical Workshops</h3>
+                  <p className="benefit-body">Hands-on workshops on cutting-edge technologies — AI/ML, Web Development, IoT, Robotics, Embedded Systems — taught by industry experts.</p>
+                </div>
+                <div className="benefit-card reveal d1">
+                  <span className="benefit-icon">🏆</span>
+                  <h3 className="benefit-title">National Competitions</h3>
+                  <p className="benefit-body">Represent MBCET at ISTE national-level contests, project expos, and hackathons. Build a portfolio that stands out to recruiters and graduate schools.</p>
+                </div>
+                <div className="benefit-card reveal d2">
+                  <span className="benefit-icon">🌐</span>
+                  <h3 className="benefit-title">Industry Networking</h3>
+                  <p className="benefit-body">Connect with industry leaders, senior alumni, and professionals through exclusive events, guest talks, and company visits curated for our members.</p>
+                </div>
+                <div className="benefit-card reveal d1">
+                  <span className="benefit-icon">📜</span>
+                  <h3 className="benefit-title">Official ISTE Card</h3>
+                  <p className="benefit-body">Receive a nationally recognized ISTE membership card, unlocking access to ISTE resources, academic journals, and nationwide student benefits.</p>
+                </div>
+                <div className="benefit-card reveal d2">
+                  <span className="benefit-icon">🎓</span>
+                  <h3 className="benefit-title">Leadership Development</h3>
+                  <p className="benefit-body">Step into committee roles, lead cross-functional teams, and organize large-scale events that build real leadership, communication, and managerial skills.</p>
+                </div>
+                <div className="benefit-card reveal d3">
+                  <span className="benefit-icon">🤝</span>
+                  <h3 className="benefit-title">Internships &amp; Placements</h3>
+                  <p className="benefit-body">Exclusive access to referrals, internship opportunities, and placement-drive invites shared within our trusted network of members and alumni.</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
 
       <section id="execom">
         <div className="section-inner">
-          <div className="section-tag reveal">Leadership 2024–25</div>
+          <div className="section-tag reveal">Leadership 2025-26</div>
           <h2 className="section-title reveal d1">Executive<br /><em>Committee</em></h2>
 
           <div className="execom-sub-label reveal">Faculty Advisors</div>
@@ -362,14 +452,23 @@ export default async function Home() {
           <h2 className="section-title reveal d1">Recent &amp;<br /><em>Upcoming</em></h2>
           <div className="events-list">
             {events.map((ev: any) => (
-              <div key={ev._id} className="event-row reveal">
+              <Link href={ev.slug ? `/events/${ev.slug}` : '#'} key={ev._id} className="event-row reveal">
                 <div className="event-date">{ev.dateLabel}</div>
-                <div>
+                <div className="event-info-main">
                   <div className="event-title">{ev.title}</div>
-                  {ev.eventType && <div className="event-type">{ev.eventType} &middot;</div>}
+                  {ev.eventType && <div className="event-type">{ev.eventType}</div>}
                 </div>
+                {ev.galleryTeaser?.length > 0 && (
+                  <div className="event-gallery-teaser">
+                    {ev.galleryTeaser.map((img: any, i: number) => (
+                      <div key={i} className="teaser-thumb" style={{ zIndex: 3 - i }}>
+                        <img src={urlForImage(img).width(80).height(80).url()} alt="Gallery teaser" />
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="event-arrow">→</div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -379,21 +478,24 @@ export default async function Home() {
         <div className="section-inner">
           <div className="section-tag reveal">Enroll Now</div>
           <h2 className="section-title reveal d1">Grab Your<br /><em>Membership</em></h2>
-          <div className="mem-grid">
-            <div>
-              <p className="mem-body reveal">
-                Becoming a member of ISTE MBCET Student Chapter is your gateway to technical excellence, peer networking,
-                and real-world professional growth. Fill in your details and we&apos;ll get you enrolled within 48 hours.
-              </p>
-              <div className="perks">
-                <div className="perk reveal d1"><div className="perk-check">✓</div>Official ISTE membership card — valid nationally</div>
-                <div className="perk reveal d2"><div className="perk-check">✓</div>Priority access to all chapter events and workshops</div>
-                <div className="perk reveal d3"><div className="perk-check">✓</div>ISTE journals, research publications &amp; digital resources</div>
-                <div className="perk reveal d4"><div className="perk-check">✓</div>Exclusive internship &amp; placement referral network</div>
-                <div className="perk reveal d5"><div className="perk-check">✓</div>Certificates of participation for every ISTE event</div>
+          <div className="mem-glass-card reveal d2">
+            <div className="mem-grid">
+              <div className="mem-left">
+                <p className="mem-body">
+                  Becoming a member of ISTE MBCET Student Chapter is your gateway to technical excellence, peer networking,
+                  and real-world professional growth. Fill in your details and we&apos;ll get you enrolled within 48 hours.
+                </p>
+                <div className="perks">
+                  {membershipPerks.map((perk: string, i: number) => (
+                    <div key={i} className="perk">
+                      <div className="perk-check">✓</div>
+                      {perk}
+                    </div>
+                  ))}
+                </div>
               </div>
+              <MembershipForm />
             </div>
-            <MembershipForm />
           </div>
         </div>
       </section>
@@ -412,7 +514,7 @@ export default async function Home() {
                 <div className="testi-divider"></div>
                 <div className="testi-author">
                   <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
+                    src={t.photo ? urlForImage(t.photo).width(80).height(80).url() : `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
                     alt={t.authorName}
                   />
                   <div>
@@ -448,7 +550,7 @@ export default async function Home() {
                     href={intern.applyLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`launchpad-preview-card reveal ${['d1','d2','d3'][i]}`}
+                    className={`launchpad-preview-card reveal ${['d1', 'd2', 'd3'][i]}`}
                   >
                     <div className="lp-role">{intern.role}</div>
                     <div className="lp-company">{intern.company}</div>
@@ -491,9 +593,9 @@ export default async function Home() {
           <div>
             <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={80} height={80} className="footer-logo-img" /></div>
             <div className="footer-tagline">
-              Indian Society for Technical Education — Mar Baselios College of Engineering and Technology Student Chapter, Kerala.
+              {footerTagline}
             </div>
-            <div className="footer-chip">Chapter Code: KE065</div>
+            <div className="footer-chip">Chapter Code: {settings.chapterCode || 'KE065'}</div>
           </div>
           <div>
             <div className="footer-col-title">Navigate</div>

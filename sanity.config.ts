@@ -30,6 +30,8 @@ export default defineConfig({
             // Regular document types
             S.documentTypeListItem('event').title('Events'),
             S.documentTypeListItem('execomMember').title('ExeCom Members'),
+            S.documentTypeListItem('pillar').title('Who We Are (Pillars)'),
+            S.documentTypeListItem('benefit').title('Member Benefits'),
             S.documentTypeListItem('stat').title('Stats'),
             S.documentTypeListItem('testimonial').title('Testimonials'),
             S.divider(),

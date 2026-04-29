@@ -24,15 +24,14 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     const handleMouseMove = (e: MouseEvent) => {
       mx = e.clientX
       my = e.clientY
-      cdot.style.left = mx + 'px'
-      cdot.style.top = my + 'px'
+      // Use transform instead of left/top to avoid layout thrashing
+      cdot.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`
     }
 
     const animRing = () => {
       rx += (mx - rx) * 0.12
       ry += (my - ry) * 0.12
-      cring.style.left = rx + 'px'
-      cring.style.top = ry + 'px'
+      cring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`
       req = requestAnimationFrame(animRing)
     }
 
