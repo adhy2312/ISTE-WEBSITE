@@ -207,7 +207,7 @@ export default async function Home() {
           <p className="hero-sub" id="hero-sub">
             {heroDescription}
           </p>
-          <div className="hero-dot-sep"><div className="badge-dot"></div></div>
+
           <div className="hero-ctas">
             <a href="#membership" className="hero-btn-primary">
               {heroPrimaryCta}
