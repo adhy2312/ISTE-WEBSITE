@@ -7,6 +7,18 @@ import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import TeamCard from '@/app/components/TeamCard'
 import MembershipForm from '@/app/components/MembershipForm'
+import { PortableText } from '@portabletext/react'
+import { 
+  Zap, 
+  Trophy, 
+  Globe, 
+  FileText, 
+  GraduationCap, 
+  Users, 
+  Lightbulb, 
+  Rocket, 
+  Briefcase 
+} from 'lucide-react'
 import ExecomAvatar from '@/app/components/ExecomAvatar'
 
 // Fallback data when Sanity has no content yet
@@ -142,6 +154,21 @@ export default async function Home() {
   const junior = members.filter((m: any) => m.category === 'junior').length
     ? members.filter((m: any) => m.category === 'junior')
     : FALLBACK_EXECOM.junior
+
+  const getBenefitIcon = (iconName: string) => {
+    const icons: Record<string, any> = {
+      Zap: <Zap size={24} strokeWidth={1.5} />,
+      Trophy: <Trophy size={24} strokeWidth={1.5} />,
+      Globe: <Globe size={24} strokeWidth={1.5} />,
+      FileText: <FileText size={24} strokeWidth={1.5} />,
+      GraduationCap: <GraduationCap size={24} strokeWidth={1.5} />,
+      Users: <Users size={24} strokeWidth={1.5} />,
+      Lightbulb: <Lightbulb size={24} strokeWidth={1.5} />,
+      Rocket: <Rocket size={24} strokeWidth={1.5} />,
+      Briefcase: <Briefcase size={24} strokeWidth={1.5} />,
+    }
+    return icons[iconName] || <Zap size={24} strokeWidth={1.5} />
+  }
 
   // Duplicate testimonials for infinite scroll
   const allTestimonials = [...testimonials, ...testimonials]
@@ -337,7 +364,9 @@ export default async function Home() {
             {benefits.length > 0 ? (
               benefits.map((benefit: any, i: number) => (
                 <div key={benefit._id} className={`benefit-card reveal ${i > 0 ? `d${i % 4}` : ''}`}>
-                  <span className="benefit-icon">{benefit.icon}</span>
+                  <div className="benefit-icon-wrapper">
+                    {getBenefitIcon(benefit.icon)}
+                  </div>
                   <h3 className="benefit-title">{benefit.title}</h3>
                   <p className="benefit-body">{benefit.body}</p>
                 </div>
@@ -345,32 +374,32 @@ export default async function Home() {
             ) : (
               <>
                 <div className="benefit-card reveal">
-                  <span className="benefit-icon">⚡</span>
+                  <div className="benefit-icon-wrapper"><Zap size={24} strokeWidth={1.5} /></div>
                   <h3 className="benefit-title">Technical Workshops</h3>
                   <p className="benefit-body">Hands-on workshops on cutting-edge technologies — AI/ML, Web Development, IoT, Robotics, Embedded Systems — taught by industry experts.</p>
                 </div>
                 <div className="benefit-card reveal d1">
-                  <span className="benefit-icon">🏆</span>
+                  <div className="benefit-icon-wrapper"><Trophy size={24} strokeWidth={1.5} /></div>
                   <h3 className="benefit-title">National Competitions</h3>
                   <p className="benefit-body">Represent MBCET at ISTE national-level contests, project expos, and hackathons. Build a portfolio that stands out to recruiters and graduate schools.</p>
                 </div>
                 <div className="benefit-card reveal d2">
-                  <span className="benefit-icon">🌐</span>
+                  <div className="benefit-icon-wrapper"><Globe size={24} strokeWidth={1.5} /></div>
                   <h3 className="benefit-title">Industry Networking</h3>
                   <p className="benefit-body">Connect with industry leaders, senior alumni, and professionals through exclusive events, guest talks, and company visits curated for our members.</p>
                 </div>
                 <div className="benefit-card reveal d1">
-                  <span className="benefit-icon">📜</span>
+                  <div className="benefit-icon-wrapper"><FileText size={24} strokeWidth={1.5} /></div>
                   <h3 className="benefit-title">Official ISTE Card</h3>
                   <p className="benefit-body">Receive a nationally recognized ISTE membership card, unlocking access to ISTE resources, academic journals, and nationwide student benefits.</p>
                 </div>
                 <div className="benefit-card reveal d2">
-                  <span className="benefit-icon">🎓</span>
+                  <div className="benefit-icon-wrapper"><GraduationCap size={24} strokeWidth={1.5} /></div>
                   <h3 className="benefit-title">Leadership Development</h3>
                   <p className="benefit-body">Step into committee roles, lead cross-functional teams, and organize large-scale events that build real leadership, communication, and managerial skills.</p>
                 </div>
                 <div className="benefit-card reveal d3">
-                  <span className="benefit-icon">🤝</span>
+                  <div className="benefit-icon-wrapper"><Briefcase size={24} strokeWidth={1.5} /></div>
                   <h3 className="benefit-title">Internships &amp; Placements</h3>
                   <p className="benefit-body">Exclusive access to referrals, internship opportunities, and placement-drive invites shared within our trusted network of members and alumni.</p>
                 </div>

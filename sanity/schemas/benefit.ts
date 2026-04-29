@@ -7,9 +7,9 @@ export const benefitSchema = defineType({
   fields: [
     defineField({
       name: 'icon',
-      title: 'Icon (Emoji)',
+      title: 'Icon Name (Lucide)',
       type: 'string',
-      description: 'e.g. "⚡", "🏆", "🌐"',
+      description: 'e.g. "Zap", "Trophy", "Globe", "FileText", "GraduationCap", "Users"',
       validation: (Rule) => Rule.required(),
     }),
     defineField({

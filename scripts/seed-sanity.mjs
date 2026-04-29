@@ -102,6 +102,15 @@ const execomMembers = [
   { _id: 'execom-26', _type: 'execomMember', name: 'Ganga A.B.', initials: 'GA', role: 'Junior ExeCom', category: 'junior', team: 'Content & Documentation', order: 26 },
 ]
 
+const benefits = [
+  { _id: 'benefit-1', _type: 'benefit', title: 'Technical Workshops', icon: 'Zap', body: 'Hands-on workshops on cutting-edge technologies — AI/ML, Web Development, IoT, Robotics, Embedded Systems — taught by industry experts.', order: 1 },
+  { _id: 'benefit-2', _type: 'benefit', title: 'National Competitions', icon: 'Trophy', body: 'Represent MBCET at ISTE national-level contests, project expos, and hackathons. Build a portfolio that stands out to recruiters and graduate schools.', order: 2 },
+  { _id: 'benefit-3', _type: 'benefit', title: 'Industry Networking', icon: 'Globe', body: 'Connect with industry leaders, senior alumni, and professionals through exclusive events, guest talks, and company visits curated for our members.', order: 3 },
+  { _id: 'benefit-4', _type: 'benefit', title: 'Official ISTE Card', icon: 'FileText', body: 'Receive a nationally recognized ISTE membership card, unlocking access to ISTE resources, academic journals, and nationwide student benefits.', order: 4 },
+  { _id: 'benefit-5', _type: 'benefit', title: 'Leadership Development', icon: 'GraduationCap', body: 'Step into committee roles, lead cross-functional teams, and organize large-scale events that build real leadership, communication, and managerial skills.', order: 5 },
+  { _id: 'benefit-6', _type: 'benefit', title: 'Internships & Placements', icon: 'Briefcase', body: 'Exclusive access to referrals, internship opportunities, and placement-drive invites shared within our trusted network of members and alumni.', order: 6 },
+]
+
 const siteSettings = {
   _id: 'siteSettings',
   _type: 'siteSettings',
@@ -143,6 +152,12 @@ async function seed() {
     await client.createOrReplace(doc)
   }
   console.log(`✅ ${execomMembers.length} ExeCom Members`)
+
+  // Benefits
+  for (const doc of benefits) {
+    await client.createOrReplace(doc)
+  }
+  console.log(`✅ ${benefits.length} Benefits`)
 
   console.log('\n🎉 All done! Refresh your Studio to see the content.')
 }
