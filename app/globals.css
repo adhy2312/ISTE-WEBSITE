@@ -930,6 +930,14 @@
       transform: translateY(-1px);
       box-shadow: 0 8px 32px rgba(255,255,255,0.18);
     }
+    .form-btn:disabled {
+      opacity: 0.6; cursor: not-allowed; transform: none;
+    }
+    .form-error {
+      font-size: .78rem; color: #ff6b6b; text-align: center;
+      margin-top: 12px; padding: 8px; border: 1px solid rgba(255,107,107,0.2);
+      background: rgba(255,107,107,0.06);
+    }
     .form-note { font-size:.68rem; color:var(--g600); text-align:center; margin-top:10px; }
     .form-success { display:none; text-align:center; padding:50px 0; }
     .form-success-icon { font-size:2.2rem; margin-bottom:14px; color: var(--white); }
@@ -1193,9 +1201,9 @@
     /* ===================== MOBILE MENU OVERLAY ===================== */
     .mob-menu {
       position: fixed; inset: 0; z-index: 2000;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       opacity: 0; pointer-events: none;
       transition: opacity .35s var(--ease);
     }
@@ -1204,47 +1212,47 @@
     .mob-menu-inner {
       position: absolute; top: 0; right: 0; bottom: 0;
       width: min(85vw, 340px);
-      background: rgba(10, 10, 15, 0.45);
-      backdrop-filter: blur(48px);
-      -webkit-backdrop-filter: blur(48px);
+      background: #0a0a0e;
       border-left: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
       display: flex; flex-direction: column;
-      padding: 32px 36px 48px;
+      padding: 28px 32px 36px;
       transform: translateX(100%);
       transition: transform .4s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-y: auto;
     }
     .mob-menu.open .mob-menu-inner { transform: translateX(0); }
 
     .mob-close {
       align-self: flex-end; background: none; border: 1px solid var(--border);
-      color: var(--white); width: 40px; height: 40px;
+      color: var(--white); width: 36px; height: 36px;
       display: flex; align-items: center; justify-content: center;
-      font-size: .95rem; cursor: pointer; margin-bottom: 48px;
+      font-size: .85rem; cursor: pointer; margin-bottom: 32px; flex-shrink: 0;
       transition: border-color .3s, background .3s;
     }
     .mob-close:hover { border-color: var(--white); background: rgba(255,255,255,.06); }
 
-    .mob-nav { display: flex; flex-direction: column; gap: 0; flex: 1; }
+    .mob-nav { display: flex; flex-direction: column; gap: 0; }
     .mob-link {
       font-family: var(--font-serif);
-      font-size: 1.55rem; font-weight: 700;
+      font-size: 1.3rem; font-weight: 700;
       color: var(--g400); text-decoration: none;
-      padding: 14px 0; border-bottom: 1px solid var(--border-light);
+      padding: 12px 0; border-bottom: 1px solid var(--border-light);
       transition: color .25s, padding-left .25s; display: block;
     }
     .mob-link:hover, .mob-link:active { color: var(--white); padding-left: 8px; }
     .mob-link--accent { color: var(--g200) !important; }
 
     .mob-cta {
-      display: block; text-align: center; margin-top: 40px; padding: 16px;
+      display: block; text-align: center; margin-top: auto; padding: 16px;
       background: var(--white); color: var(--black);
       font-size: .78rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
       text-decoration: none; transition: background .3s;
+      flex-shrink: 0;
     }
     .mob-cta:hover { background: var(--g200); }
 
-    .mob-footer { display: flex; justify-content: center; gap: 28px; margin-top: 28px; }
+    .mob-footer { display: flex; justify-content: center; gap: 28px; margin-top: 20px; flex-shrink: 0; }
     .mob-footer a {
       font-size: .65rem; letter-spacing: .2em; text-transform: uppercase;
       color: var(--g600); text-decoration: none; transition: color .3s;
