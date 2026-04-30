@@ -24,14 +24,13 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     const handleMouseMove = (e: MouseEvent) => {
       mx = e.clientX
       my = e.clientY
-      // Use transform instead of left/top to avoid layout thrashing
-      cdot.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`
     }
 
     const animRing = () => {
+      cdot.style.transform = `translate3d(${mx}px, ${my}px, 0)`
       rx += (mx - rx) * 0.12
       ry += (my - ry) * 0.12
-      cring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`
+      cring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`
       req = requestAnimationFrame(animRing)
     }
 
@@ -39,8 +38,14 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     req = requestAnimationFrame(animRing)
 
     const interactiveEls = document.querySelectorAll('a, button, .execom-card, .event-row, .benefit-card, .who-card, .team-card')
-    const enter = () => { cdot.classList.add('big'); cring.classList.add('big') }
-    const leave = () => { cdot.classList.remove('big'); cring.classList.remove('big') }
+    const enter = () => { 
+      document.querySelector('.c-dot-inner')?.classList.add('big'); 
+      document.querySelector('.c-ring-inner')?.classList.add('big'); 
+    }
+    const leave = () => { 
+      document.querySelector('.c-dot-inner')?.classList.remove('big'); 
+      document.querySelector('.c-ring-inner')?.classList.remove('big'); 
+    }
 
     interactiveEls.forEach(el => {
       el.addEventListener('mouseenter', enter)
@@ -61,10 +66,17 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
   useEffect(() => {
     const navbar = document.getElementById('navbar')
     if (!navbar) return
+    let ticking = false
     const handleScroll = () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 60)
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          navbar.classList.toggle('scrolled', window.scrollY > 60)
+          ticking = false
+        })
+        ticking = true
+      }
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -154,16 +166,19 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         if (!targetAttr) return
         const target = +targetAttr
         const dur = 1800
-        const step = target / (dur / 16)
-        let cur = 0
-        const t = setInterval(() => {
-          cur = Math.min(cur + step, target)
+        let start: number | null = null
+        const stepAnim = (timestamp: number) => {
+          if (!start) start = timestamp
+          const progress = timestamp - start
+          const cur = Math.min(target * (progress / dur), target)
           el.textContent = Math.floor(cur).toString()
-          if (cur >= target) {
+          if (progress < dur) {
+            requestAnimationFrame(stepAnim)
+          } else {
             el.textContent = target.toString()
-            clearInterval(t)
           }
-        }, 16)
+        }
+        requestAnimationFrame(stepAnim)
         co.unobserve(el)
       })
     }, { threshold: 0.5 })

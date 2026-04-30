@@ -177,8 +177,8 @@ export default async function Home() {
     <>
       <HomeAnimations heroTypedText={heroTypedText} />
 
-      <div className="c-dot" id="cdot"></div>
-      <div className="c-ring" id="cring"></div>
+      <div id="cdot"><div className="c-dot-inner"></div></div>
+      <div id="cring"><div className="c-ring-inner"></div></div>
 
       <div className="grid-lines">
         <div className="grid-line"></div>

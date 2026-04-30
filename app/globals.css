@@ -57,27 +57,33 @@
     .grid-lines { display: none; }
 
     /* ===================== CUSTOM CURSOR ===================== */
-    .c-dot {
+    #cdot, #cring {
       position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transform: translate3d(-50%, -50%, 0);
+      will-change: transform;
+      mix-blend-mode: difference;
+    }
+    #cring { z-index: 9998; mix-blend-mode: normal; }
+
+    .c-dot-inner {
       width: 10px; height: 10px;
       background: var(--white); border-radius: 50%;
-      pointer-events: none; z-index: 9999;
-      transform: translate(-50%,-50%);
-      transition: width .2s, height .2s;
-      mix-blend-mode: difference;
+      transform: scale(1) translate(-50%, -50%);
+      transform-origin: 0 0;
+      transition: transform .2s var(--ease);
       will-change: transform;
     }
-    .c-ring {
-      position: fixed; top: 0; left: 0;
+    .c-ring-inner {
       width: 38px; height: 38px;
       border: 1.5px solid rgba(255,255,255,0.45); border-radius: 50%;
-      pointer-events: none; z-index: 9998;
-      transform: translate(-50%,-50%);
-      transition: width .3s, height .3s, border-color .3s;
+      transform: scale(1) translate(-50%, -50%);
+      transform-origin: 0 0;
+      transition: transform .3s var(--ease), border-color .3s;
       will-change: transform;
     }
-    .c-dot.big  { width: 18px; height: 18px; }
-    .c-ring.big { width: 56px; height: 56px; border-color: rgba(255,255,255,0.8); }
+    .c-dot-inner.big  { transform: scale(1.8) translate(-50%, -50%); }
+    .c-ring-inner.big { transform: scale(1.5) translate(-50%, -50%); border-color: rgba(255,255,255,0.8); }
 
     /* ===================== NAVIGATION ===================== */
     nav {
@@ -165,6 +171,7 @@
       filter: blur(60px);
       opacity: 0.5;
       animation: auroraShift 8s ease-in-out infinite alternate;
+      will-change: transform, opacity;
     }
     .aurora-inner {
       width: 100%; height: 100%;
@@ -181,9 +188,9 @@
       animation: auroraFlow 12s ease-in-out infinite alternate;
     }
     @keyframes auroraShift {
-      0% { opacity: 0.4; filter: blur(60px); width: 280px; }
-      50% { opacity: 0.6; filter: blur(70px); width: 360px; }
-      100% { opacity: 0.45; filter: blur(55px); width: 300px; }
+      0% { opacity: 0.4; transform: translateX(-50%) scaleX(0.9); }
+      50% { opacity: 0.6; transform: translateX(-50%) scaleX(1.15); }
+      100% { opacity: 0.45; transform: translateX(-50%) scaleX(1.0); }
     }
     @keyframes auroraFlow {
       0% { transform: scaleX(1) translateY(0); }
@@ -308,11 +315,13 @@
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
     .hero-divider {
-      width: 0; height: 1px;
+      width: 280px; height: 1px;
       background: rgba(255,255,255,0.28);
-      transition: width 1s var(--ease);
+      transform: scaleX(0); transform-origin: center;
+      transition: transform 1s var(--ease);
+      will-change: transform;
     }
-    .hero-divider.open { width: 280px; }
+    .hero-divider.open { transform: scaleX(1); }
 
     .hero-sub {
       font-family: var(--font-sans);
