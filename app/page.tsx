@@ -8,16 +8,16 @@ import HomeAnimations from '@/app/components/HomeAnimations'
 import TeamCard from '@/app/components/TeamCard'
 import MembershipForm from '@/app/components/MembershipForm'
 import { PortableText } from '@portabletext/react'
-import { 
-  Zap, 
-  Trophy, 
-  Globe, 
-  FileText, 
-  GraduationCap, 
-  Users, 
-  Lightbulb, 
-  Rocket, 
-  Briefcase 
+import {
+  Zap,
+  Trophy,
+  Globe,
+  FileText,
+  GraduationCap,
+  Users,
+  Lightbulb,
+  Rocket,
+  Briefcase
 } from 'lucide-react'
 import ExecomAvatar from '@/app/components/ExecomAvatar'
 
@@ -225,6 +225,33 @@ export default async function Home() {
       </div>
 
       <section id="hero">
+        {/* Aurora Gradient Ribbon */}
+        <div className="aurora-ribbon" aria-hidden="true">
+          <div className="aurora-inner"></div>
+        </div>
+
+        {/* Orbital Lines SVG */}
+        <svg className="orbital-lines" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <ellipse cx="600" cy="320" rx="380" ry="120" stroke="rgba(255,255,255,0.06)" strokeWidth="1">
+            <animateTransform attributeName="transform" type="rotate" from="0 600 320" to="360 600 320" dur="30s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="600" cy="400" rx="500" ry="180" stroke="rgba(255,255,255,0.04)" strokeWidth="1">
+            <animateTransform attributeName="transform" type="rotate" from="0 600 400" to="-360 600 400" dur="45s" repeatCount="indefinite" />
+          </ellipse>
+          {/* Orbiting dot 1 */}
+          <circle r="4" fill="rgba(255,255,255,0.3)">
+            <animateMotion dur="30s" repeatCount="indefinite" path="M220,320 A380,120 0 1,1 220,319.9 Z" />
+          </circle>
+          {/* Orbiting dot 2 */}
+          <circle r="3" fill="rgba(127,140,255,0.5)">
+            <animateMotion dur="45s" repeatCount="indefinite" path="M100,400 A500,180 0 1,0 100,399.9 Z" />
+          </circle>
+        </svg>
+
+
+
+
+        {/* Hero Main Content */}
         <div className="hero-content">
           <h1 className="hero-headline" id="hero-headline">
             <span id="typed-out"></span>
@@ -244,6 +271,12 @@ export default async function Home() {
               {heroSecondaryCta} <span>→</span>
             </a>
           </div>
+        </div>
+
+        {/* Stats floater */}
+        <div className="hero-stat-floater" aria-hidden="true">
+          <div className="stat-floater-num">{stats[0]?.value || 300}<span>+</span></div>
+          <div className="stat-floater-label">members are already part of the chapter</div>
         </div>
 
         {/* Ever-looping Marquee Strip */}
