@@ -18,24 +18,38 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     const cring = document.getElementById('cring')
     if (!cdot || !cring) return
 
-    let mx = 0, my = 0, rx = 0, ry = 0
-    let req: number
+    let mx = -100, my = -100, rx = -100, ry = -100
+    let req: number | null = null
 
     const handleMouseMove = (e: MouseEvent) => {
       mx = e.clientX
       my = e.clientY
+      if (!req) {
+        req = requestAnimationFrame(animRing)
+      }
     }
 
     const animRing = () => {
       cdot.style.transform = `translate3d(${mx}px, ${my}px, 0)`
-      rx += (mx - rx) * 0.12
-      ry += (my - ry) * 0.12
+      
+      const dx = mx - rx
+      const dy = my - ry
+      
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+        rx = mx
+        ry = my
+        cring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`
+        req = null
+        return
+      }
+
+      rx += dx * 0.12
+      ry += dy * 0.12
       cring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`
       req = requestAnimationFrame(animRing)
     }
 
     document.addEventListener('mousemove', handleMouseMove)
-    req = requestAnimationFrame(animRing)
 
     const interactiveEls = document.querySelectorAll('a, button, .execom-card, .event-row, .benefit-card, .who-card, .team-card')
     const enter = () => { 

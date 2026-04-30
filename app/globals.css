@@ -204,6 +204,26 @@
       width: 100%; height: 100%;
       z-index: 0; pointer-events: none;
     }
+    .orbit-ellipse-1 {
+      transform-origin: 600px 320px;
+      animation: spin 30s linear infinite;
+    }
+    .orbit-ellipse-2 {
+      transform-origin: 600px 400px;
+      animation: spin-reverse 45s linear infinite;
+    }
+    .orbit-dot-1 {
+      offset-path: path("M220,320 A380,120 0 1,1 220,319.9 Z");
+      animation: orbit-move 30s linear infinite;
+    }
+    .orbit-dot-2 {
+      offset-path: path("M100,400 A500,180 0 1,0 100,399.9 Z");
+      animation: orbit-move-reverse 45s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+    @keyframes orbit-move { 100% { offset-distance: 100%; } }
+    @keyframes orbit-move-reverse { 0% { offset-distance: 100%; } 100% { offset-distance: 0%; } }
 
     /* Floating Chips */
     .hero-float {

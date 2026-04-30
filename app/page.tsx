@@ -232,20 +232,12 @@ export default async function Home() {
 
         {/* Orbital Lines SVG */}
         <svg className="orbital-lines" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <ellipse cx="600" cy="320" rx="380" ry="120" stroke="rgba(255,255,255,0.06)" strokeWidth="1">
-            <animateTransform attributeName="transform" type="rotate" from="0 600 320" to="360 600 320" dur="30s" repeatCount="indefinite" />
-          </ellipse>
-          <ellipse cx="600" cy="400" rx="500" ry="180" stroke="rgba(255,255,255,0.04)" strokeWidth="1">
-            <animateTransform attributeName="transform" type="rotate" from="0 600 400" to="-360 600 400" dur="45s" repeatCount="indefinite" />
-          </ellipse>
+          <ellipse className="orbit-ellipse-1" cx="600" cy="320" rx="380" ry="120" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+          <ellipse className="orbit-ellipse-2" cx="600" cy="400" rx="500" ry="180" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
           {/* Orbiting dot 1 */}
-          <circle r="4" fill="rgba(255,255,255,0.3)">
-            <animateMotion dur="30s" repeatCount="indefinite" path="M220,320 A380,120 0 1,1 220,319.9 Z" />
-          </circle>
+          <circle className="orbit-dot-1" r="4" fill="rgba(255,255,255,0.3)" />
           {/* Orbiting dot 2 */}
-          <circle r="3" fill="rgba(127,140,255,0.5)">
-            <animateMotion dur="45s" repeatCount="indefinite" path="M100,400 A500,180 0 1,0 100,399.9 Z" />
-          </circle>
+          <circle className="orbit-dot-2" r="3" fill="rgba(127,140,255,0.5)" />
         </svg>
 
 
