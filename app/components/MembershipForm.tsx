@@ -1,42 +1,31 @@
 'use client'
 
 import { useState } from 'react'
-
-// Replace this with your deployed Google Apps Script URL
-const GOOGLE_SCRIPT_URL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL || ''
+import { submitMembership } from '../actions/membership'
 
 export default function MembershipForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  const submitForm = async (e: React.FormEvent) => {
+  const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setStatus('loading')
     setErrorMsg('')
 
-    const firstName = (document.getElementById('fn') as HTMLInputElement).value.trim()
-    const lastName = (document.getElementById('ln') as HTMLInputElement).value.trim()
-    const email = (document.getElementById('em') as HTMLInputElement).value.trim()
-    const phone = (document.getElementById('ph') as HTMLInputElement).value.trim()
-    const department = (document.getElementById('dp') as HTMLSelectElement).value
-    const year = (document.getElementById('yr') as HTMLSelectElement).value
-
-    const payload = { firstName, lastName, email, phone, department, year }
+    const formData = new FormData(e.currentTarget)
 
     try {
-      const res = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
+      const result = await submitMembership(formData)
 
-      // Google Apps Script with no-cors returns opaque response
-      // so we assume success if no network error was thrown
-      setStatus('success')
+      if (result.success) {
+        setStatus('success')
+      } else {
+        setErrorMsg(result.error || 'Failed to submit application.')
+        setStatus('error')
+      }
     } catch (err) {
       console.error('Form submission error:', err)
-      setErrorMsg('Network error — please check your connection and try again.')
+      setErrorMsg('An unexpected error occurred — please try again.')
       setStatus('error')
     }
   }
@@ -50,25 +39,25 @@ export default function MembershipForm() {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="fn">First Name</label>
-              <input type="text" id="fn" placeholder="Arjun" required />
+              <input type="text" id="fn" name="first_name" placeholder="Arjun" required />
             </div>
             <div className="form-group">
               <label htmlFor="ln">Last Name</label>
-              <input type="text" id="ln" placeholder="Menon" required />
+              <input type="text" id="ln" name="last_name" placeholder="Menon" required />
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="em">Email Address</label>
-            <input type="email" id="em" placeholder="you@mbcet.ac.in" required />
+            <input type="email" id="em" name="email" placeholder="you@mbcet.ac.in" required />
           </div>
           <div className="form-group">
             <label htmlFor="ph">Phone Number</label>
-            <input type="tel" id="ph" placeholder="+91 98765 43210" required />
+            <input type="tel" id="ph" name="phone" placeholder="+91 98765 43210" required />
           </div>
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="dp">Department</label>
-              <select id="dp" required>
+              <select id="dp" name="department" required>
                 <option value="">Select</option>
                 <option>Computer Science Engineering</option>
                 <option>CSE with AI</option>
@@ -82,7 +71,7 @@ export default function MembershipForm() {
             </div>
             <div className="form-group">
               <label htmlFor="yr">Year of Study</label>
-              <select id="yr" required>
+              <select id="yr" name="year_of_study" required>
                 <option value="">Select</option>
                 <option>1st Year</option>
                 <option>2nd Year</option>

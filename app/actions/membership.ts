@@ -73,6 +73,32 @@ export async function submitMembership(formData: FormData) {
       // We don't fail the whole request if just the email fails, since the DB insert succeeded.
     }
 
+    // Send data to Google Apps Script webhook
+    try {
+      const googleScriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
+      if (googleScriptUrl && googleScriptUrl !== 'paste_your_script_url_here') {
+        const payload = {
+          firstName,
+          lastName,
+          email,
+          phone,
+          department,
+          year: yearOfStudy
+        };
+
+        await fetch(googleScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        console.warn('Google Script URL is missing or invalid. Skipping Google Sheets update.');
+      }
+    } catch (scriptError) {
+      console.error('Failed to send data to Google Apps Script:', scriptError);
+      // Don't fail if the google sheet update fails
+    }
+
     return { success: true }
   } catch (error: any) {
     console.error('Unexpected error during submission:', error)
