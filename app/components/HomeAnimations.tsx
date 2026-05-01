@@ -68,7 +68,7 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
-      cancelAnimationFrame(req)
+      if (req !== null) cancelAnimationFrame(req)
       interactiveEls.forEach(el => {
         el.removeEventListener('mouseenter', enter)
         el.removeEventListener('mouseleave', leave)
