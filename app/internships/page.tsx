@@ -5,9 +5,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
 
-export const metadata = {
-  title: "Internship Launchpad | ISTE MBCET",
-  description: "Discover curated internship opportunities for ISTE MBCET members. Updated regularly by the chapter team.",
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Internship Launchpad | Member Resources",
+  description: "Exclusive internship opportunities curated by ISTE MBCET for our student members. Connect with industry leaders and kickstart your career.",
+  openGraph: {
+    title: "Internship Launchpad | ISTE MBCET",
+    description: "Exclusive internship opportunities curated for ISTE MBCET members.",
+    images: ['/iste.png'],
+  }
 }
 
 const FALLBACK_INTERNSHIPS = [
@@ -142,12 +149,13 @@ export default async function InternshipsPage() {
               {open.map((intern: any, i: number) => (
                 <div key={intern._id} className={`internship-card reveal ${['d1', 'd2', 'd3', 'd4'][i % 4]}`}>
                   <div className="intern-card-top">
-                    <div className="intern-logo-wrap">
+                    <div className="intern-logo-wrap" style={{ position: 'relative' }}>
                       {intern.logo?.asset ? (
-                        <img
+                        <Image
                           src={intern.logo.asset.url}
                           alt={intern.company}
-                          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          fill
+                          className="object-contain"
                         />
                       ) : (
                         <div className="intern-logo-placeholder">

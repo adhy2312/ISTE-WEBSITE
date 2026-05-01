@@ -7,8 +7,30 @@ import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
 import HomeAnimations from '@/app/components/HomeAnimations'
 
+import { Metadata } from 'next'
+
 // Revalidate this page every 60 seconds
 export const revalidate = 60
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { slug } = await params
+  const event = await getClient().fetch(eventBySlugQuery, { slug })
+
+  if (!event) return {}
+
+  const description = event.description?.[0]?.children?.[0]?.text || `Learn more about ${event.title} at ISTE MBCET.`
+
+  return {
+    title: event.title,
+    description: description,
+    openGraph: {
+      title: event.title,
+      description: description,
+      type: 'article',
+      images: event.gallery?.[0] ? [urlForImage(event.gallery[0]).width(1200).height(630).url()] : ['/iste.png'],
+    },
+  }
+}
 
 export default async function EventPage({ params }: { params: { slug: string } }) {
   const { slug } = await params
@@ -16,6 +38,34 @@ export default async function EventPage({ params }: { params: { slug: string } }
   
   if (!event) {
     notFound()
+  }
+
+  // Structured Data (JSON-LD)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.title,
+    startDate: event.date,
+    description: event.description?.[0]?.children?.[0]?.text || '',
+    eventStatus: event.status === 'upcoming' ? 'https://schema.org/EventScheduled' : 'https://schema.org/EventPostponed',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    location: {
+      '@type': 'Place',
+      name: 'Mar Baselios College of Engineering and Technology',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Nalanchira',
+        addressLocality: 'Thiruvananthapuram',
+        addressRegion: 'Kerala',
+        postalCode: '695015',
+        addressCountry: 'IN',
+      },
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: 'ISTE MBCET Student\'s Chapter',
+      url: 'https://iste-mbcet.vercel.app',
+    },
   }
 
   // Fetch settings for Navbar/Footer
@@ -26,6 +76,10 @@ export default async function EventPage({ params }: { params: { slug: string } }
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HomeAnimations heroTypedText="ISTE MBCET EVENTS" />
 
       <div className="c-dot" id="cdot"></div>
@@ -102,11 +156,15 @@ export default async function EventPage({ params }: { params: { slug: string } }
           <div className="interactive-gallery reveal d3">
             {event.gallery.map((img: any, i: number) => (
               <div key={i} className="gallery-item">
-                <img 
-                  src={urlForImage(img).width(800).height(800).url()} 
-                  alt={`${event.title} gallery image ${i + 1}`} 
-                  loading="lazy"
-                />
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', overflow: 'hidden', borderRadius: '12px' }}>
+                  <Image 
+                    src={urlForImage(img).width(800).height(800).url()} 
+                    alt={`${event.title} gallery image ${i + 1}`} 
+                    fill
+                    className="object-cover"
+                    loading="lazy"
+                  />
+                </div>
               </div>
             ))}
           </div>

@@ -515,8 +515,13 @@ export default async function Home() {
                 {ev.galleryTeaser?.length > 0 && (
                   <div className="event-gallery-teaser">
                     {ev.galleryTeaser.map((img: any, i: number) => (
-                      <div key={i} className="teaser-thumb" style={{ zIndex: 3 - i }}>
-                        <img src={urlForImage(img).width(80).height(80).url()} alt="Gallery teaser" />
+                      <div key={i} className="teaser-thumb" style={{ zIndex: 3 - i, position: 'relative', width: 80, height: 80 }}>
+                        <Image 
+                          src={urlForImage(img).width(80).height(80).url()} 
+                          alt="Gallery teaser" 
+                          fill
+                          className="object-cover"
+                        />
                       </div>
                     ))}
                   </div>
@@ -567,10 +572,14 @@ export default async function Home() {
                 <div className="testi-text">{t.quote}</div>
                 <div className="testi-divider"></div>
                 <div className="testi-author">
-                  <img
-                    src={t.photo ? urlForImage(t.photo).width(80).height(80).url() : `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
-                    alt={t.authorName}
-                  />
+                  <div style={{ position: 'relative', width: 80, height: 80, overflow: 'hidden', borderRadius: '50%' }}>
+                    <Image
+                      src={t.photo ? urlForImage(t.photo).width(80).height(80).url() : `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
+                      alt={t.authorName}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   <div>
                     <div className="testi-name">{t.authorName}</div>
                     <div className="testi-role">{t.authorRole}</div>

@@ -75,7 +75,7 @@ export async function submitMembership(formData: FormData) {
 
     // Send data to Google Apps Script webhook
     try {
-      const googleScriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
+      const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL;
       if (googleScriptUrl && googleScriptUrl !== 'paste_your_script_url_here') {
         const payload = {
           firstName,
