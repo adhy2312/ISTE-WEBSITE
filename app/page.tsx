@@ -189,7 +189,7 @@ export default async function Home() {
       </div>
 
       <nav id="navbar">
-        <a href="#hero" className="nav-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" /><span>ISTE SC MBCET</span></a>
+        <a href="#hero" className="nav-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" priority /><span>ISTE SC MBCET</span></a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
           <li><a href="#who">Who We Are</a></li>
@@ -572,12 +572,14 @@ export default async function Home() {
                 <div className="testi-text">{t.quote}</div>
                 <div className="testi-divider"></div>
                 <div className="testi-author">
-                  <div style={{ position: 'relative', width: 80, height: 80, overflow: 'hidden', borderRadius: '50%' }}>
-                    <Image
-                      src={t.photo ? urlForImage(t.photo).width(80).height(80).url() : `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
+                  <div style={{ position: 'relative', width: 48, height: 48, overflow: 'hidden', borderRadius: '50%' }}>
+                    <img
+                      src={t.photo ? urlForImage(t.photo).width(96).height(96).url() : `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
                       alt={t.authorName}
-                      fill
-                      className="object-cover"
+                      width={48}
+                      height={48}
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   </div>
                   <div>
