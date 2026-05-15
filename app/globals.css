@@ -422,7 +422,6 @@
     .hero-ticker-track {
       display: flex; width: max-content;
       animation: tickerScroll 40s linear infinite;
-      will-change: transform;
     }
     .hero-ticker-set {
       display: flex; align-items: center; gap: 0;
@@ -1036,7 +1035,6 @@
       display: flex;
       width: max-content;
       animation: marquee 30s linear infinite;
-      will-change: transform;
     }
     
     .marquee-content:hover {
