@@ -39,7 +39,7 @@ export default function ExecomAvatar({ photo, photoUrl, initials, name, size = '
   if (imgUrl) {
     return (
       <div className={`execom-avatar execom-avatar--photo execom-avatar--${size}`}>
-        <img src={imgUrl} alt={name} />
+        <img src={imgUrl} alt={name} width={px} height={px} loading="lazy" />
       </div>
     )
   }

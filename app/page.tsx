@@ -4,9 +4,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { urlForImage } from '@/lib/sanity/image'
 import { homePageQuery } from '@/app/queries/homeQueries'
-import HomeAnimations from '@/app/components/HomeAnimations'
+import dynamic from 'next/dynamic'
+const HomeAnimations = dynamic(() => import('@/app/components/HomeAnimations'), { ssr: false })
 import TeamCard from '@/app/components/TeamCard'
-import MembershipForm from '@/app/components/MembershipForm'
+const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'), { ssr: false })
 import { PortableText } from '@portabletext/react'
 import {
   Zap,
