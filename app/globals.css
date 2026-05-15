@@ -696,7 +696,7 @@
       font-family:var(--font-serif); font-size:1rem; font-weight:700; color:var(--white);
       flex-shrink:0;
     }
-    .team-info {}
+    
     .team-name   { font-family:var(--font-serif); font-size:.95rem; font-weight:700; color:var(--white); margin-bottom:3px; }
     .team-label  { font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:var(--g400); }
     .team-toggle {
