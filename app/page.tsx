@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { urlForImage } from '@/lib/sanity/image'
 import { homePageQuery } from '@/app/queries/homeQueries'
 import dynamic from 'next/dynamic'
-const HomeAnimations = dynamic(() => import('@/app/components/HomeAnimations'), { ssr: false })
+const HomeAnimations = dynamic(() => import('@/app/components/HomeAnimations'))
 import TeamCard from '@/app/components/TeamCard'
-const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'), { ssr: false })
+const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'))
 import { PortableText } from '@portabletext/react'
 import {
   Zap,
