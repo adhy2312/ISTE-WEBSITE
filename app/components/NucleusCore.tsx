@@ -12,12 +12,12 @@ export default function NucleusCore() {
   useEffect(() => {
     // If the PerformanceAmplifier detects dropping FPS, it updates the brain state.
     // We throttle our animation if FPS drops below 30 to guarantee 0 lag.
-    if (brain.systemState.fps > 0 && brain.systemState.fps < 30) {
+    if (brain.perfMetrics.fps > 0 && brain.perfMetrics.fps < 30) {
       setIsLowPerf(true)
     } else {
       setIsLowPerf(false)
     }
-  }, [brain.systemState.fps])
+  }, [brain.perfMetrics.fps])
 
   return (
     <div className="nucleus-wrapper" ref={containerRef}>

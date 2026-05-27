@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic'
 const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'))
 import { PortableText } from '@portabletext/react'
 import AliveClock from '@/app/components/AliveClock'
-const NucleusCore = dynamic(() => import('@/app/components/NucleusCore'), { ssr: false })
+const NucleusCore = dynamic(() => import('@/app/components/NucleusCore'))
 import {
   Zap,
   Trophy,
