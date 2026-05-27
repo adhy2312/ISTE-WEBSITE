@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display, Orbitron, Anton, Plus_Jakarta_Sans } from 'next/font/google';
+import { Outfit, Playfair_Display, Orbitron, Anton, Plus_Jakarta_Sans } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
 import BrainProvider from './brain/BrainProvider';
@@ -19,7 +19,7 @@ const PrefetchEngine = dynamic(() => import('./brain/PrefetchEngine'));
 const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngine'));
 const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-mono', weight: ['700', '900'], display: 'swap' });
 const anton = Anton({ weight: '400', subsets: ['latin'], variable: '--font-anton', display: 'swap' });
@@ -111,7 +111,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans`}
+        className={`${outfit.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans`}
         suppressHydrationWarning
       >
         <BrainProvider>
