@@ -7,6 +7,7 @@ export default function MagneticCursor() {
   const dotRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
   const brain = useBrain()
+  const notifyEngine = brain.notifyEngine
   const router = useRouter()
   const pathname = usePathname()
 
@@ -45,14 +46,14 @@ export default function MagneticCursor() {
       ring.style.height = '36px'
       ring.style.background = 'rgba(255, 255, 255, 1)'
       ring.style.border = 'none'
-      brain.notifyEngine('Cursor', 'snap')
+      notifyEngine('Cursor', 'snap')
 
       // Predictive Routing: Zero-Latency Prefetch
       const el = e.currentTarget as HTMLElement
       if (el.tagName === 'A') {
         const href = el.getAttribute('href')
         if (href && href.startsWith('/')) {
-          brain.notifyEngine('Prefetch', 'predictive_route', { url: href })
+          notifyEngine('Prefetch', 'predictive_route', { url: href })
           router.prefetch(href)
         }
       }
@@ -109,7 +110,7 @@ export default function MagneticCursor() {
         document.head.removeChild(style)
       }
     }
-  }, [pathname, brain, router])
+  }, [pathname, router, notifyEngine])
 
   return (
     <>

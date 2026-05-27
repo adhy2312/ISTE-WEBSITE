@@ -67,16 +67,15 @@ export default function SecurityGuardian() {
         interactionHistory.current.shift();
       }
 
-      // If 10 interactions happened in less than 500ms, it's a bot
+      // If 10 clicks happened in less than 500ms, it's a bot
       if (interactionHistory.current.length === 10) {
         const timeDelta = now - interactionHistory.current[0];
         if (timeDelta < 500) {
-          handleThreat('BOT_BEHAVIOR_DETECTED', `Impossibly fast interactions (${timeDelta}ms for 10 actions)`);
+          handleThreat('BOT_BEHAVIOR_DETECTED', `Impossibly fast clicks (${timeDelta}ms for 10 actions)`);
         }
       }
     };
     window.addEventListener('click', handleInteraction);
-    window.addEventListener('keydown', handleInteraction);
 
     // ── 3. MALICIOUS PAYLOAD SENSOR (Input Monitoring) ────────────────
     const handleInput = (e: Event) => {
@@ -148,7 +147,6 @@ export default function SecurityGuardian() {
     return () => {
       observer.disconnect();
       window.removeEventListener('click', handleInteraction);
-      window.removeEventListener('keydown', handleInteraction);
       window.removeEventListener('input', handleInput, true);
       window.removeEventListener('contextmenu', preventAction);
       window.removeEventListener('keydown', handleKeydown, true);

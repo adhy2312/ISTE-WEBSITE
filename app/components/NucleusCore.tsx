@@ -65,7 +65,6 @@ export default function NucleusCore() {
           border-radius: 20px;
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.05);
-          box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.5);
         }
 
         /* 3D Scene Setup */
@@ -81,6 +80,7 @@ export default function NucleusCore() {
           height: 100%;
           position: relative;
           transform-style: preserve-3d;
+          will-change: transform;
           animation: coreFloat 8s ease-in-out infinite;
         }
 
@@ -96,6 +96,7 @@ export default function NucleusCore() {
           border-radius: 50%;
           border: 1px solid rgba(var(--c-main), 0.3);
           transform-style: preserve-3d;
+          will-change: transform;
         }
 
         /* GPU Accelerated Hardware Transforms for 0 Lag */
@@ -146,6 +147,7 @@ export default function NucleusCore() {
           transform: translate(-50%, -50%);
           width: 30px; height: 30px;
           transform-style: preserve-3d;
+          will-change: transform;
         }
 
         .n-center-solid {
@@ -161,6 +163,7 @@ export default function NucleusCore() {
           top: -15px; left: -15px; right: -15px; bottom: -15px;
           background: radial-gradient(circle, rgba(var(--c-main), 0.4) 0%, transparent 70%);
           border-radius: 50%;
+          will-change: transform, opacity;
           animation: pulseGlow 3s ease-in-out infinite;
         }
 
@@ -174,6 +177,7 @@ export default function NucleusCore() {
           position: absolute;
           inset: 0;
           transform-style: preserve-3d;
+          will-change: transform;
           animation: spinZ 10s linear infinite;
         }
 
