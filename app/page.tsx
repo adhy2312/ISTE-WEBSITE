@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic'
 const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'))
 import { PortableText } from '@portabletext/react'
 import AliveClock from '@/app/components/AliveClock'
+const NucleusCore = dynamic(() => import('@/app/components/NucleusCore'), { ssr: false })
 import {
   Zap,
   Trophy,
@@ -404,12 +405,7 @@ export default async function Home() {
             )}
           </div>
           <div className="about-visual reveal d2">
-            <div className="about-box-main">
-              <div className="about-code-label">Chapter Identifier</div>
-              <div className="about-code-big">{settings.chapterCode?.slice(0, 2)}<br />{settings.chapterCode?.slice(2) || '065'}</div>
-              <div className="about-code-sub">{settings.chapterLocation || 'MBCET · Kerala'}</div>
-            </div>
-            <div className="about-box-inner"></div>
+            <NucleusCore />
           </div>
         </div>
       </section>

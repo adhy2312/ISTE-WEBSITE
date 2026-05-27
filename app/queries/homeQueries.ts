@@ -111,7 +111,7 @@ export const siteSettingsQuery = groq`
 `
 
 export const internshipsQuery = groq`
-  *[_type == "internship"] | order(order asc, deadline asc) {
+  *[_type == "internship"] | order(_createdAt desc) {
     _id,
     company,
     role,
@@ -135,7 +135,7 @@ export const internshipsQuery = groq`
 `
 
 export const featuredInternshipsQuery = groq`
-  *[_type == "internship" && featured == true && status == "open"] | order(order asc) [0...3] {
+  *[_type == "internship" && featured == true && status == "open"] | order(_createdAt desc) [0...3] {
     _id,
     company,
     role,

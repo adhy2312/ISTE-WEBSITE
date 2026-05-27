@@ -11,6 +11,8 @@ import { useBrain } from './BrainProvider';
  * 1. Unauthorized script injections (XSS)
  * 2. Rapid bot-like interactions (DDoS / Scraper behavior)
  * 3. Malicious payload typing (SQLi / XSS heuristics)
+ * 4. Anti-Tampering (Blocks DevTools, Inspect Element, Right-Click, Source View)
+ * 5. Data Protection (Blocks Copying, Dragging)
  * 
  * When a threat is detected, it triggers the organism's stress response and
  * can lockdown critical systems.
@@ -94,6 +96,33 @@ export default function SecurityGuardian() {
     // Use capture phase to intercept before React state updates
     window.addEventListener('input', handleInput, true);
 
+    // ── 4. ANTI-TAMPERING / ANTI-DEBUGGING PROTOCOLS ──────────────────
+    const preventAction = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleThreat('ANTI_TAMPER', 'Unauthorized inspection or data extraction attempt blocked.');
+      return false;
+    };
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+        (e.ctrlKey && e.key === 'u') ||
+        (e.metaKey && e.altKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
+        (e.metaKey && e.key === 'u')
+      ) {
+        preventAction(e);
+      }
+    };
+
+    window.addEventListener('contextmenu', preventAction); // Block right click
+    window.addEventListener('keydown', handleKeydown, true); // Block DevTools shortcuts
+    window.addEventListener('copy', preventAction); // Block copying
+    window.addEventListener('cut', preventAction); // Block cutting
+    window.addEventListener('dragstart', preventAction); // Block dragging images/text
+
     // ── THREAT RESPONSE PROTOCOL ──────────────────────────────────────
     const handleThreat = (type: string, details: string) => {
       isLockedDown.current = true;
@@ -121,6 +150,11 @@ export default function SecurityGuardian() {
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('keydown', handleInteraction);
       window.removeEventListener('input', handleInput, true);
+      window.removeEventListener('contextmenu', preventAction);
+      window.removeEventListener('keydown', handleKeydown, true);
+      window.removeEventListener('copy', preventAction);
+      window.removeEventListener('cut', preventAction);
+      window.removeEventListener('dragstart', preventAction);
     };
   }, []); // Remove brain from dependencies to prevent infinite loops
 

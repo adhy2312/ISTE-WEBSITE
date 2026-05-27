@@ -8,6 +8,7 @@ export default function MagneticCursor() {
   const ringRef = useRef<HTMLDivElement>(null)
   const brain = useBrain()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (window.innerWidth <= 768 || ('ontouchstart' in window)) {
@@ -35,7 +36,7 @@ export default function MagneticCursor() {
       dot.style.transform = `translate3d(${mouseX - 3}px, ${mouseY - 3}px, 0)`
     }
 
-    let interactables: NodeListOf<Element> = document.querySelectorAll('a, button, input, textarea, .execom-card, .junior-card, .team-card, .event-row, .benefit-card, .assistant-dock-btn')
+    let interactables: NodeListOf<Element> = document.querySelectorAll('a, button, input, textarea, .execom-card, .junior-card, .team-card, .event-row, .benefit-card, .assistant-dock-btn, .internship-card, .intern-apply-btn, .launchpad-preview-card')
 
     const onMouseEnter = (e: Event) => {
       isHovering = true
@@ -108,7 +109,7 @@ export default function MagneticCursor() {
         document.head.removeChild(style)
       }
     }
-  }, [])
+  }, [pathname, brain, router])
 
   return (
     <>
