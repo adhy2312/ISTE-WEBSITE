@@ -369,35 +369,90 @@
     @keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
     @keyframes fadeIn  { to { opacity:1; } }
 
-    /* Hero CTAs */
     .hero-ctas {
       display: flex; align-items: center; gap: 32px;
       opacity: 0; animation: fadeUp .8s var(--ease) forwards 2.8s;
       transform: translateY(14px);
     }
+
+    /* Premium Glowing Glassmorphic CTA */
     .hero-btn-primary {
-      display: inline-flex; align-items: center; gap: 12px;
+      position: relative;
+      display: inline-flex; align-items: center; gap: 14px;
       font-size: .88rem; font-weight: 600;
-      letter-spacing: .03em;
-      color: var(--black); background: var(--white);
-      padding: 14px 28px; border-radius: 50px;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--white);
+      background: rgba(10, 10, 14, 0.7);
+      padding: 14px 32px; border-radius: 50px;
       text-decoration: none;
-      box-shadow: 0 6px 28px rgba(255,255,255,0.14), 0 2px 8px rgba(0,0,0,0.5);
-      transition: background .3s, box-shadow .3s, transform .2s;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      z-index: 1;
     }
+    
+    /* The living magnetic border */
+    .hero-btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, rgba(var(--c-main), 1), rgba(var(--c-alt1), 0.5), rgba(var(--c-main), 1));
+      background-size: 200% 200%;
+      animation: gradientSpin 4s ease infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: -1;
+    }
+    
+    /* Subconscious hover glow */
+    .hero-btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(var(--c-main), 0.4) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      z-index: -2;
+    }
+
     .hero-btn-primary:hover {
-      background: #e8eaed;
-      box-shadow: 0 10px 40px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.5);
-      transform: translateY(-2px);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 45px rgba(var(--c-main), 0.25), inset 0 1px 0 rgba(255,255,255,0.2);
     }
+    .hero-btn-primary:hover::after {
+      opacity: 1;
+    }
+    .hero-btn-primary:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
     .hero-btn-arrow {
       display: inline-flex; align-items: center; justify-content: center;
       width: 32px; height: 32px; border-radius: 50%;
-      background: #4f6ef7; color: var(--white);
+      background: rgba(var(--c-main), 0.15); 
+      color: rgba(var(--c-main), 1);
+      border: 1px solid rgba(var(--c-main), 0.3);
       font-size: 1rem; font-weight: 700;
-      transition: background .3s, transform .3s;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .hero-btn-primary:hover .hero-btn-arrow { background: #3b5be6; transform: translateX(3px); }
+    .hero-btn-primary:hover .hero-btn-arrow { 
+      background: rgba(var(--c-main), 1); 
+      color: var(--white);
+      transform: translateX(4px) rotate(15deg); 
+      box-shadow: 0 0 15px rgba(var(--c-main), 0.5);
+    }
+
+    @keyframes gradientSpin {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
     .hero-btn-secondary {
       font-size: .88rem; font-weight: 500;
@@ -1397,6 +1452,196 @@
       padding: 4px 12px; border: 1px solid; border-radius: 20px; flex-shrink: 0;
     }
 
+    /* ===================== INTERNSHIP LAUNCHPAD (ELEGANT UI) ===================== */
+    .internship-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+    
+    .internship-card {
+      background: rgba(20, 20, 28, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 32px 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .internship-card:hover {
+      transform: translateY(-5px);
+      background: rgba(25, 25, 35, 0.9);
+      border-color: rgba(var(--c-main), 0.3);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(var(--c-main), 0.1);
+    }
+    
+    /* Glowing edge effect on hover */
+    .internship-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(var(--c-main), 0.8), transparent 50%, rgba(var(--c-alt1), 0.8));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    
+    .internship-card:hover::before {
+      opacity: 1;
+    }
+    
+    .intern-card-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .intern-logo-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .intern-logo-placeholder {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: rgba(var(--c-main), 1);
+    }
+    
+    .intern-company {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.02em;
+    }
+    
+    .intern-domain {
+      font-size: 0.8rem;
+      color: var(--g400);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+    
+    .intern-role {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    
+    .intern-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .intern-tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--g200);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    
+    .intern-desc {
+      font-size: 0.9rem;
+      color: var(--g400);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+    
+    .intern-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .intern-deadline {
+      font-size: 0.8rem;
+      color: var(--g400);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .intern-apply-btn {
+      background: var(--white);
+      color: var(--black);
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    
+    .intern-apply-btn:hover {
+      background: rgba(var(--c-main), 1);
+      color: var(--white);
+      transform: scale(1.05);
+    }
+    
+    .internship-card--dim {
+      opacity: 0.6;
+      filter: grayscale(100%);
+    }
+    
+    .internship-card--dim:hover {
+      opacity: 1;
+      filter: grayscale(0%);
+    }
+
+    .intern-status-badge {
+      margin-left: auto;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 1px solid;
+    }
+    
     /* ===================== MOBILE MENU OVERLAY ===================== */
     .mob-menu {
       position: fixed; inset: 0; z-index: 2000;

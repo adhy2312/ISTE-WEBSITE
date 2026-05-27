@@ -1,9 +1,9 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 
-// The 37 Engines Architecture (including Membership, Haptic, Physical, Cursor, Atmosphere, Neural, and Creative Engines)
-type EngineType = 'Scroll' | 'Render' | 'Animation' | 'Interaction' | 'Data' | 'Prefetch' | 'Telemetry' | 'Resource' | 'Memory' | 'DOM' | 'Layout' | 'Paint' | 'Composite' | 'Network' | 'State' | 'Events' | 'Routing' | 'Cache' | 'Security' | 'Analytics' | 'SEO' | 'Accessibility' | 'Audio' | 'Video' | 'WebGL' | 'Workers' | 'Storage' | 'I18n' | 'PWA' | 'Sync' | 'Membership' | 'Haptic' | 'Physical' | 'Cursor' | 'Atmosphere' | 'Neural' | 'Creative' | 'Performance';
+// The 38 Engines Architecture (including Membership, Haptic, Physical, Cursor, Atmosphere, Neural, Creative, and Internship Engines)
+type EngineType = 'Scroll' | 'Render' | 'Animation' | 'Interaction' | 'Data' | 'Prefetch' | 'Telemetry' | 'Resource' | 'Memory' | 'DOM' | 'Layout' | 'Paint' | 'Composite' | 'Network' | 'State' | 'Events' | 'Routing' | 'Cache' | 'Security' | 'Analytics' | 'SEO' | 'Accessibility' | 'Audio' | 'Video' | 'WebGL' | 'Workers' | 'Storage' | 'I18n' | 'PWA' | 'Sync' | 'Membership' | 'Haptic' | 'Physical' | 'Cursor' | 'Atmosphere' | 'Neural' | 'Creative' | 'Performance' | 'Internship';
 
 interface BrainState {
   isSmooth: boolean;
@@ -39,18 +39,18 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
   const filterRef = useRef<BiquadFilterNode | null>(null);
   const audioStarted = useRef(false);
 
-  const registerEngine = (engine: EngineType) => {
+  const registerEngine = useCallback((engine: EngineType) => {
     setActiveEngines(prev => {
       const next = new Set(prev);
       next.add(engine);
       return next;
     });
-  };
+  }, []);
 
   // Throttle references for high-frequency events
   const lastAudioUpdate = useRef(0);
 
-  const notifyEngine = (engine: EngineType, event: string, data?: any) => {
+  const notifyEngine = useCallback((engine: EngineType, event: string, data?: any) => {
     if (engine === 'Creative') {
       if (event === 'trigger_immersive') {
         setCreativeState(prev => ({ ...prev, immersiveMode: data?.enabled ?? !prev.immersiveMode }));
@@ -61,6 +61,12 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
     }
     if (engine === 'Membership' && event === 'traffic_surge') {
       console.log(`[Membership Engine] Traffic Spike Detected: ${data.intensity} interactions/sec. Optimizing connection pools.`);
+    }
+    if (engine === 'Internship') {
+      if (event === 'analyze_interest') {
+        console.log(`[Internship Engine] AI Agent Notified: User shows high interest in domain - ${data.domain}. Prioritizing fetching these roles.`);
+        // In the future, this would trigger the AI agent's Vercel Cron via API route.
+      }
     }
     if (engine === 'Haptic' && event === 'vibrate') {
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -100,7 +106,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
         }
       }
     }
-  };
+  }, []);
 
   useEffect(() => {
     // Interconnect engines for butter smooth performance

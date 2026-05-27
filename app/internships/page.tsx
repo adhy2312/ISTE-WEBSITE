@@ -4,6 +4,7 @@ import { internshipsQuery } from '@/app/queries/homeQueries'
 import Image from 'next/image'
 import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
+import InternshipClientEngine from './InternshipClientEngine'
 
 import { Metadata } from 'next'
 
@@ -88,6 +89,7 @@ export default async function InternshipsPage() {
   return (
     <>
       <HomeAnimations heroTypedText="INTERNSHIP LAUNCHPAD" />
+      <InternshipClientEngine />
 
 
 
