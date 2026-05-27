@@ -15,6 +15,9 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-serif)", "Georgia", "serif"],
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
+        anton: ["var(--font-anton)", "sans-serif"],
+        jakarta: ["var(--font-jakarta)", "sans-serif"],
       },
       animation: {
         "fade-rise": "fadeRise 0.8s ease-out forwards",

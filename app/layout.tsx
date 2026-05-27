@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
+import { Inter, Playfair_Display, Orbitron, Anton, Plus_Jakarta_Sans } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
 import BrainProvider from './brain/BrainProvider';
@@ -18,10 +18,11 @@ const PresenceEngine = dynamic(() => import('./brain/PresenceEngine'));
 const PrefetchEngine = dynamic(() => import('./brain/PrefetchEngine'));
 const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngine'));
 
-
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-mono', weight: ['700', '900'], display: 'swap' });
+const anton = Anton({ weight: '400', subsets: ['latin'], variable: '--font-anton', display: 'swap' });
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta', display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://iste-mbcet.vercel.app'),
@@ -87,7 +88,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${playfair.variable} ${orbitron.variable} font-sans`}
+        className={`${inter.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans bg-[var(--black)] text-[var(--white)]`}
         suppressHydrationWarning
       >
         <BrainProvider>
