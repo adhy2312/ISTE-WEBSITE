@@ -12,31 +12,8 @@ export default function IsteAssistant() {
   const [input, setInput] = useState('');
   const brain = useBrain();
 
-  // Watch for AI Internship Scraper discoveries
-  const [lastFoundCount, setLastFoundCount] = useState(0);
-
-  useEffect(() => {
-    if (brain.internshipState.foundCount > lastFoundCount) {
-      // Find the most recent 'FOUND' log
-      const latestFoundLog = brain.internshipState.logs.find(log => log.includes('[FOUND]'));
-      if (latestFoundLog) {
-        setMessages(prev => [
-          ...prev, 
-          { 
-            role: 'ai', 
-            text: `⚠️ URGENT INTERRUPT: My neural scrapers ${latestFoundLog.replace('[FOUND]', 'have just detected')}. Check the Launchpad immediately.`
-          }
-        ]);
-        
-        // Auto-open the assistant if it's closed to alert the user
-        if (!isOpen) {
-          setIsOpen(true);
-          brain.notifyEngine('Haptic', 'vibrate', { duration: [50, 100, 50] }); // Triple buzz alert
-        }
-      }
-      setLastFoundCount(brain.internshipState.foundCount);
-    }
-  }, [brain.internshipState.foundCount, lastFoundCount, isOpen, brain.internshipState.logs, brain]);
+  // Internship discoveries are tracked silently — no aggressive popups
+  // The count is displayed as a subtle badge on the dock button only
 
   // Haptic feedback for the button
   const triggerHaptic = () => {

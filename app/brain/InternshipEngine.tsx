@@ -36,11 +36,11 @@ export default function InternshipEngine() {
       const randomHub = KERALA_HUBS[Math.floor(Math.random() * KERALA_HUBS.length)];
       notifyEngine('Internship', 'agent_log', `[SCAN] Traversing subnet: ${randomHub}...`);
       
-      await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+      await new Promise(resolve => setTimeout(resolve, 4000 + Math.random() * 6000));
       if (!isActive) return;
 
       // Phase 2: Analyzing or Finding
-      const foundSomething = Math.random() > 0.4; // 60% chance to find
+      const foundSomething = Math.random() > 0.7; // 30% chance to find (reduced from 60%)
       
       if (foundSomething) {
         notifyEngine('Internship', 'agent_status', 'OPPORTUNITY DETECTED');
@@ -52,8 +52,7 @@ export default function InternshipEngine() {
         notifyEngine('Internship', 'agent_log', `[INFO] No match in sector ${Math.floor(Math.random() * 9999)}. Rerouting...`);
       }
 
-      // Loop
-      const nextDelay = 3000 + Math.random() * 5000;
+      const nextDelay = 15000 + Math.random() * 15000;
       setTimeout(simulateAgentActivity, nextDelay);
     };
 

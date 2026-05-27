@@ -90,7 +90,6 @@ export default async function InternshipsPage() {
   return (
     <>
       <HomeAnimations heroTypedText="INTERNSHIP LAUNCHPAD" />
-      <InternshipClientEngine />
 
 
 
