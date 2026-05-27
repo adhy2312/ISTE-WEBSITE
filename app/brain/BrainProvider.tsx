@@ -108,6 +108,24 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
+  // AI Performance Engine: Active Intervention Protocol
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      if (intervention) {
+        document.documentElement.classList.add('low-power-mode');
+        console.log('%c[AI Performance Engine] Critical load detected. Engaging Low Power Mode. Downgrading visual fidelity to preserve 60FPS.', 'color: #ff3366; font-weight: bold;');
+        if (audioCtxRef.current && audioCtxRef.current.state === 'running') {
+          audioCtxRef.current.suspend(); // Kill audio thread to save CPU
+        }
+      } else {
+        document.documentElement.classList.remove('low-power-mode');
+        if (audioStarted.current && audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+          audioCtxRef.current.resume();
+        }
+      }
+    }
+  }, [intervention]);
+
   useEffect(() => {
     // Interconnect engines for butter smooth performance
     const allEngines: EngineType[] = [
@@ -176,12 +194,18 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
         isLooping = false;
         cancelAnimationFrame(animFrame);
         notifyEngine('Memory', 'sleep');
+        if (audioCtxRef.current && audioCtxRef.current.state === 'running') {
+          audioCtxRef.current.suspend();
+        }
       } else {
         // Wake brain up
         isLooping = true;
         lastTime = performance.now();
         animFrame = requestAnimationFrame(measureFPSAndPhysics);
         notifyEngine('Memory', 'wake');
+        if (audioStarted.current && audioCtxRef.current && audioCtxRef.current.state === 'suspended' && !intervention) {
+          audioCtxRef.current.resume();
+        }
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);

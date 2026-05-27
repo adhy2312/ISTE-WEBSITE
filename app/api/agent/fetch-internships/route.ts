@@ -61,7 +61,7 @@ export async function GET(req: Request) {
 
     console.log('[AI Agent] HTML Extracted. Sending to Gemini for analysis...');
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const prompt = `
       You are an expert tech recruiter AI agent for a college in Kerala. 
       Read the following text extracted from a job board. Find all INTERNSHIPS. Ignore full-time or senior roles.

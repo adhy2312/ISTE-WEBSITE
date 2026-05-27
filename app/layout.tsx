@@ -3,9 +3,11 @@ import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
 import BrainProvider from './brain/BrainProvider';
-import IsteAssistant from './components/IsteAssistant';
-import MagneticCursor from './components/MagneticCursor';
-import DigitalSoul from './components/DigitalSoul';
+import dynamic from 'next/dynamic';
+
+const IsteAssistant = dynamic(() => import('./components/IsteAssistant'));
+const MagneticCursor = dynamic(() => import('./components/MagneticCursor'));
+const DigitalSoul = dynamic(() => import('./components/DigitalSoul'));
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
@@ -58,7 +60,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/iste.png",
     apple: "/iste.png",
   },
 };

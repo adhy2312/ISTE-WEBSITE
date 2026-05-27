@@ -7,7 +7,8 @@ import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import LiveEventBanner from '@/app/components/LiveEventBanner'
 import TeamCard from '@/app/components/TeamCard'
-import MembershipForm from '@/app/components/MembershipForm'
+import dynamic from 'next/dynamic'
+const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'))
 import { PortableText } from '@portabletext/react'
 import {
   Zap,

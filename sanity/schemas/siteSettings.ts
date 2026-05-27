@@ -4,8 +4,7 @@ export const siteSettingsSchema = defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
-  // Singleton — only one document of this type
-  __experimental_actions: ['update', 'publish'],
+  // Singleton — handled in structure builder
   fields: [
     defineField({
       name: 'heroHeadline',
