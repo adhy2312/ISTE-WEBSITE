@@ -6,6 +6,8 @@ import { siteSettingsSchema } from './siteSettings'
 import { internshipSchema } from './internship'
 import { pillarSchema } from './pillar'
 import { benefitSchema } from './benefit'
+import { announcementSchema } from './announcement'
+import { faqSchema } from './faq'
 
 export const schemaTypes = [
   eventSchema,
@@ -16,4 +18,6 @@ export const schemaTypes = [
   internshipSchema,
   pillarSchema,
   benefitSchema,
+  announcementSchema,
+  faqSchema,
 ]
