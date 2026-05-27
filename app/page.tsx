@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { urlForImage } from '@/lib/sanity/image'
 import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
+import LiveEventBanner from '@/app/components/LiveEventBanner'
 import TeamCard from '@/app/components/TeamCard'
 import MembershipForm from '@/app/components/MembershipForm'
 import { PortableText } from '@portabletext/react'
@@ -117,6 +118,8 @@ export default async function Home() {
   const heroSecondaryCta = settings.heroSecondaryCtaLabel || "Explore Events"
   const navCta = settings.navCtaLabel || "Join Now"
   const footerTagline = settings.footerTagline || "Indian Society for Technical Education — Mar Baselios College of Engineering and Technology Student Chapter, Kerala."
+  const membershipEnabled = settings.membershipEnabled !== false // defaults to true
+  const membershipClosedMessage = settings.membershipClosedMessage || "Membership applications are currently closed. Please check back later."
 
   // Default ticker array if not provided in Sanity
   const tickerItems = settings.tickerItems?.length ? settings.tickerItems : [
@@ -155,6 +158,9 @@ export default async function Home() {
     ? members.filter((m: any) => m.category === 'junior')
     : FALLBACK_EXECOM.junior
 
+  // Filter live active events
+  const activeEvents = events.filter((e: any) => e.status === 'registration_active' || e.status === 'coming_soon' || e.status === 'upcoming')
+
   const getBenefitIcon = (iconName: string) => {
     const icons: Record<string, any> = {
       Zap: <Zap size={24} strokeWidth={1.5} />,
@@ -177,10 +183,9 @@ export default async function Home() {
     <>
       <HomeAnimations heroTypedText={heroTypedText} />
 
-      <div id="cdot"><div className="c-dot-inner"></div></div>
-      <div id="cring"><div className="c-ring-inner"></div></div>
 
-      <div className="grid-lines">
+
+      <div className="grid-lines" aria-hidden="true">
         <div className="grid-line"></div>
         <div className="grid-line"></div>
         <div className="grid-line"></div>
@@ -188,27 +193,30 @@ export default async function Home() {
         <div className="grid-line"></div>
       </div>
 
-      <nav id="navbar">
-        <a href="#hero" className="nav-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" priority /><span>ISTE SC MBCET</span></a>
-        <ul className="nav-links">
-          <li><a href="#about">About</a></li>
-          <li><a href="#who">Who We Are</a></li>
-          <li><a href="#benefits">Benefits</a></li>
-          <li><a href="#execom">ExeCom</a></li>
-          <li><a href="#events">Events</a></li>
-          <li><Link href="/internships" className="nav-link-highlight">Launchpad ✦</Link></li>
+      <nav id="navbar" aria-label="Main Navigation" role="navigation">
+        <a href="#hero" className="nav-logo" aria-label="ISTE MBCET Home">
+          <Image src="/iste.png" alt="ISTE SC MBCET Logo" width={40} height={40} className="logo-img" priority />
+          <span>ISTE SC MBCET</span>
+        </a>
+        <ul className="nav-links" role="menubar">
+          <li role="none"><a role="menuitem" href="#about">About</a></li>
+          <li role="none"><a role="menuitem" href="#who">Who We Are</a></li>
+          <li role="none"><a role="menuitem" href="#benefits">Benefits</a></li>
+          <li role="none"><a role="menuitem" href="#execom">ExeCom</a></li>
+          <li role="none"><a role="menuitem" href="#events">Events</a></li>
+          <li role="none"><Link role="menuitem" href="/internships" className="nav-link-highlight">Launchpad ✦</Link></li>
         </ul>
-        <a href="#membership" className="nav-cta">{navCta}</a>
-        <div className="nav-hamburger" id="hamburger">
-          <span></span><span></span><span></span>
-        </div>
+        <a href="#membership" className="nav-cta" aria-label="Navigate to Membership Form">{navCta}</a>
+        <button className="nav-hamburger" id="hamburger" aria-label="Open mobile menu" aria-expanded="false" aria-controls="mob-menu">
+          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </button>
       </nav>
 
       {/* ===== MOBILE MENU OVERLAY ===== */}
-      <div className="mob-menu" id="mob-menu">
+      <div className="mob-menu" id="mob-menu" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
         <div className="mob-menu-inner">
           <button className="mob-close" id="mob-close" aria-label="Close menu">✕</button>
-          <nav className="mob-nav">
+          <nav className="mob-nav" aria-label="Mobile Navigation">
             <a href="#about" className="mob-link" id="ml-1">About</a>
             <a href="#who" className="mob-link" id="ml-2">Who We Are</a>
             <a href="#benefits" className="mob-link" id="ml-3">Benefits</a>
@@ -216,10 +224,10 @@ export default async function Home() {
             <a href="#events" className="mob-link" id="ml-5">Events</a>
             <Link href="/internships" className="mob-link mob-link--accent" id="ml-6">Internship Launchpad ✦</Link>
           </nav>
-          <a href="#membership" className="mob-cta">{navCta} →</a>
+          <a href="#membership" className="mob-cta" aria-label="Navigate to Membership Form">{navCta} →</a>
           <div className="mob-footer">
-            <a href="https://www.instagram.com/iste_mbcet/">Instagram</a>
-            <a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a>
+            <a href="https://www.instagram.com/iste_mbcet/" aria-label="ISTE MBCET Instagram">Instagram</a>
+            <a href="https://www.linkedin.com/company/istescmbcet/" aria-label="ISTE MBCET LinkedIn">LinkedIn</a>
           </div>
         </div>
       </div>
@@ -288,6 +296,9 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Dynamic Active Event Banner */}
+      <LiveEventBanner activeEvents={activeEvents} />
+
       <section id="about">
         <div className="section-inner about-grid">
           <div>
@@ -295,11 +306,9 @@ export default async function Home() {
             <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.aboutTitle || 'Shaping <em>Engineers</em><br />of Tomorrow' }}></h2>
 
             {settings.aboutBody?.length ? (
-              settings.aboutBody.map((block: any, i: number) => (
-                <p key={i} className={`section-body reveal ${i === 0 ? 'd2' : 'd3'}`} style={{ marginTop: i === 0 ? 24 : 16 }}>
-                  {block.children?.[0]?.text || ''}
-                </p>
-              ))
+              <div className="section-body-wrapper reveal d2" style={{ marginTop: 24 }}>
+                <PortableText value={settings.aboutBody} />
+              </div>
             ) : (
               <>
                 <p className="section-body reveal d2" style={{ marginTop: 24 }}>
@@ -318,8 +327,8 @@ export default async function Home() {
           <div className="about-visual reveal d2">
             <div className="about-box-main">
               <div className="about-code-label">Chapter Identifier</div>
-              <div className="about-code-big">KE<br />065</div>
-              <div className="about-code-sub">MBCET &nbsp;·&nbsp; Kerala</div>
+              <div className="about-code-big">{settings.chapterCode?.slice(0, 2)}<br />{settings.chapterCode?.slice(2) || '065'}</div>
+              <div className="about-code-sub">{settings.chapterLocation || 'MBCET · Kerala'}</div>
             </div>
             <div className="about-box-inner"></div>
           </div>
@@ -436,16 +445,41 @@ export default async function Home() {
 
       <section id="execom">
         <div className="section-inner">
-          <div className="section-tag reveal">Leadership 2025-26</div>
-          <h2 className="section-title reveal d1">Executive<br /><em>Committee</em></h2>
+          <div className="section-tag reveal">Leadership 2026-27</div>
+          <h2 className="section-title reveal d1" style={{ position: 'relative', zIndex: 2 }}>
+            Executive<br /><em>Committee</em>
+          </h2>
+          
+          {/* Decorative atmospheric node for the Execom section */}
+          <div className="absolute left-1/2 top-32 -translate-x-1/2 w-[800px] h-[800px] blur-[150px] opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(var(--c-alt1), 1) 0%, transparent 60%)', zIndex: 0 }} />
 
           <div className="execom-sub-label reveal">Faculty Advisors</div>
           <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
             {faculty.map((m: any, i: number) => (
               <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
-                <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
-                <div className="execom-name">{m.name}</div>
-                <div className="execom-role">{m.role}</div>
+                <div className="execom-card-content">
+                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
+                  <div className="execom-name">{m.name}</div>
+                  <div className="execom-role">{m.role}</div>
+                  {(m.linkedinUrl || m.instagramUrl) && (
+                    <div className="flex items-center justify-center gap-3 mt-4">
+                      {m.linkedinUrl && (
+                        <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                          </svg>
+                        </a>
+                      )}
+                      {m.instagramUrl && (
+                        <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -454,20 +488,60 @@ export default async function Home() {
           <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
             {mentors.map((m: any, i: number) => (
               <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
-                <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
-                <div className="execom-name">{m.name}</div>
-                <div className="execom-role">{m.role}</div>
+                <div className="execom-card-content">
+                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
+                  <div className="execom-name">{m.name}</div>
+                  <div className="execom-role">{m.role}</div>
+                  {(m.linkedinUrl || m.instagramUrl) && (
+                    <div className="flex items-center justify-center gap-3 mt-4">
+                      {m.linkedinUrl && (
+                        <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                          </svg>
+                        </a>
+                      )}
+                      {m.instagramUrl && (
+                        <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
 
           <div className="execom-sub-label reveal">Core Officers</div>
-          <div className="execom-core">
+          <div className="execom-core bento">
             {core.map((m: any, i: number) => (
-              <div key={m._id} className={`execom-card reveal ${DELAY_CLASSES[i] || ''}`}>
-                <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
-                <div className="execom-name">{m.name}</div>
-                <div className="execom-role">{m.role}</div>
+              <div key={m._id} className={`execom-card reveal ${DELAY_CLASSES[i] || ''} ${i < 2 ? 'bento-wide' : 'bento-wide'}`}>
+                <div className="execom-card-content">
+                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
+                  <div className="execom-name">{m.name}</div>
+                  <div className="execom-role">{m.role}</div>
+                  {(m.linkedinUrl || m.instagramUrl) && (
+                    <div className="flex items-center justify-center gap-3 mt-4">
+                      {m.linkedinUrl && (
+                        <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                          </svg>
+                        </a>
+                      )}
+                      {m.instagramUrl && (
+                        <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
+                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -491,9 +565,11 @@ export default async function Home() {
           <div className="junior-grid">
             {junior.map((m: any, i: number) => (
               <div key={m._id} className={`junior-card reveal ${DELAY_CLASSES[i] || ''}`}>
-                <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} size="sm" />
-                <div className="junior-name">{m.name}</div>
-                <div className="junior-role">{m.team || m.role}</div>
+                <div className="execom-card-content">
+                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} size="sm" />
+                  <div className="junior-name">{m.name}</div>
+                  <div className="junior-role">{m.team || m.role}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -553,7 +629,10 @@ export default async function Home() {
                   ))}
                 </div>
               </div>
-              <MembershipForm />
+              <MembershipForm 
+                enabled={membershipEnabled} 
+                closedMessage={membershipClosedMessage} 
+              />
             </div>
           </div>
         </div>
@@ -654,6 +733,7 @@ export default async function Home() {
       </section>
 
       <footer>
+        <div className="footer-watermark">v5.6</div>
         <div className="footer-top">
           <div>
             <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={80} height={80} className="footer-logo-img" /></div>

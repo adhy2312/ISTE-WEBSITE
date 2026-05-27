@@ -2,6 +2,10 @@ import type { Metadata } from 'next';
 import { Inter, Playfair_Display, Orbitron } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
+import BrainProvider from './brain/BrainProvider';
+import IsteAssistant from './components/IsteAssistant';
+import MagneticCursor from './components/MagneticCursor';
+import DigitalSoul from './components/DigitalSoul';
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
@@ -74,8 +78,12 @@ export default async function RootLayout({
         className={`${inter.variable} ${playfair.variable} ${orbitron.variable} font-sans`}
         suppressHydrationWarning
       >
-        {children}
-
+        <BrainProvider>
+          {!isStudio && <DigitalSoul />}
+          {children}
+          {!isStudio && <IsteAssistant />}
+          {!isStudio && <MagneticCursor />}
+        </BrainProvider>
       </body>
     </html>
   );

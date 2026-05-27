@@ -46,6 +46,8 @@ export const execomMembersQuery = groq`
       hotspot,
       crop,
     },
+    linkedinUrl,
+    instagramUrl,
     subMembers[] {
       name,
       initials,
@@ -99,6 +101,7 @@ export const siteSettingsQuery = groq`
     navCtaLabel,
     footerTagline,
     chapterCode,
+    chapterLocation,
     contactEmail,
     instagramUrl,
     linkedinUrl,

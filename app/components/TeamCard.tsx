@@ -27,26 +27,28 @@ export default function TeamCard({ id, name, team, delay, subs, photo }: TeamCar
 
   return (
     <div className={`team-card reveal ${delay || ''}`} onClick={toggleTeam}>
-      <div className="team-head">
-        <div className="team-head-left">
-          <ExecomAvatar photo={photo} initials={id} name={name} size="sm" />
-          <div className="team-info">
-            <div className="team-name">{name}</div>
-            <div className="team-label">{team}</div>
-          </div>
-        </div>
-        <div className="team-toggle">▾</div>
-      </div>
-      <div className="team-subs">
-        {subs.map((sub, sIdx) => (
-          <div key={sIdx} className="sub-member">
-            <ExecomAvatar photo={sub.photo ?? null} initials={sub.initials} name={sub.name} size="sm" />
-            <div>
-              <div className="sub-name">{sub.name}</div>
-              <div className="sub-role">Sub-head</div>
+      <div className="execom-card-content">
+        <div className="team-head">
+          <div className="team-head-left">
+            <ExecomAvatar photo={photo} initials={id} name={name} size="sm" />
+            <div className="team-info">
+              <div className="team-name">{name}</div>
+              <div className="team-label">{team}</div>
             </div>
           </div>
-        ))}
+          <div className="team-toggle">▾</div>
+        </div>
+        <div className="team-subs">
+          {subs.map((sub, sIdx) => (
+            <div key={sIdx} className="sub-member">
+              <ExecomAvatar photo={sub.photo ?? null} initials={sub.initials} name={sub.name} size="sm" />
+              <div>
+                <div className="sub-name">{sub.name}</div>
+                <div className="sub-role">Sub-head</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

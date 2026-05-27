@@ -12,69 +12,7 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
   const heroDividerRef = useRef<HTMLDivElement | null>(null)
   const heroSubRef = useRef<HTMLParagraphElement | null>(null)
 
-  // Custom Cursor
-  useEffect(() => {
-    const cdot = document.getElementById('cdot')
-    const cring = document.getElementById('cring')
-    if (!cdot || !cring) return
 
-    let mx = -100, my = -100, rx = -100, ry = -100
-    let req: number | null = null
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mx = e.clientX
-      my = e.clientY
-      if (!req) {
-        req = requestAnimationFrame(animRing)
-      }
-    }
-
-    const animRing = () => {
-      cdot.style.transform = `translate3d(${mx}px, ${my}px, 0)`
-      
-      const dx = mx - rx
-      const dy = my - ry
-      
-      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
-        rx = mx
-        ry = my
-        cring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`
-        req = null
-        return
-      }
-
-      rx += dx * 0.12
-      ry += dy * 0.12
-      cring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`
-      req = requestAnimationFrame(animRing)
-    }
-
-    document.addEventListener('mousemove', handleMouseMove)
-
-    const interactiveEls = document.querySelectorAll('a, button, .execom-card, .event-row, .benefit-card, .who-card, .team-card')
-    const enter = () => { 
-      document.querySelector('.c-dot-inner')?.classList.add('big'); 
-      document.querySelector('.c-ring-inner')?.classList.add('big'); 
-    }
-    const leave = () => { 
-      document.querySelector('.c-dot-inner')?.classList.remove('big'); 
-      document.querySelector('.c-ring-inner')?.classList.remove('big'); 
-    }
-
-    interactiveEls.forEach(el => {
-      el.addEventListener('mouseenter', enter)
-      el.addEventListener('mouseleave', leave)
-    })
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      if (req !== null) cancelAnimationFrame(req)
-      interactiveEls.forEach(el => {
-        el.removeEventListener('mouseenter', enter)
-        el.removeEventListener('mouseleave', leave)
-      })
-    }
-  }, [])
 
   // Navbar Scroll
   useEffect(() => {
@@ -168,7 +106,7 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
           ro.unobserve(e.target)
         }
       })
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
+    }, { threshold: 0, rootMargin: '0px 0px 200px 0px' })
 
     document.querySelectorAll('.reveal').forEach(el => ro.observe(el))
 
@@ -202,6 +140,69 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     return () => {
       ro.disconnect()
       co.disconnect()
+    }
+  }, [])
+
+  // Holographic 3D Card Tilt Effect
+  useEffect(() => {
+    const cards = document.querySelectorAll('.execom-card, .team-card, .junior-card') as NodeListOf<HTMLElement>
+    
+    // Load Dissipation: RAF Lock for physics calculations
+    let physicsLock = false;
+    
+    const handleMouseMove = (e: MouseEvent, card: HTMLElement) => {
+      if (physicsLock) return;
+      physicsLock = true;
+      
+      requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
+        
+        const centerX = rect.width / 2
+        const centerY = rect.height / 2
+        
+        // Calculate rotation (max 15 degrees)
+        const rotateX = ((y - centerY) / centerY) * -15
+        const rotateY = ((x - centerX) / centerX) * 15
+        
+        card.style.setProperty('--rx', `${rotateX}deg`)
+        card.style.setProperty('--ry', `${rotateY}deg`)
+        
+        // Calculate glare position
+        const px = (x / rect.width) * 100
+        const py = (y / rect.height) * 100
+        card.style.setProperty('--mx', `${px}%`)
+        card.style.setProperty('--my', `${py}%`)
+        
+        physicsLock = false;
+      });
+    }
+    
+    const handleMouseLeave = (card: HTMLElement) => {
+      card.style.setProperty('--rx', '0deg')
+      card.style.setProperty('--ry', '0deg')
+      card.style.setProperty('--mx', '50%')
+      card.style.setProperty('--my', '50%')
+    }
+    
+    const listeners = new Map()
+    
+    cards.forEach(card => {
+      const move = (e: MouseEvent) => handleMouseMove(e, card)
+      const leave = () => handleMouseLeave(card)
+      
+      card.addEventListener('mousemove', move)
+      card.addEventListener('mouseleave', leave)
+      listeners.set(card, { move, leave })
+    })
+    
+    return () => {
+      cards.forEach(card => {
+        const { move, leave } = listeners.get(card) || {}
+        if (move) card.removeEventListener('mousemove', move)
+        if (leave) card.removeEventListener('mouseleave', leave)
+      })
     }
   }, [])
 

@@ -82,8 +82,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
       />
       <HomeAnimations heroTypedText="ISTE MBCET EVENTS" />
 
-      <div className="c-dot" id="cdot"></div>
-      <div className="c-ring" id="cring"></div>
+
 
       {/* Grid Background */}
       <div className="grid-lines" style={{ position: 'fixed', zIndex: -1 }}>

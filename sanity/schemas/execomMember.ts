@@ -57,6 +57,16 @@ export const execomMemberSchema = defineType({
       type: 'number',
     }),
     defineField({
+      name: 'linkedinUrl',
+      title: 'LinkedIn URL',
+      type: 'url',
+    }),
+    defineField({
+      name: 'instagramUrl',
+      title: 'Instagram URL',
+      type: 'url',
+    }),
+    defineField({
       name: 'subMembers',
       title: 'Sub-Members (for Team Leads only)',
       type: 'array',

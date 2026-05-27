@@ -1,14 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { submitMembership } from '../actions/membership'
+import { useBrain } from '../brain/BrainProvider'
 
-export default function MembershipForm() {
+interface MembershipFormProps {
+  enabled?: boolean;
+  closedMessage?: string;
+}
+
+export default function MembershipForm({ enabled = true, closedMessage = "Membership applications are currently closed." }: MembershipFormProps) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  
+  // Connect to Central Nervous System
+  const brain = useBrain()
+  const interactionCount = useRef(0)
+
+  // Traffic Monitoring (Membership Engine)
+  const handleInteraction = () => {
+    interactionCount.current += 1;
+    if (interactionCount.current > 5) {
+      // Simulate traffic surge to the central brain
+      brain.notifyEngine('Membership', 'traffic_surge', { intensity: interactionCount.current });
+      interactionCount.current = 0; // reset
+    }
+  };
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!enabled) return;
+    
     setStatus('loading')
     setErrorMsg('')
 
@@ -32,8 +54,14 @@ export default function MembershipForm() {
 
   return (
     <div className="mem-form reveal d2">
-      {status !== 'success' ? (
-        <form id="mem-form" onSubmit={submitForm}>
+      {!enabled ? (
+        <div className="form-success" style={{ display: 'block', textAlign: 'center', padding: '40px 20px' }}>
+          <div className="form-success-icon" style={{ borderColor: 'var(--border)', color: 'var(--g400)' }}>⨯</div>
+          <div className="form-success-title" style={{ color: 'var(--g200)' }}>Currently Closed</div>
+          <div className="form-success-sub" style={{ marginTop: '12px', fontSize: '0.9rem' }}>{closedMessage}</div>
+        </div>
+      ) : status !== 'success' ? (
+        <form id="mem-form" onSubmit={submitForm} onChange={handleInteraction} onFocus={handleInteraction}>
           <div className="form-head">Apply for Membership</div>
           <div className="form-sub">One-time enrollment &nbsp;·&nbsp; Students only</div>
           <div className="form-row">

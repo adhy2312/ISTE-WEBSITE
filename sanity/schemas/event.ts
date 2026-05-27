@@ -45,7 +45,9 @@ export const eventSchema = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Upcoming', value: 'upcoming' },
+          { title: 'Registration Active (Live)', value: 'registration_active' },
+          { title: 'Coming Soon', value: 'coming_soon' },
+          { title: 'Upcoming (Standard)', value: 'upcoming' },
           { title: 'Past', value: 'past' },
         ],
         layout: 'radio',

@@ -89,8 +89,7 @@ export default async function InternshipsPage() {
     <>
       <HomeAnimations heroTypedText="INTERNSHIP LAUNCHPAD" />
 
-      <div className="c-dot" id="cdot"></div>
-      <div className="c-ring" id="cring"></div>
+
 
       {/* Navbar */}
       <nav id="navbar">

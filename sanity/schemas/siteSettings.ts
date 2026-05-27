@@ -58,13 +58,27 @@ export const siteSettingsSchema = defineType({
       name: 'aboutBody',
       title: 'About Body Paragraphs',
       type: 'array',
-      of: [{ type: 'text' }],
+      of: [{ type: 'block' }],
     }),
     defineField({
       name: 'membershipPerks',
       title: 'Membership Perks',
       type: 'array',
       of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'membershipEnabled',
+      title: 'Accepting Memberships',
+      description: 'Toggle whether the membership application form is open.',
+      type: 'boolean',
+      initialValue: true,
+    }),
+    defineField({
+      name: 'membershipClosedMessage',
+      title: 'Membership Closed Message',
+      description: 'Message to show when membership applications are closed.',
+      type: 'string',
+      initialValue: 'Membership applications are currently closed. Please check back later.',
     }),
     defineField({
       name: 'navCtaLabel',
@@ -82,6 +96,12 @@ export const siteSettingsSchema = defineType({
       title: 'Chapter Code',
       type: 'string',
       initialValue: 'KE065',
+    }),
+    defineField({
+      name: 'chapterLocation',
+      title: 'Chapter Location',
+      type: 'string',
+      initialValue: 'MBCET · Kerala',
     }),
     defineField({
       name: 'contactEmail',
