@@ -15,6 +15,10 @@ import os, time, hashlib, random, re, json
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urljoin, urlparse
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # ── Terminal Colors ──
 class C:
@@ -39,6 +43,9 @@ SANITY_URL = f"https://{SANITY_PROJECT_ID}.api.sanity.io/v2023-01-01/data/mutate
 HEADERS_SANITY = {"Content-Type":"application/json","Authorization":f"Bearer {SANITY_TOKEN}"}
 
 SESSION = requests.Session()
+_retries = Retry(total=3, backoff_factor=0.5, status_forcelist=[500, 502, 503, 504])
+SESSION.mount('http://', HTTPAdapter(max_retries=_retries))
+SESSION.mount('https://', HTTPAdapter(max_retries=_retries))
 SESSION.headers.update({
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
     "Accept-Language": "en-IN,en;q=0.9",
@@ -65,6 +72,11 @@ def scrape_internshala():
         "work-from-home-python-django-internships",
         "work-from-home-web-development-internships",
         "work-from-home-machine-learning-internships",
+        "cyber-security-internship",
+        "data-analytics-internship",
+        "work-from-home-react-js-internships",
+        "work-from-home-node-js-internships",
+        "app-development-internship-in-kerala",
     ]
     for kw in keywords:
         try:
@@ -226,12 +238,349 @@ def get_kerala_ecosystem():
     return all_items
 
 # ═══════════════════════════════════════════════════════════════
+# SOURCE 3: ELITE RESEARCH & GOV HUNTER (VSSC, ISRO, IISc, CDAC)
+# ═══════════════════════════════════════════════════════════════
+def hunt_elite_research():
+    t_log("INFO", "ELITE_HUNTER", "Hunting for live notifications from Elite Institutions (ISRO, VSSC, IISc, DRDO)...")
+    results = []
+    
+    targets = [
+        {
+            "company": "ISRO / VSSC (Trivandrum)",
+            "url": "https://www.vssc.gov.in/student-projects.html",
+            "domain": "Aerospace & Tech",
+            "type": "On-Site",
+            "stipend": "Academic"
+        },
+        {
+            "company": "DRDO NPOL (Kochi)",
+            "url": "https://www.drdo.gov.in/labs-and-establishments/naval-physical-oceanographic-laboratory-npol",
+            "domain": "Defense & Tech",
+            "type": "On-Site",
+            "stipend": "Academic"
+        },
+        {
+            "company": "IISc Bangalore",
+            "url": "https://iisc.ac.in/admissions/",
+            "domain": "Deep Research",
+            "type": "On-Site",
+            "stipend": "Fellowship"
+        },
+        {
+            "company": "C-DAC (Trivandrum)",
+            "url": "https://www.cdac.in/index.aspx?id=careers",
+            "domain": "Supercomputing & AI",
+            "type": "On-Site",
+            "stipend": "Govt Norms"
+        },
+        {
+            "company": "Kerala State IT Mission",
+            "url": "https://itmission.kerala.gov.in/",
+            "domain": "e-Governance",
+            "type": "Hybrid",
+            "stipend": "Govt Norms"
+        }
+    ]
+    
+    keywords = ['intern', 'fellowship', 'student project', 'summer research', 'apprentice']
+    
+    for target in targets:
+        try:
+            jitter(1.0, 2.5)
+            # Some gov sites have bad SSL certs or block basic User Agents, use our standard SESSION
+            resp = SESSION.get(target["url"], timeout=15, verify=False) 
+            if resp.status_code != 200:
+                continue
+                
+            soup = BeautifulSoup(resp.text, "lxml")
+            links = soup.find_all("a", href=True)
+            
+            found_count = 0
+            for a in links:
+                text = a.get_text(strip=True).lower()
+                href = a['href']
+                
+                # Look for matching keywords in text or href
+                if any(kw in text for kw in keywords) or any(kw in href.lower() for kw in keywords):
+                    if not href.startswith('http'):
+                        href = urljoin(target["url"], href)
+                        
+                    role = a.get_text(strip=True)
+                    if len(role) < 5 or len(role) > 80:
+                        role = "Research / Project Intern"
+                        
+                    # Skip generic navigation links
+                    if "login" in text or "contact" in text:
+                        continue
+                        
+                    results.append({
+                        "company": target["company"],
+                        "role": role[:80],
+                        "type": target["type"],
+                        "domain": target["domain"],
+                        "stipend": target["stipend"],
+                        "duration": "Check Notification",
+                        "deadlineLabel": "Active Notification",
+                        "applyLink": href,
+                        "status": "open",
+                        "source": "EliteHunter"
+                    })
+                    found_count += 1
+                    
+                    if found_count >= 3: # Limit to top 3 recent notifications per institution to avoid spam
+                        break
+        except Exception as e:
+            t_log("WARN", "ELITE_HUNTER", f"Failed to hunt {target['company']}: {e}")
+            
+    t_log("SUCCESS", "ELITE_HUNTER", f"Hunted {len(results)} live notifications from Elite Institutions.")
+    return results
+
+# ═══════════════════════════════════════════════════════════════
+# ELITE TECH ENGINE: Continuous Corporate Hunter (Google, MS, Amazon)
+# ═══════════════════════════════════════════════════════════════
+class EliteTechEngine:
+    def __init__(self):
+        self.session = requests.Session()
+        _retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+        self.session.mount('https://', HTTPAdapter(max_retries=_retries))
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+        })
+        self.targets = [
+            {
+                "company": "Google",
+                "api": "https://careers.google.com/api/v3/search/?degree=BACHELORS&distance=50&employment_type=INTERN",
+                "domain": "Software Engineering"
+            },
+            {
+                "company": "Microsoft",
+                "api": "https://gcsservices.careers.microsoft.com/search/api/v1/search?lc=India&exp=Students%20and%20graduates",
+                "domain": "Software Engineering"
+            },
+            {
+                "company": "Amazon",
+                "api": "https://www.amazon.jobs/en/search.json?category%5B%5D=software-development&schedule_type_id%5B%5D=Intern",
+                "domain": "Software Engineering"
+            }
+        ]
+
+    def hunt(self):
+        t_log("INFO", "ELITE_TECH", "Booting Elite Tech Engine... Dwelling in corporate API endpoints.")
+        results = []
+        
+        # 1. Google Search API simulation (Public JSON)
+        try:
+            jitter(1.0, 2.0)
+            resp = self.session.get(self.targets[0]["api"], timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                for job in data.get("jobs", [])[:3]:
+                    title = job.get("title", "")
+                    if "intern" in title.lower():
+                        results.append({
+                            "company": "Google",
+                            "role": title,
+                            "type": "On-Site",
+                            "domain": "Software Engineering",
+                            "stipend": "Highly Competitive",
+                            "duration": "Summer",
+                            "deadlineLabel": "Apply ASAP",
+                            "applyLink": f"https://careers.google.com/jobs/results/{job.get('id', '')}",
+                            "status": "open",
+                            "source": "EliteTech Engine"
+                        })
+        except Exception as e:
+            t_log("WARN", "ELITE_TECH", f"Google API dwell failed: {e}")
+
+        # 2. Microsoft Search API
+        try:
+            jitter(1.0, 2.0)
+            resp = self.session.get(self.targets[1]["api"], timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                for job in data.get("operationResult", {}).get("result", {}).get("jobs", [])[:3]:
+                    title = job.get("title", "")
+                    if "intern" in title.lower():
+                        results.append({
+                            "company": "Microsoft",
+                            "role": title,
+                            "type": "Hybrid",
+                            "domain": "Software Engineering",
+                            "stipend": "Highly Competitive",
+                            "duration": "Check Portal",
+                            "deadlineLabel": "Apply ASAP",
+                            "applyLink": f"https://careers.microsoft.com/v2/global/en/details/{job.get('jobId')}",
+                            "status": "open",
+                            "source": "EliteTech Engine"
+                        })
+        except Exception as e:
+            t_log("WARN", "ELITE_TECH", f"Microsoft API dwell failed: {e}")
+
+        # 3. Amazon Jobs Search JSON
+        try:
+            jitter(1.0, 2.0)
+            resp = self.session.get(self.targets[2]["api"], timeout=10)
+            if resp.status_code == 200:
+                data = resp.json()
+                for job in data.get("jobs", [])[:3]:
+                    title = job.get("title", "")
+                    if "intern" in title.lower():
+                        results.append({
+                            "company": "Amazon",
+                            "role": title,
+                            "type": "Hybrid",
+                            "domain": "Software Engineering",
+                            "stipend": "Highly Competitive",
+                            "duration": "Summer",
+                            "deadlineLabel": "Apply ASAP",
+                            "applyLink": f"https://www.amazon.jobs/en/jobs/{job.get('id_icims')}",
+                            "status": "open",
+                            "source": "EliteTech Engine"
+                        })
+        except Exception as e:
+            t_log("WARN", "ELITE_TECH", f"Amazon API dwell failed: {e}")
+
+        # 4. NVIDIA & Intel HTML Scrape
+        fallback_targets = [
+            {"company": "NVIDIA", "url": "https://www.nvidia.com/en-in/about-nvidia/careers/university-recruiting/"},
+            {"company": "Intel", "url": "https://jobs.intel.com/en/search-jobs/intern/India"}
+        ]
+        
+        for target in fallback_targets:
+            try:
+                jitter(1.0, 2.0)
+                resp = self.session.get(target["url"], timeout=10)
+                if resp.status_code == 200:
+                    soup = BeautifulSoup(resp.text, "lxml")
+                    links = soup.find_all("a", href=True)
+                    found = 0
+                    for a in links:
+                        text = a.get_text(strip=True).lower()
+                        href = a["href"]
+                        if "intern" in text or "intern" in href.lower():
+                            if not href.startswith("http"):
+                                href = urljoin(target["url"], href)
+                            if len(text) > 5:
+                                results.append({
+                                    "company": target["company"],
+                                    "role": text[:80] if len(text) < 80 else "Internship Opportunity",
+                                    "type": "Hybrid",
+                                    "domain": "Hardware & AI",
+                                    "stipend": "Highly Competitive",
+                                    "duration": "Check Portal",
+                                    "deadlineLabel": "Active Notification",
+                                    "applyLink": href,
+                                    "status": "open",
+                                    "source": "EliteTech Engine"
+                                })
+                                found += 1
+                                if found >= 2: break
+            except Exception:
+                pass
+                
+        t_log("SUCCESS", "ELITE_TECH", f"Elite Tech Engine discovered {len(results)} active corporate internships.")
+        return results
+
+# ═══════════════════════════════════════════════════════════════
+# LINKFETCH ENGINE: Deep Link Discovery & Validation
+# ═══════════════════════════════════════════════════════════════
+class LinkFetchEngine:
+    def __init__(self):
+        self.session = requests.Session()
+        _retries = Retry(total=2, backoff_factor=0.5, status_forcelist=[429, 500, 502, 503, 504])
+        self.session.mount('https://', HTTPAdapter(max_retries=_retries))
+        self.session.mount('http://', HTTPAdapter(max_retries=_retries))
+        self.session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Upgrade-Insecure-Requests": "1"
+        })
+        self.closed_markers = [
+            "no longer accepting",
+            "job has expired",
+            "position has been filled",
+            "no longer available",
+            "opening has been filled",
+            "not currently accepting",
+            "applications are closed",
+            "internship is closed",
+            "not accepting applications",
+            "0 active jobs",
+            "no open positions",
+            "sorry, this job is closed",
+            "position closed"
+        ]
+
+    def analyze_and_fetch(self, url, company, role):
+        """
+        Validates URL liveliness, detects 'closed' states, and deeply parses
+        the DOM to find the exact application link if a generic one is provided.
+        Returns the most accurate active link, or None if the position is dead.
+        """
+        try:
+            resp = self.session.get(url, timeout=12, allow_redirects=True)
+            
+            # 1. HTTP Status Validation
+            if resp.status_code in [404, 410]:
+                return None
+            if resp.status_code >= 400:
+                # Assume active if bot protection blocks us
+                return url
+
+            text_lower = resp.text.lower()
+            
+            # 2. Semantic Analysis for Closed Status
+            for marker in self.closed_markers:
+                if marker in text_lower:
+                    return None
+            
+            # 3. Deep Link Resolution (DOM Traversal)
+            soup = BeautifulSoup(resp.text, "lxml")
+            best_link = resp.url
+            
+            # If the URL is generic, try to find a more specific internship link on the page
+            if any(term in url.lower() for term in ['careers', 'jobs', 'students', 'university', 'campus']):
+                links = soup.find_all("a", href=True)
+                for a in links:
+                    href = a.get('href', '')
+                    a_text = a.get_text(strip=True).lower()
+                    role_keywords = role.lower().split()
+                    
+                    # Score the link relevance
+                    score = 0
+                    if 'intern' in href.lower() or 'intern' in a_text:
+                        score += 2
+                    if any(kw in href.lower() for kw in role_keywords if len(kw) > 3):
+                        score += 1
+                        
+                    if score >= 2:
+                        if not href.startswith('http') and not href.startswith('javascript'):
+                            best_link = urljoin(resp.url, href)
+                        elif href.startswith('http'):
+                            best_link = href
+                        break
+                        
+            return best_link
+            
+        except requests.exceptions.Timeout:
+            return url
+        except requests.exceptions.RequestException:
+            return url
+        except Exception:
+            return url
+
+LINK_ENGINE = LinkFetchEngine()
+
+# ═══════════════════════════════════════════════════════════════
 # NEURAL FRAUD DETECTION & QUALITY FILTER
 # ═══════════════════════════════════════════════════════════════
 def deduplicate_and_filter(internships):
     t_log("SYSTEM", "FILTER", f"Running Neural Fraud Detection on {len(internships)} raw entries...")
     seen = set()
-    verified = []
+    pre_verified = []
     dropped_duplicate = 0
     dropped_fraud = 0
     dropped_low_quality = 0
@@ -274,19 +623,43 @@ def deduplicate_and_filter(internships):
             dropped_low_quality += 1
             continue
 
-        # 5. Link Integrity Check
-        apply_link = item.get('applyLink','')
-        if not apply_link.startswith('http') or 'bit.ly' in apply_link or 'forms.gle' in apply_link:
-            # Drop unverified shortlinks or random google forms if they aren't from trusted sources
-            # But we allow trusted sources like Google/Microsoft
+        # 5. Cybersecurity & URL Sanitization Check
+        apply_link = item.get('applyLink', '').strip()
+        parsed = urlparse(apply_link)
+        if parsed.scheme not in ['http', 'https']:
+            t_log("WARN", "SEC_SHIELD", f"BLOCKED: Invalid URL scheme '{parsed.scheme}' for {item['company']}")
+            dropped_fraud += 1
+            continue
+            
+        if 'bit.ly' in apply_link or 'forms.gle' in apply_link:
             if company_lower not in ['google', 'microsoft', 'amazon']:
                 dropped_fraud += 1
                 continue
 
-        verified.append(item)
+        pre_verified.append(item)
+
+    # 6. LinkFetch Engine - Concurrent Deep Analysis
+    t_log("SYSTEM", "LINKFETCH", f"Spinning up LinkFetch Engine for deep validation of {len(pre_verified)} links...")
+    verified = []
+    
+    def fetch_and_validate(item):
+        link = LINK_ENGINE.analyze_and_fetch(item['applyLink'], item['company'], item['role'])
+        if link:
+            item['applyLink'] = link
+            return item
+        return None
+
+    with ThreadPoolExecutor(max_workers=25) as executor:
+        futures = {executor.submit(fetch_and_validate, item): item for item in pre_verified}
+        for future in as_completed(futures):
+            result = future.result()
+            if result:
+                verified.append(result)
+            else:
+                dropped_low_quality += 1
 
     total_dropped = dropped_duplicate + dropped_fraud + dropped_low_quality
-    t_log("SUCCESS", "FILTER", f"Verified: {len(verified)} | Dropped: {total_dropped} (Fraud: {dropped_fraud}, Low-Quality: {dropped_low_quality}, Dupes: {dropped_duplicate})")
+    t_log("SUCCESS", "FILTER", f"Verified & Active: {len(verified)} | Dropped: {total_dropped} (Fraud: {dropped_fraud}, Closed/Low-Quality: {dropped_low_quality}, Dupes: {dropped_duplicate})")
     return verified
 
 # ═══════════════════════════════════════════════════════════════
@@ -352,7 +725,8 @@ def sync_with_sanity(internships):
                 successful_mutations += len(batch)
                 t_log("SUCCESS", "CMS", f"Batch {i//BATCH_SIZE+1}: {len(batch)} mutations processed")
             else:
-                t_log("ERROR", "CMS", f"Batch error: {resp.status_code} — {resp.text[:200]}")
+                safe_text = resp.text[:100].replace('\n', ' ')
+                t_log("ERROR", "CMS", f"Batch error: {resp.status_code} — {safe_text}")
         except Exception as e:
             t_log("ERROR", "CMS", f"Connection failed: {e}")
         jitter(0.3, 0.8)
@@ -360,39 +734,95 @@ def sync_with_sanity(internships):
     t_log("SUCCESS", "CMS", f"Sync complete. Processed {successful_mutations}/{total_mutations} mutations (Updated/Added: {len(new_docs)}, Removed: {len(obsolete_ids)}).")
 
 # ═══════════════════════════════════════════════════════════════
-# MAIN AGENT
+# MAIN AGENT & AUTONOMOUS DAEMON
 # ═══════════════════════════════════════════════════════════════
-def run_agent():
-    print(f"\n{C.MG}{C.BD}{'='*60}{C.RS}")
-    print(f"{C.MG}{C.BD}  ISTE MBCET INTERNSHIP SCRAPER v4.0.0 (KERALA POWERHOUSE)  {C.RS}")
-    print(f"{C.MG}{C.BD}{'='*60}{C.RS}\n")
-
-    t_log("SYSTEM", "CORE", "Booting scraper across Kerala & National channels...")
-
-    raw = []
-
-    # Phase 1: Live scrape from Internshala
-    try:
-        raw.extend(scrape_internshala())
-    except Exception as e:
-        t_log("ERROR", "CORE", f"Internshala scrape failed: {e}")
-
-    # Phase 2: Curated Kerala ecosystem DB
-    raw.extend(get_kerala_ecosystem())
-
-    # Phase 3: Deduplicate & filter
-    verified = deduplicate_and_filter(raw)
-
-    # Phase 4: Push and Sync to Sanity
+def process_and_sync(raw_data):
+    if not raw_data:
+        t_log("WARN", "CORE", "No raw internships gathered. Skipping sync.")
+        return
+    verified = deduplicate_and_filter(raw_data)
     if verified:
         sync_with_sanity(verified)
     else:
         t_log("WARN", "CORE", "No verified internships to push.")
-
-    # Summary
     print(f"\n{C.GR}{C.BD}{'-'*60}{C.RS}")
     t_log("SYSTEM", "CORE", f"Scrape complete. {len(verified)} opportunities live on Launchpad.")
     print(f"{C.GR}{C.BD}{'-'*60}{C.RS}\n")
 
+def run_phase(func):
+    try:
+        return func()
+    except Exception as e:
+        t_log("ERROR", "CORE", f"Engine failed: {e}")
+        return []
+
+def run_full_sync():
+    print(f"\n{C.MG}{C.BD}{'='*60}{C.RS}")
+    print(f"{C.MG}{C.BD}  ISTE MBCET INTERNSHIP SCRAPER v4.0.0 (KERALA POWERHOUSE)  {C.RS}")
+    print(f"{C.MG}{C.BD}{'='*60}{C.RS}\n")
+    t_log("SYSTEM", "CORE", "Booting scraper across Kerala & National channels...")
+
+    raw = []
+    elite_tech = EliteTechEngine()
+    engines = [scrape_internshala, hunt_elite_research, elite_tech.hunt, get_kerala_ecosystem]
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(run_phase, engine) for engine in engines]
+        for future in as_completed(futures):
+            raw.extend(future.result())
+
+    process_and_sync(raw)
+
+def run_autonomous_daemon():
+    print(f"\n{C.MG}{C.BD}{'='*60}{C.RS}")
+    print(f"{C.MG}{C.BD}  [AUTONOMOUS DAEMON 24/7 ACTIVATED]  {C.RS}")
+    print(f"{C.MG}{C.BD}{'='*60}{C.RS}\n")
+    t_log("SYSTEM", "DAEMON", "Organism heartbeat started. Elite engine dwelling 24/7. General engine on 48h cycle.")
+    
+    # Define cycle times
+    ELITE_INTERVAL = 60 * 60 * 2    # Every 2 hours
+    GENERAL_INTERVAL = 60 * 60 * 48 # Every 48 hours
+    
+    # To run both immediately on boot
+    last_general_run = 0
+    last_elite_run = 0
+    
+    elite_tech = EliteTechEngine()
+    
+    while True:
+        now = time.time()
+        
+        # 1. Run Elite Tech Engine 24/7 (Every 2 hours)
+        if now - last_elite_run >= ELITE_INTERVAL:
+            t_log("SYSTEM", "DAEMON", "Initiating 24/7 Elite Tech Dweller heartbeat...")
+            try:
+                raw_elite = run_phase(elite_tech.hunt)
+                process_and_sync(raw_elite)
+                last_elite_run = time.time()
+            except Exception as e:
+                t_log("ERROR", "DAEMON", f"Elite Engine heartbeat failed: {e}")
+                
+        # 2. Run General Engine (Every 48 hours)
+        if now - last_general_run >= GENERAL_INTERVAL:
+            t_log("SYSTEM", "DAEMON", "Initiating 48h General Ecosystem Sweep...")
+            try:
+                engines = [scrape_internshala, hunt_elite_research, get_kerala_ecosystem]
+                raw_general = []
+                with ThreadPoolExecutor(max_workers=3) as executor:
+                    futures = [executor.submit(run_phase, engine) for engine in engines]
+                    for future in as_completed(futures):
+                        raw_general.extend(future.result())
+                process_and_sync(raw_general)
+                last_general_run = time.time()
+            except Exception as e:
+                t_log("ERROR", "DAEMON", f"General Sweep failed: {e}")
+                
+        # Sleep for 15 minutes before checking schedules again
+        time.sleep(60 * 15)
+
+import sys
 if __name__ == "__main__":
-    run_agent()
+    if len(sys.argv) > 1 and sys.argv[1] == "--daemon":
+        run_autonomous_daemon()
+    else:
+        run_full_sync()
