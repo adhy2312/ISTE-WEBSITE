@@ -21,16 +21,14 @@ export default async function DashboardOverview() {
     .from('event_registrations')
     .select('*')
     .eq('user_id', session.user.id)
-    .order('created_at', { ascending: false })
-    .catch(() => ({ data: [] })); // Fallback if table doesn't exist yet
+    .order('created_at', { ascending: false });
 
   // Fetch Certificates (if table exists)
   const { data: certificates } = await supabase
     .from('certificates')
     .select('*')
     .eq('user_id', session.user.id)
-    .order('created_at', { ascending: false })
-    .catch(() => ({ data: [] })); // Fallback
+    .order('created_at', { ascending: false });
 
   const isProfileComplete = profile && profile.full_name && profile.department;
 
