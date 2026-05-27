@@ -25,13 +25,26 @@ export default async function Login(props: {
     const cookieStore = await cookies();
     const supabase = await createClient(cookieStore);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
       return redirect('/login?message=' + encodeURIComponent(error.message));
+    }
+
+    // Check if user is an Admin (EXECOM)
+    if (data?.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (profile && profile.role === 'EXECOM') {
+        return redirect('/admin');
+      }
     }
 
     return redirect('/dashboard');

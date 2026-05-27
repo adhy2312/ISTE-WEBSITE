@@ -17,6 +17,7 @@ const SecurityGuardian = dynamic(() => import('./brain/SecurityGuardian'));
 const PresenceEngine = dynamic(() => import('./brain/PresenceEngine'));
 const PrefetchEngine = dynamic(() => import('./brain/PrefetchEngine'));
 const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngine'));
+const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -73,6 +74,9 @@ export const metadata: Metadata = {
     icon: "/iste.png",
     apple: "/iste.png",
   },
+  verification: {
+    google: "nXHbXTdgWRTlc3Q2BeBRp9mlojQVs7Eta8i8xNwM1dQ",
+  },
 };
 
 export default async function RootLayout({
@@ -85,10 +89,29 @@ export default async function RootLayout({
   const isStudio = pathname.startsWith('/studio');
   const isAdmin = pathname.startsWith('/admin');
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: "ISTE MBCET Student's Chapter",
+    url: 'https://iste-mbcet.vercel.app',
+    logo: 'https://iste-mbcet.vercel.app/iste.png',
+    description: "Empowering engineering students through innovation, technology, and excellence at Mar Baselios College of Engineering and Technology.",
+    sameAs: [
+      'https://www.instagram.com/iste_mbcet/',
+      'https://www.linkedin.com/company/istescmbcet/'
+    ]
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
-        className={`${inter.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans bg-[var(--black)] text-[var(--white)]`}
+        className={`${inter.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans`}
         suppressHydrationWarning
       >
         <BrainProvider>
@@ -99,6 +122,7 @@ export default async function RootLayout({
           <SecurityGuardian />
           <PrefetchEngine />
           <ColorExtractionEngine />
+          <InternshipEngine />
           {!isStudio && <PresenceEngine />}
           {!isStudio && <DigitalSoul />}
           {children}

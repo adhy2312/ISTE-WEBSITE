@@ -147,6 +147,7 @@ export default async function InternshipsPage() {
           <p className="hero-sub" id="hero-sub">Curated opportunities, updated live by the chapter team</p>
         </div>
 
+      <InternshipClientEngine />
       </section>
 
       {/* Main Content */}

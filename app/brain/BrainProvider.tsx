@@ -13,6 +13,7 @@ interface BrainState {
   perfMetrics: { fps: number; loadTime: number; intervention: boolean };
   soulState: { isThinking: boolean; scrollVelocity: number };
   creativeState: { immersiveMode: boolean; glitchIntensity: number };
+  internshipState: { agentStatus: string; logs: string[]; foundCount: number };
   scrollVelocityRef: { current: number };
 }
 
@@ -24,6 +25,7 @@ const BrainContext = createContext<BrainState>({
   perfMetrics: { fps: 60, loadTime: 0, intervention: false },
   soulState: { isThinking: false, scrollVelocity: 0 },
   creativeState: { immersiveMode: false, glitchIntensity: 0 },
+  internshipState: { agentStatus: 'IDLE', logs: [], foundCount: 0 },
   scrollVelocityRef: { current: 0 }
 });
 
@@ -35,6 +37,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
   const [intervention, setIntervention] = useState(false);
   const [soulState, setSoulState] = useState({ isThinking: false, scrollVelocity: 0 });
   const [creativeState, setCreativeState] = useState({ immersiveMode: false, glitchIntensity: 0 });
+  const [internshipState, setInternshipState] = useState({ agentStatus: 'INITIALIZING', logs: [] as string[], foundCount: 0 });
   const scrollVelocityRef = useRef(0);
 
   // Atmosphere Engine Audio Context
@@ -60,6 +63,35 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       } else if (event === 'glitch') {
         setCreativeState(prev => ({ ...prev, glitchIntensity: data?.intensity || 1 }));
         setTimeout(() => setCreativeState(prev => ({ ...prev, glitchIntensity: 0 })), 300);
+      }
+    } else if (engine === 'Internship') {
+      if (event === 'agent_status') {
+        setInternshipState(prev => ({ ...prev, agentStatus: data }));
+        
+        // Deep integration: Wire AI data to the Neural Engine
+        if (data.includes('OPPORTUNITY DETECTED')) {
+          // Trigger the Neural Network 'thinking' state
+          if (typeof document !== 'undefined') {
+            document.body.classList.add('neural-processing');
+            setTimeout(() => document.body.classList.remove('neural-processing'), 2000);
+          }
+          // Trigger Haptic feedback engine
+          if (activeEngines.has('Haptic')) {
+             console.log('[Neural Link] Sending vibration impulse for detected opportunity.');
+             // Assuming HapticEngine intercepts 'vibrate' events somewhere, or just use native:
+             if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([30, 50, 30]);
+          }
+          // Trigger a micro-glitch in the Creative Engine to simulate a data spike
+          setCreativeState(prev => ({ ...prev, glitchIntensity: 0.5 }));
+          setTimeout(() => setCreativeState(prev => ({ ...prev, glitchIntensity: 0 })), 300);
+        }
+        
+      } else if (event === 'agent_log') {
+        setInternshipState(prev => ({ 
+          ...prev, 
+          logs: [data, ...prev.logs].slice(0, 50), // Keep last 50 logs
+          foundCount: data.includes('FOUND') ? prev.foundCount + 1 : prev.foundCount
+        }));
       }
     }
     if (engine === 'Membership' && event === 'traffic_surge') {
@@ -316,6 +348,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       perfMetrics: { fps, loadTime: typeof window !== 'undefined' ? performance.now() : 0, intervention },
       soulState,
       creativeState,
+      internshipState,
       scrollVelocityRef
     }}>
       {/* The Central Brain Wrapping the App */}

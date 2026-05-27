@@ -6,46 +6,46 @@
     @import "tailwindcss";
 
 :root {
-      --black:    #171e19;
-      --white:    #ffffff;
-      --off-white:#d5f4f9;
-      --g100: #d5f4f9;
-      --g200: #b7c6c2;
-      --g400: #9f8d8b;
-      --g600: #9f8d8b;
-      --g800: #302b2f;
-      --g900: #171e19;
-      --border:       rgba(183,198,194,0.15);
-      --border-light: rgba(183,198,194,0.05);
+      --black:    #0a0a0c;
+      --white:    #f8fafc;
+      --off-white:#f1f5f9;
+      --g100: #e2e8f0;
+      --g200: #cbd5e1;
+      --g400: #94a3b8;
+      --g600: #64748b;
+      --g800: #121214;
+      --g900: #0a0a0c;
+      --border:       rgba(255,255,255,0.08);
+      --border-light: rgba(255,255,255,0.05);
       --font-serif: var(--font-serif), 'Playfair Display', Georgia, serif;
       --font-sans:  var(--font-sans), 'Inter', system-ui, sans-serif;
       --font-mono:  var(--font-mono), 'Orbitron', monospace;
       --ease: cubic-bezier(0.25, 1, 0.5, 1);
       
       /* Chrono-Aesthetics Defaults (Peak) */
-      --c-main: 213, 244, 249;
-      --c-alt1: 183, 198, 194;
-      --c-alt2: 159, 141, 139;
+      --c-main: 255, 81, 47;
+      --c-alt1: 221, 36, 118;
+      --c-alt2: 240, 152, 25;
     }
     
     /* Dawn: 6 AM - 11 AM */
     :root[data-chrono="dawn"] {
-      --c-main: 213, 244, 249; /* Amber */
-      --c-alt1: 183, 198, 194; /* Soft Peach */
-      --c-alt2: 159, 141, 139; /* Pink Dawn */
+      --c-main: 240, 152, 25; /* Amber */
+      --c-alt1: 255, 200, 120; /* Soft Peach */
+      --c-alt2: 255, 120, 200; /* Pink Dawn */
     }
     /* Peak: 12 PM - 5 PM */
     :root[data-chrono="peak"] {
-      --c-main: 213, 244, 249;
-      --c-alt1: 183, 198, 194;
-      --c-alt2: 159, 141, 139;
+      --c-main: 255, 81, 47;
+      --c-alt1: 221, 36, 118;
+      --c-alt2: 240, 152, 25;
     }
     /* Hacker: 6 PM - 5 AM */
     :root[data-chrono="hacker"] {
-      --c-main: 213, 244, 249; /* Cyan */
-      --c-alt1: 183, 198, 194;  /* Matrix Green */
-      --c-alt2: 159, 141, 139;  /* Deep Blue */
-      --black: #171e19;
+      --c-main: 0, 240, 255; /* Cyan */
+      --c-alt1: 57, 255, 20;  /* Matrix Green */
+      --c-alt2: 0, 120, 255;  /* Deep Blue */
+      --black: #020205;
     }
 
     /* =========================================================
