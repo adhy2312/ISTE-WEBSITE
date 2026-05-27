@@ -162,9 +162,9 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         const centerX = rect.width / 2
         const centerY = rect.height / 2
         
-        // Calculate rotation (max 15 degrees)
-        const rotateX = ((y - centerY) / centerY) * -15
-        const rotateY = ((x - centerX) / centerX) * 15
+        // Calculate rotation (max 3 degrees for subtle, professional Apple-like parallax)
+        const rotateX = ((y - centerY) / centerY) * -3
+        const rotateY = ((x - centerX) / centerX) * 3
         
         card.style.setProperty('--rx', `${rotateX}deg`)
         card.style.setProperty('--ry', `${rotateY}deg`)

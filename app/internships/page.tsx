@@ -93,7 +93,7 @@ export default async function InternshipsPage() {
 
 
 
-      {/* Navbar */}
+    {/* Navbar */}
       <nav id="navbar">
         <Link href="/" className="nav-logo">
           <Image src="/iste.png" alt="ISTE SC MBCET" width={40} height={40} className="logo-img" />
@@ -111,6 +111,26 @@ export default async function InternshipsPage() {
           <span></span><span></span><span></span>
         </div>
       </nav>
+
+      {/* ===== MOBILE MENU OVERLAY ===== */}
+      <div className="mob-menu" id="mob-menu" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
+        <div className="mob-menu-inner">
+          <button className="mob-close" id="mob-close" aria-label="Close menu">✕</button>
+          <nav className="mob-nav" aria-label="Mobile Navigation">
+            <Link href="/#about" className="mob-link">About</Link>
+            <Link href="/#who" className="mob-link">Who We Are</Link>
+            <Link href="/#benefits" className="mob-link">Benefits</Link>
+            <Link href="/#execom" className="mob-link">ExeCom</Link>
+            <Link href="/#events" className="mob-link">Events</Link>
+            <Link href="/internships" className="mob-link mob-link--accent">Internship Launchpad ✦</Link>
+          </nav>
+          <Link href="/#membership" className="mob-cta">Join Now →</Link>
+          <div className="mob-footer">
+            <a href="https://www.instagram.com/iste_mbcet/">Instagram</a>
+            <a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a>
+          </div>
+        </div>
+      </div>
 
       {/* Hero */}
       <section id="hero">

@@ -10,7 +10,11 @@ export default function MagneticCursor() {
   const router = useRouter()
 
   useEffect(() => {
-    if (window.innerWidth <= 768 || ('ontouchstart' in window)) return
+    if (window.innerWidth <= 768 || ('ontouchstart' in window)) {
+      if (dotRef.current) dotRef.current.style.display = 'none';
+      if (ringRef.current) ringRef.current.style.display = 'none';
+      return;
+    }
 
     const dot = dotRef.current
     const ring = ringRef.current

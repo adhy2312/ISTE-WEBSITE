@@ -37,13 +37,26 @@ export default function DigitalSoul() {
 
     let raf: number;
 
+    const startTime = Date.now();
+
     const loop = () => {
       time += 0.01;
+      
+      const timeSpent = Date.now() - startTime;
+      const isAwake = timeSpent > 300000; // 5 mins in ms
+
+      const docHeight = document.documentElement.scrollHeight || window.innerHeight;
 
       // 1. Autonomous Wandering (Perlin-noise-like movement)
-      // The soul slowly drifts around the screen subconsciously
-      targetX = (window.innerWidth / 2) + Math.sin(time * 0.5) * (window.innerWidth * 0.3) + Math.cos(time * 0.8) * 100;
-      targetY = (window.innerHeight / 2) + Math.cos(time * 0.6) * (window.innerHeight * 0.3) + Math.sin(time * 0.4) * 100;
+      targetX = (window.innerWidth / 2) + Math.sin(time * 0.5) * (window.innerWidth * 0.4) + Math.cos(time * 0.8) * 50;
+      
+      if (isAwake) {
+        // Freely wanders the whole document if awake
+        targetY = (docHeight / 2) + Math.cos(time * 0.6) * (docHeight * 0.4);
+      } else {
+        // Dwells subtly at the bottom of the website
+        targetY = docHeight - 150 + Math.cos(time * 0.4) * 100;
+      }
 
       // Fluid lerp towards target
       soulX += (targetX - soulX) * 0.02;
@@ -71,6 +84,9 @@ export default function DigitalSoul() {
         soul.style.background = 'radial-gradient(circle, rgba(var(--c-alt2), 0.3) 0%, rgba(var(--c-alt1), 0.15) 40%, transparent 70%)';
       }
 
+      // Very subtle opacity
+      soul.style.opacity = state.isThinking ? '0.2' : '0.08';
+
       raf = requestAnimationFrame(loop);
     };
 
@@ -83,14 +99,14 @@ export default function DigitalSoul() {
     <div
       ref={soulRef}
       style={{
-        position: 'fixed',
+        position: 'absolute', // Absolute to the document, not fixed to screen
         top: -150, // Offset center
         left: -150,
         width: 300,
         height: 300,
         borderRadius: '50%',
         pointerEvents: 'none',
-        zIndex: 0, // Behind the content, inside the background
+        zIndex: -1, // Strictly behind footer and all content
         willChange: 'transform, background',
         mixBlendMode: 'screen',
       }}
