@@ -5,6 +5,24 @@ import { useBrain } from '../brain/BrainProvider';
 export default function DigitalSoul() {
   const { soulState, perfMetrics, creativeState } = useBrain();
   const soulRef = useRef<HTMLDivElement>(null);
+  
+  // Use refs to track state without breaking the animation loop
+  const stateRef = useRef({ 
+    isThinking: soulState.isThinking, 
+    scrollVelocity: soulState.scrollVelocity,
+    intervention: perfMetrics.intervention,
+    immersiveMode: creativeState?.immersiveMode
+  });
+
+  // Sync state to refs immediately
+  useEffect(() => {
+    stateRef.current = {
+      isThinking: soulState.isThinking,
+      scrollVelocity: soulState.scrollVelocity,
+      intervention: perfMetrics.intervention,
+      immersiveMode: creativeState?.immersiveMode
+    };
+  }, [soulState.isThinking, soulState.scrollVelocity, perfMetrics.intervention, creativeState]);
 
   useEffect(() => {
     const soul = soulRef.current;
@@ -33,20 +51,21 @@ export default function DigitalSoul() {
 
       // 2. Engine Interconnections
       // Neural Engine: Pulse and enlarge when thinking
-      const scale = soulState.isThinking ? 1.5 + Math.sin(time * 15) * 0.2 : 1.0;
+      const state = stateRef.current;
+      const scale = state.isThinking ? 1.5 + Math.sin(time * 15) * 0.2 : 1.0;
       
       // Scroll Engine: Stretch vertically based on scroll velocity (motion blur effect)
-      const stretch = 1 + Math.min(Math.abs(soulState.scrollVelocity) * 0.05, 3);
+      const stretch = 1 + Math.min(Math.abs(state.scrollVelocity) * 0.05, 3);
       
-      soul.style.transform = `translate3d(${soulX}px, ${soulY}px, 0) scale(${creativeState?.immersiveMode ? 3 : scale}) scaleY(${stretch})`;
+      soul.style.transform = `translate3d(${soulX}px, ${soulY}px, 0) scale(${state.immersiveMode ? 3 : scale}) scaleY(${stretch})`;
       
       // Dynamic brightness based on Neural Engine & Performance AI
-      if (perfMetrics.intervention) {
+      if (state.intervention) {
         // AI Intervention: Minimum possible footprint
         soul.style.background = 'radial-gradient(circle, rgba(var(--c-main), 0.1) 0%, transparent 40%)';
-      } else if (creativeState?.immersiveMode) {
+      } else if (state.immersiveMode) {
         soul.style.background = 'radial-gradient(circle, rgba(var(--c-main), 0.8) 0%, rgba(var(--c-alt2), 0.5) 40%, transparent 80%)';
-      } else if (soulState.isThinking) {
+      } else if (state.isThinking) {
         soul.style.background = 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(var(--c-main), 0.4) 30%, transparent 70%)';
       } else {
         soul.style.background = 'radial-gradient(circle, rgba(var(--c-alt2), 0.3) 0%, rgba(var(--c-alt1), 0.15) 40%, transparent 70%)';
@@ -58,7 +77,7 @@ export default function DigitalSoul() {
     raf = requestAnimationFrame(loop);
 
     return () => cancelAnimationFrame(raf);
-  }, [soulState.isThinking, soulState.scrollVelocity, perfMetrics.intervention, creativeState]);
+  }, []);
 
   return (
     <div
