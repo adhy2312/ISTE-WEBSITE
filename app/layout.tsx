@@ -4,10 +4,19 @@ import { headers } from 'next/headers';
 import './globals.css';
 import BrainProvider from './brain/BrainProvider';
 import dynamic from 'next/dynamic';
+import PhysicsEngine from './brain/PhysicsEngine';
+import NeuralNetwork from './brain/NeuralNetwork';
+import MemoryEngine from './brain/MemoryEngine';
 
 const IsteAssistant = dynamic(() => import('./components/IsteAssistant'));
 const MagneticCursor = dynamic(() => import('./components/MagneticCursor'));
 const DigitalSoul = dynamic(() => import('./components/DigitalSoul'));
+const EngineObservatory = dynamic(() => import('./components/EngineObservatory'));
+const PerformanceAmplifier = dynamic(() => import('./brain/PerformanceAmplifier'));
+const SecurityGuardian = dynamic(() => import('./brain/SecurityGuardian'));
+const PresenceEngine = dynamic(() => import('./brain/PresenceEngine'));
+const PrefetchEngine = dynamic(() => import('./brain/PrefetchEngine'));
+const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngine'));
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
@@ -73,6 +82,7 @@ export default async function RootLayout({
   const headersList = await headers();
   const pathname = headersList.get('next-url') || '';
   const isStudio = pathname.startsWith('/studio');
+  const isAdmin = pathname.startsWith('/admin');
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -81,10 +91,19 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <BrainProvider>
+          <PhysicsEngine />
+          <NeuralNetwork />
+          <MemoryEngine />
+          <PerformanceAmplifier />
+          <SecurityGuardian />
+          <PrefetchEngine />
+          <ColorExtractionEngine />
+          {!isStudio && <PresenceEngine />}
           {!isStudio && <DigitalSoul />}
           {children}
           {!isStudio && <IsteAssistant />}
           {!isStudio && <MagneticCursor />}
+          {!isStudio && (process.env.NODE_ENV === 'development' || isAdmin) && <EngineObservatory />}
         </BrainProvider>
       </body>
     </html>

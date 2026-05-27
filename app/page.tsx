@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { urlForImage } from '@/lib/sanity/image'
 import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
-import LiveEventBanner from '@/app/components/LiveEventBanner'
+// import LiveEventBanner from '@/app/components/LiveEventBanner'
 import TeamCard from '@/app/components/TeamCard'
 import dynamic from 'next/dynamic'
 const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'))
 import { PortableText } from '@portabletext/react'
+import AliveClock from '@/app/components/AliveClock'
 import {
   Zap,
   Trophy,
@@ -105,7 +106,10 @@ export default async function Home() {
   }
 
   const events = sanityData?.events?.length ? sanityData.events : FALLBACK_EVENTS
-  const stats = sanityData?.stats?.length ? sanityData.stats : FALLBACK_STATS
+  const rawStats = sanityData?.stats?.length ? sanityData.stats : FALLBACK_STATS
+  const stats = rawStats.filter((stat: any, index: number, self: any[]) =>
+    index === self.findIndex((t: any) => t.label === stat.label)
+  )
   const testimonials = sanityData?.testimonials?.length ? sanityData.testimonials : FALLBACK_TESTIMONIALS
   const settings = sanityData?.settings || {}
   const featuredInternships: any[] = sanityData?.featuredInternships || []
@@ -297,8 +301,82 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Dynamic Active Event Banner */}
-      <LiveEventBanner activeEvents={activeEvents} />
+      {/* Dynamic Active Event Section */}
+      <section id="active-events" style={{ borderBottom: '1px solid var(--border)', paddingTop: 40, paddingBottom: 60 }}>
+        <div className="section-inner">
+          <div className="section-tag reveal">Live Now</div>
+          <h2 className="section-title reveal d1" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Active <em>Events</em></h2>
+          
+          <div className="active-events-container reveal d2" style={{ marginTop: 32 }}>
+            {activeEvents.length > 0 ? (
+              <div className="events-list">
+                {activeEvents.map((ev: any) => (
+                  <Link href={ev.slug?.current ? `/events/${ev.slug.current}` : '#'} key={ev._id} className={`event-row ${ev.isCurrentlyHappening ? 'live-event' : ''}`} style={{ padding: '24px 0' }}>
+                    <div className="event-date" style={{ color: ev.isCurrentlyHappening ? '#ef4444' : 'var(--c-main)' }}>
+                      {ev.isCurrentlyHappening && <span className="live-heartbeat"></span>}
+                      {ev.dateLabel}
+                    </div>
+                    <div className="event-info-main">
+                      <div className="event-title">
+                        {ev.title}
+                        {ev.isCurrentlyHappening && <span style={{ marginLeft: 12, fontSize: '0.7rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '2px 8px', borderRadius: 12, border: '1px solid rgba(239, 68, 68, 0.3)' }}>HAPPENING NOW</span>}
+                      </div>
+                      {ev.eventType && <div className="event-type">{ev.eventType}</div>}
+                    </div>
+                    <div className="event-arrow">→</div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="no-active-events-card" style={{
+                position: 'relative',
+                padding: '64px 32px',
+                textAlign: 'center',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.01) 0%, rgba(255,255,255,0.04) 100%)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '24px',
+                overflow: 'hidden',
+                boxShadow: 'inset 0 0 80px rgba(0,0,0,0.5)',
+              }}>
+                {/* Breathing Background Glow */}
+                <div style={{
+                  position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                  width: '150px', height: '150px',
+                  background: 'radial-gradient(circle, rgba(var(--c-main), 0.2) 0%, transparent 70%)',
+                  borderRadius: '50%', filter: 'blur(40px)', animation: 'heartbeat 4s ease-in-out infinite',
+                  zIndex: 0, pointerEvents: 'none'
+                }}></div>
+                
+                <div className="no-events-icon" style={{ 
+                  position: 'relative', zIndex: 1,
+                  fontSize: '2rem', color: 'var(--white)',
+                  textShadow: '0 0 20px rgba(var(--c-main), 0.8)',
+                  animation: 'float 6s ease-in-out infinite'
+                }}>✦</div>
+                
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <h3 style={{ 
+                    fontFamily: 'var(--font-serif)', fontSize: '1.75rem', color: 'var(--white)',
+                    letterSpacing: '0.02em', marginBottom: '8px'
+                  }}>The silence before the storm.</h3>
+                  <p style={{ 
+                    color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', maxWidth: '420px', 
+                    margin: '0 auto', lineHeight: 1.6, letterSpacing: '0.01em' 
+                  }}>
+                    Our team is currently architecting the next generation of technical experiences. 
+                    The grid is quiet, but something big is coming.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       <section id="about">
         <div className="section-inner about-grid">
@@ -583,10 +661,16 @@ export default async function Home() {
           <h2 className="section-title reveal d1">Recent &amp;<br /><em>Upcoming</em></h2>
           <div className="events-list">
             {events.map((ev: any) => (
-              <Link href={ev.slug ? `/events/${ev.slug}` : '#'} key={ev._id} className="event-row reveal">
-                <div className="event-date">{ev.dateLabel}</div>
+              <Link href={ev.slug ? `/events/${ev.slug}` : '#'} key={ev._id} className={`event-row reveal ${ev.isCurrentlyHappening ? 'live-event' : ''}`}>
+                <div className="event-date" style={{ color: ev.isCurrentlyHappening ? '#ef4444' : 'var(--c-main)' }}>
+                  {ev.isCurrentlyHappening && <span className="live-heartbeat"></span>}
+                  {ev.dateLabel}
+                </div>
                 <div className="event-info-main">
-                  <div className="event-title">{ev.title}</div>
+                  <div className="event-title">
+                    {ev.title}
+                    {ev.isCurrentlyHappening && <span style={{ marginLeft: 12, fontSize: '0.7rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '2px 8px', borderRadius: 12, border: '1px solid rgba(239, 68, 68, 0.3)' }}>HAPPENING NOW</span>}
+                  </div>
                   {ev.eventType && <div className="event-type">{ev.eventType}</div>}
                 </div>
                 {ev.galleryTeaser?.length > 0 && (
@@ -779,6 +863,7 @@ export default async function Home() {
             <a href={settings.linkedinUrl || 'https://www.linkedin.com/company/istescmbcet/'}>LinkedIn</a>
           </div>
         </div>
+        <AliveClock />
       </footer>
     </>
   )

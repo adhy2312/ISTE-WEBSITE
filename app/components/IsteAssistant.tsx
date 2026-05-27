@@ -261,12 +261,16 @@ export default function IsteAssistant() {
 
         @media (max-width: 768px) {
           .assistant-dock-btn {
-            width: 36px;
-            height: 90px;
+            width: 32px;
+            height: 80px;
+            border-radius: 0 12px 12px 0;
+          }
+          .assistant-dock-btn svg {
+            width: 20px;
+            height: 20px;
           }
           .assistant-panel {
-            width: 100vw;
-            border-right: none;
+            width: min(85vw, 340px);
           }
         }
       `}</style>

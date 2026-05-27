@@ -9,6 +9,7 @@ export const eventsQuery = groq`
     date,
     eventType,
     status,
+    isCurrentlyHappening,
     link,
     order,
     "galleryTeaser": gallery[0...3]
@@ -24,6 +25,7 @@ export const eventBySlugQuery = groq`
     date,
     eventType,
     status,
+    isCurrentlyHappening,
     link,
     registrationLink,
     description,

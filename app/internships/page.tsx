@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import InternshipClientEngine from './InternshipClientEngine'
+import AliveClock from '@/app/components/AliveClock'
 
 import { Metadata } from 'next'
 
@@ -303,6 +304,7 @@ export default async function InternshipsPage() {
             <a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a>
           </div>
         </div>
+        <AliveClock />
       </footer>
     </>
   )

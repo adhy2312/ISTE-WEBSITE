@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 
-// The 38 Engines Architecture (including Membership, Haptic, Physical, Cursor, Atmosphere, Neural, Creative, and Internship Engines)
-type EngineType = 'Scroll' | 'Render' | 'Animation' | 'Interaction' | 'Data' | 'Prefetch' | 'Telemetry' | 'Resource' | 'Memory' | 'DOM' | 'Layout' | 'Paint' | 'Composite' | 'Network' | 'State' | 'Events' | 'Routing' | 'Cache' | 'Security' | 'Analytics' | 'SEO' | 'Accessibility' | 'Audio' | 'Video' | 'WebGL' | 'Workers' | 'Storage' | 'I18n' | 'PWA' | 'Sync' | 'Membership' | 'Haptic' | 'Physical' | 'Cursor' | 'Atmosphere' | 'Neural' | 'Creative' | 'Performance' | 'Internship';
+// The 38 Engines Architecture (including Membership, Haptic, Physical, Cursor, Atmosphere, Neural, Creative, Performance, Internship, and Physics Engines)
+type EngineType = 'Scroll' | 'Render' | 'Animation' | 'Interaction' | 'Data' | 'Prefetch' | 'Telemetry' | 'Resource' | 'Memory' | 'DOM' | 'Layout' | 'Paint' | 'Composite' | 'Network' | 'State' | 'Events' | 'Routing' | 'Cache' | 'Security' | 'Analytics' | 'SEO' | 'Accessibility' | 'Audio' | 'Video' | 'WebGL' | 'Workers' | 'Storage' | 'I18n' | 'PWA' | 'Sync' | 'Membership' | 'Haptic' | 'Physical' | 'Cursor' | 'Atmosphere' | 'Neural' | 'Creative' | 'Performance' | 'Internship' | 'Physics' | 'Amplifier' | 'Presence' | 'ColorExtraction';
 
 interface BrainState {
   isSmooth: boolean;
@@ -13,6 +13,7 @@ interface BrainState {
   perfMetrics: { fps: number; loadTime: number; intervention: boolean };
   soulState: { isThinking: boolean; scrollVelocity: number };
   creativeState: { immersiveMode: boolean; glitchIntensity: number };
+  scrollVelocityRef: { current: number };
 }
 
 const BrainContext = createContext<BrainState>({
@@ -22,7 +23,8 @@ const BrainContext = createContext<BrainState>({
   notifyEngine: () => {},
   perfMetrics: { fps: 60, loadTime: 0, intervention: false },
   soulState: { isThinking: false, scrollVelocity: 0 },
-  creativeState: { immersiveMode: false, glitchIntensity: 0 }
+  creativeState: { immersiveMode: false, glitchIntensity: 0 },
+  scrollVelocityRef: { current: 0 }
 });
 
 export const useBrain = () => useContext(BrainContext);
@@ -33,6 +35,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
   const [intervention, setIntervention] = useState(false);
   const [soulState, setSoulState] = useState({ isThinking: false, scrollVelocity: 0 });
   const [creativeState, setCreativeState] = useState({ immersiveMode: false, glitchIntensity: 0 });
+  const scrollVelocityRef = useRef(0);
 
   // Atmosphere Engine Audio Context
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -77,6 +80,14 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       // Play a tiny haptic tick when the cursor snaps to a button
       notifyEngine('Haptic', 'vibrate', { duration: 5 });
     }
+    if (engine === 'Performance' && event === 'preemptive_degradation') {
+      setIntervention(true);
+    }
+    
+    if (engine === 'Creative' && event === 'ambient_glow' && data?.color) {
+      document.documentElement.style.setProperty('--ambient-glow', data.color);
+    }
+    
     if (engine === 'Scroll' && event === 'velocity') {
       // Atmosphere Engine: Throttle audio modulation to save CPU
       const now = performance.now();
@@ -87,7 +98,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
           filterRef.current.frequency.setTargetAtTime(targetFreq, audioCtxRef.current.currentTime, 0.1);
         }
       }
-      setSoulState(prev => ({ ...prev, scrollVelocity: data.velocity || 0 }));
+      scrollVelocityRef.current = data.velocity || 0;
     }
     if (engine === 'Neural') {
       if (event === 'processing') {
@@ -131,7 +142,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
     const allEngines: EngineType[] = [
       'Scroll', 'Render', 'Animation', 'Interaction', 'Data', 'Prefetch', 'Telemetry', 'Resource', 'Memory', 'DOM', 
       'Layout', 'Paint', 'Composite', 'Network', 'State', 'Events', 'Routing', 'Cache', 'Security', 'Analytics', 
-      'SEO', 'Accessibility', 'Audio', 'Video', 'WebGL', 'Workers', 'Storage', 'I18n', 'PWA', 'Sync', 'Membership', 'Haptic', 'Physical', 'Cursor', 'Atmosphere', 'Neural', 'Creative', 'Performance'
+      'SEO', 'Accessibility', 'Audio', 'Video', 'WebGL', 'Workers', 'Storage', 'I18n', 'PWA', 'Sync', 'Membership', 'Haptic', 'Physical', 'Cursor', 'Atmosphere', 'Neural', 'Creative', 'Performance', 'Amplifier', 'Presence', 'ColorExtraction'
     ];
     
     // Boot up all engines
@@ -304,7 +315,8 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       notifyEngine,
       perfMetrics: { fps, loadTime: typeof window !== 'undefined' ? performance.now() : 0, intervention },
       soulState,
-      creativeState
+      creativeState,
+      scrollVelocityRef
     }}>
       {/* The Central Brain Wrapping the App */}
       <div className="central-brain-layer" style={{ display: 'contents' }}>

@@ -55,6 +55,13 @@ export const eventSchema = defineType({
       initialValue: 'past',
     }),
     defineField({
+      name: 'isCurrentlyHappening',
+      title: 'Is Currently Happening? (Live Event Heartbeat)',
+      description: 'Turn this on if the event is actively taking place RIGHT NOW. It will pulse red on the website.',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
       name: 'link',
       title: 'Event Link (optional)',
       type: 'url',

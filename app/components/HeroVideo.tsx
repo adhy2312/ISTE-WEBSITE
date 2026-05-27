@@ -9,70 +9,48 @@ const FADE_DURATION = 0.5 // seconds
 
 export default function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const rafRef = useRef<number | null>(null)
-  const isFadingOut = useRef(false)
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
     video.style.opacity = '0'
+    video.style.transition = `opacity ${FADE_DURATION}s ease`
 
-    const tick = () => {
-      if (!video) return
-
+    // timeupdate fires ~4x/sec natively — no rAF needed
+    const handleTimeUpdate = () => {
       const { currentTime, duration } = video
-      if (!duration || isNaN(duration)) {
-        rafRef.current = requestAnimationFrame(tick)
-        return
-      }
+      if (!duration || isNaN(duration)) return
 
       if (currentTime < FADE_DURATION) {
-        const progress = currentTime / FADE_DURATION
-        video.style.opacity = String(Math.min(progress, 1))
-        isFadingOut.current = false
+        video.style.opacity = String(Math.min(currentTime / FADE_DURATION, 1))
+      } else if (currentTime >= duration - FADE_DURATION) {
+        video.style.opacity = String(Math.max((duration - currentTime) / FADE_DURATION, 0))
+      } else {
+        video.style.opacity = '1'
       }
-
-      const fadeOutStart = duration - FADE_DURATION
-      if (currentTime >= fadeOutStart && !isFadingOut.current) {
-        isFadingOut.current = true
-      }
-      if (isFadingOut.current && currentTime >= fadeOutStart) {
-        const progress = 1 - (currentTime - fadeOutStart) / FADE_DURATION
-        video.style.opacity = String(Math.max(progress, 0))
-      }
-
-      rafRef.current = requestAnimationFrame(tick)
     }
 
     const handleEnded = () => {
       video.style.opacity = '0'
-      isFadingOut.current = false
       setTimeout(() => {
         video.currentTime = 0
         video.play().catch(() => {})
       }, 100)
     }
 
-    const handleCanPlay = () => {
-      video.play().catch(() => {})
-      rafRef.current = requestAnimationFrame(tick)
-    }
+    const handleCanPlay = () => video.play().catch(() => {})
 
+    video.addEventListener('timeupdate', handleTimeUpdate)
     video.addEventListener('canplay', handleCanPlay)
     video.addEventListener('ended', handleEnded)
 
-    if (video.readyState >= 3) {
-      video.play().catch(() => {})
-      rafRef.current = requestAnimationFrame(tick)
-    }
+    if (video.readyState >= 3) video.play().catch(() => {})
 
     return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate)
       video.removeEventListener('canplay', handleCanPlay)
       video.removeEventListener('ended', handleEnded)
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current)
-      }
     }
   }, [])
 
