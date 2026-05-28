@@ -1,36 +1,22 @@
 import { MetadataRoute } from 'next'
-import { getClient } from '@/lib/sanity/client'
-import { groq } from 'next-sanity'
 
-const BASE_URL = 'https://iste-mbcet.vercel.app'
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch event slugs from Sanity
-  const events = await getClient().fetch<{ slug: string; _updatedAt: string }[]>(
-    groq`*[_type == "event" && defined(slug.current)] { "slug": slug.current, _updatedAt }`
-  )
-
-  const eventEntries: MetadataRoute.Sitemap = events.map((event) => ({
-    url: `${BASE_URL}/events/${event.slug}`,
-    lastModified: event._updatedAt,
-    changeFrequency: 'weekly',
-    priority: 0.6,
-  }))
-
-  const staticEntries: MetadataRoute.Sitemap = [
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = 'https://iste-mbcet.vercel.app'
+  
+  return [
     {
-      url: BASE_URL,
+      url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: `${BASE_URL}/internships`,
+      url: `${baseUrl}/internships`,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.8,
+      priority: 0.9,
     },
+    // Note: To make this highly dynamic, you can fetch event slugs from Sanity here 
+    // and map them into this array for full dynamic SEO discoverability.
   ]
-
-  return [...staticEntries, ...eventEntries]
 }

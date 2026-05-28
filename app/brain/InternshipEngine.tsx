@@ -10,20 +10,25 @@ const COMPANIES = ['TCS', 'Infosys', 'UST Global', 'Appzoc', 'QBurst', 'IBS Soft
 
 export default function InternshipEngine() {
   const { registerEngine, notifyEngine, activeEngines } = useBrain();
-  const mounted = useRef(false);
+  const isRegistered = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 1. Handle Registration
   useEffect(() => {
-    if (!mounted.current) {
+    if (!isRegistered.current) {
       registerEngine('Internship');
-      mounted.current = true;
+      isRegistered.current = true;
     }
   }, [registerEngine]);
 
-  useEffect(() => {
-    // Only run the simulation if the engine is registered
-    if (!activeEngines.has('Internship')) return;
+  // 2. Handle Execution Loop
+  // We only depend on the specific boolean value of whether THIS engine is active.
+  // This prevents the loop from resetting if other engines register and activeEngines gets a new reference.
+  const isEngineActive = activeEngines.has('Internship');
 
-    // Simulate Agent Boot Sequence
+  useEffect(() => {
+    if (!isEngineActive) return;
+
     notifyEngine('Internship', 'agent_status', 'BOOTING NEURAL SCRAPER...');
     
     let isActive = true;
@@ -36,11 +41,15 @@ export default function InternshipEngine() {
       const randomHub = KERALA_HUBS[Math.floor(Math.random() * KERALA_HUBS.length)];
       notifyEngine('Internship', 'agent_log', `[SCAN] Traversing subnet: ${randomHub}...`);
       
-      await new Promise(resolve => setTimeout(resolve, 4000 + Math.random() * 6000));
+      // Await network delay, tracked safely
+      await new Promise(resolve => {
+        timeoutRef.current = setTimeout(resolve, 4000 + Math.random() * 6000);
+      });
+      
       if (!isActive) return;
 
       // Phase 2: Analyzing or Finding
-      const foundSomething = Math.random() > 0.7; // 30% chance to find (reduced from 60%)
+      const foundSomething = Math.random() > 0.7; // 30% chance to find
       
       if (foundSomething) {
         notifyEngine('Internship', 'agent_status', 'OPPORTUNITY DETECTED');
@@ -52,18 +61,22 @@ export default function InternshipEngine() {
         notifyEngine('Internship', 'agent_log', `[INFO] No match in sector ${Math.floor(Math.random() * 9999)}. Rerouting...`);
       }
 
+      // Schedule next cycle
       const nextDelay = 15000 + Math.random() * 15000;
-      setTimeout(simulateAgentActivity, nextDelay);
+      timeoutRef.current = setTimeout(simulateAgentActivity, nextDelay);
     };
 
     // Start the infinite scanning loop after a short initial delay
-    const initialDelay = setTimeout(simulateAgentActivity, 2000);
+    timeoutRef.current = setTimeout(simulateAgentActivity, 2000);
 
     return () => {
       isActive = false;
-      clearTimeout(initialDelay);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, [activeEngines, notifyEngine]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEngineActive]);
 
   return null; // Invisible Engine
 }

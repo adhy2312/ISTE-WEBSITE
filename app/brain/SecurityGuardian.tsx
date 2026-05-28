@@ -29,6 +29,7 @@ export default function SecurityGuardian() {
   const trustScore = useRef(80); // 0-100 (100 = full trust, 0 = hard block)
   const interactionHistory = useRef<{time: number, type: string}[]>([]);
   const isLockedDown = useRef(false);
+  const lockdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     brain.registerEngine('Security');
@@ -129,12 +130,15 @@ export default function SecurityGuardian() {
       document.documentElement.setAttribute('data-security-lockdown', 'true');
 
       // Auto-recover after 15 seconds (Student friendly)
-      setTimeout(() => {
+      if (lockdownTimeoutRef.current) clearTimeout(lockdownTimeoutRef.current);
+      
+      lockdownTimeoutRef.current = setTimeout(() => {
         isLockedDown.current = false;
         trustScore.current = 60; // Reset trust partially
         document.documentElement.removeAttribute('data-security-lockdown');
         document.documentElement.setAttribute('data-emotion', 'calm');
         console.log('%c[SECURITY GUARDIAN] Lockdown lifted. Rebuilding trust profile.', 'color: #00ff00;');
+        lockdownTimeoutRef.current = null;
       }, 15000);
     };
 
@@ -145,6 +149,7 @@ export default function SecurityGuardian() {
       observer.disconnect();
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('input', handleInput, true);
+      if (lockdownTimeoutRef.current) clearTimeout(lockdownTimeoutRef.current);
     };
   }, []);
 

@@ -182,7 +182,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
           <div>
             <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={80} height={80} className="footer-logo-img" /></div>
             <div className="footer-tagline">{footerTagline}</div>
-            <div className="footer-chip">Chapter Code: {settings.chapterCode || 'KE065'}</div>
+            {settings.chapterCode && <div className="footer-chip">Chapter Code: {settings.chapterCode}</div>}
           </div>
           <div>
             <div className="footer-col-title">Navigate</div>

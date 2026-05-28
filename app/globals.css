@@ -325,6 +325,8 @@
     .nav-hamburger {
       display: none; flex-direction: column; gap: 5px; cursor: pointer;
       padding: 8px; margin: -8px; /* enlarge tap target */
+      background: transparent;
+      border: none;
     }
     .nav-hamburger span { width: 22px; height: 1.5px; background: var(--white); transition: .3s; display:block; }
     

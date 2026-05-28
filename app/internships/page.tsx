@@ -267,7 +267,7 @@ export default async function InternshipsPage() {
             <div className="footer-tagline">
               Indian Society for Technical Education — Mar Baselios College of Engineering and Technology Student Chapter, Kerala.
             </div>
-            <div className="footer-chip">Chapter Code: KE065</div>
+            {/* Removed chapter code display */}
           </div>
           <div>
             <div className="footer-col-title">Navigate</div>
@@ -298,7 +298,7 @@ export default async function InternshipsPage() {
           </div>
         </div>
         <div className="footer-bottom">
-          <div className="footer-copy">© 2026 ISTE MBCET Student&apos;s Chapter &nbsp;·&nbsp; KE065. All rights reserved.</div>
+          <div className="footer-copy">© 2026 ISTE MBCET Student&apos;s Chapter. All rights reserved.</div>
           <div className="footer-socials">
             <a href="https://www.instagram.com/iste_mbcet/">Instagram</a>
             <a href="https://www.linkedin.com/company/istescmbcet/">LinkedIn</a>

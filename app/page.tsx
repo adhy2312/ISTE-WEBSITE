@@ -130,7 +130,6 @@ export default async function Home() {
   // Default ticker array if not provided in Sanity
   const tickerItems = settings.tickerItems?.length ? settings.tickerItems : [
     'Indian Society for Technical Education',
-    'KE065',
     'Mar Baselios College of Engineering and Technology',
     'Innovate.',
     'Engineer.',
@@ -821,7 +820,7 @@ export default async function Home() {
             <div className="footer-tagline">
               {footerTagline}
             </div>
-            <div className="footer-chip">Chapter Code: {settings.chapterCode || 'KE065'}</div>
+            {settings.chapterCode && <div className="footer-chip">Chapter Code: {settings.chapterCode}</div>}
           </div>
           <div>
             <div className="footer-col-title">Navigate</div>
@@ -853,7 +852,7 @@ export default async function Home() {
           </div>
         </div>
         <div className="footer-bottom">
-          <div className="footer-copy">© 2026 ISTE MBCET Student&apos;s Chapter &nbsp;·&nbsp; KE065. All rights reserved.</div>
+          <div className="footer-copy">© 2026 ISTE MBCET Student&apos;s Chapter. All rights reserved.</div>
           <div className="footer-socials">
             <a href={settings.instagramUrl || 'https://www.instagram.com/iste_mbcet/'}>Instagram</a>
             <a href={settings.linkedinUrl || 'https://www.linkedin.com/company/istescmbcet/'}>LinkedIn</a>

@@ -28,7 +28,7 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakart
 export const metadata: Metadata = {
   metadataBase: new URL('https://iste-mbcet.vercel.app'),
   title: {
-    default: "ISTE MBCET Student's Chapter | KE065",
+    default: "ISTE MBCET Student's Chapter",
     template: "%s | ISTE MBCET"
   },
   description: "Empowering engineering students through innovation, technology, and excellence at Mar Baselios College of Engineering and Technology. Join India's premier technical community.",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: "https://iste-mbcet.vercel.app",
-    title: "ISTE MBCET Student's Chapter | KE065",
+    title: "ISTE MBCET Student's Chapter",
     description: "Empowering engineering students through innovation, technology, and excellence at MBCET.",
     siteName: "ISTE MBCET",
     images: [
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ISTE MBCET Student's Chapter | KE065",
+    title: "ISTE MBCET Student's Chapter",
     description: "Empowering engineering students through innovation, technology, and excellence at MBCET.",
     images: ["/iste.png"],
     creator: "@iste_mbcet",

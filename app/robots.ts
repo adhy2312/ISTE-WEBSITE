@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/studio/', '/admin/', '/api/'],
+      disallow: ['/studio/', '/admin/'],
     },
     sitemap: 'https://iste-mbcet.vercel.app/sitemap.xml',
   }
