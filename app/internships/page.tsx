@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import InternshipClientEngine from './InternshipClientEngine'
+import LiveInternshipsList from './LiveInternshipsList'
 import AliveClock from '@/app/components/AliveClock'
 
 import { Metadata } from 'next'
@@ -159,6 +160,9 @@ export default async function InternshipsPage() {
           <p className="section-body reveal d2" style={{ marginTop: '20px', marginBottom: '60px' }}>
             These positions have been curated and verified by the ISTE MBCET chapter team. Apply directly via the link provided.
           </p>
+
+          {/* Dynamic AI-Scraped List */}
+          <LiveInternshipsList />
 
           {open.length === 0 ? (
             <div className="reveal" style={{ padding: '60px 0', textAlign: 'center', color: 'var(--g400)', borderTop: '1px solid var(--border)' }}>
