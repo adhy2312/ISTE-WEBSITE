@@ -89,6 +89,7 @@
       color: var(--white);
       font-family: var(--font-sans);
       line-height: 1.6;
+      overflow-x: hidden;
       overflow-x: clip;
       width: 100%;
       /* default cursor for professional feel */
@@ -1884,7 +1885,7 @@
 
     @media (max-width:768px) {
       /* Prevent any horizontal overflow */
-      html, body { overflow-x: clip; width: 100%; position: relative; }
+      html, body { overflow-x: hidden; overflow-x: clip; width: 100%; position: relative; }
 
       section { padding: 64px 20px; }
       nav, nav.scrolled { padding: 16px 20px; }

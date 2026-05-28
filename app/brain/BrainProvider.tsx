@@ -188,7 +188,9 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
     // Engine 4: Physical (Smooth scrolling + Momentum via Lenis)
     // Dynamic import to avoid SSR issues with Lenis
     let lenis: any = null;
-    if (typeof ResizeObserver !== 'undefined') {
+    const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    
+    if (typeof ResizeObserver !== 'undefined' && !isTouch) {
       import('lenis').then(({ default: Lenis }) => {
         lenis = new Lenis({
           duration: 1.2,

@@ -12,7 +12,8 @@ export default function MagneticCursor() {
   const pathname = usePathname()
 
   useEffect(() => {
-    if (window.innerWidth <= 768 || ('ontouchstart' in window)) {
+    const isTouch = typeof window !== 'undefined' && (window.innerWidth <= 768 || 'ontouchstart' in window || navigator.maxTouchPoints > 0);
+    if (isTouch) {
       if (dotRef.current) dotRef.current.style.display = 'none';
       if (ringRef.current) ringRef.current.style.display = 'none';
       return;
