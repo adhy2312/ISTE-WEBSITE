@@ -4,40 +4,94 @@ import { useEffect, useRef } from 'react';
 import { useBrain } from './BrainProvider';
 
 /**
- * ENGINE 43: SECURITY GUARDIAN
+ * ENGINE 43: SECURITY GUARDIAN (Adaptive Behavioral Trust Engine)
  * 
- * An autonomous cybersecurity layer that operates as the organism's immune system.
- * It monitors for:
- * 1. Unauthorized script injections (XSS)
- * 2. Rapid bot-like interactions (DDoS / Scraper behavior)
- * 3. Malicious payload typing (SQLi / XSS heuristics)
- * 4. Anti-Tampering (Blocks DevTools, Inspect Element, Right-Click, Source View)
- * 5. Data Protection (Blocks Copying, Dragging)
- * 
- * When a threat is detected, it triggers the organism's stress response and
- * can lockdown critical systems.
+ * Re-architected to prioritize intelligent contextual analysis over rigid blocking.
+ * Understands genuine student behavior (rapid searching, heavy browsing, refreshes)
+ * vs actual malicious attack patterns (XSS, SQLi, Mass Scraping, DDoS).
  */
 
-const THREAT_PATTERNS = [
-  /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+const HARD_THREAT_PATTERNS = [
+  /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, // XSS Injection
   /javascript:/gi,
   /onerror\s*=/gi,
   /onload\s*=/gi,
-  /SELECT\s+.*?\s+FROM/gi,
+  /SELECT\s+.*?\s+FROM/gi, // SQLi
   /UNION\s+SELECT/gi,
-  /DROP\s+TABLE/gi
+  /DROP\s+TABLE/gi,
+  /etc\/passwd/gi // Path Traversal
 ];
 
 export default function SecurityGuardian() {
   const brain = useBrain();
-  const interactionHistory = useRef<number[]>([]);
+  
+  // Behavioral tracking
+  const trustScore = useRef(80); // 0-100 (100 = full trust, 0 = hard block)
+  const interactionHistory = useRef<{time: number, type: string}[]>([]);
   const isLockedDown = useRef(false);
 
   useEffect(() => {
     brain.registerEngine('Security');
 
-    // ── 1. DOM IMMUNE SYSTEM (Mutation Observer) ───────────────────────
-    // Watches the DOM for unauthorized script injections
+    // ── 1. CONTEXTUAL INTERACTION SENSOR (Soft Monitoring) ──────────────
+    const logInteraction = (type: string) => {
+      if (isLockedDown.current) return;
+      
+      const now = Date.now();
+      interactionHistory.current.push({ time: now, type });
+      
+      // Keep last 30 seconds of history
+      interactionHistory.current = interactionHistory.current.filter(i => now - i.time < 30000);
+      
+      analyzeBehavioralTrust();
+    };
+
+    const analyzeBehavioralTrust = () => {
+      const history = interactionHistory.current;
+      const clicks = history.filter(i => i.type === 'click').length;
+      const inputs = history.filter(i => i.type === 'input').length;
+      
+      // We know students might click heavily or open multiple tabs
+      if (clicks > 30) {
+        // High click volume -> reduce trust slightly, but don't ban
+        trustScore.current = Math.max(trustScore.current - 5, 20);
+        brain.notifyEngine('Security', 'silent_monitor', { msg: 'High interaction volume detected. Assuming enthusiastic student behavior.' });
+      } else {
+        // Normal behavior recovers trust
+        trustScore.current = Math.min(trustScore.current + 1, 100);
+      }
+      
+      if (trustScore.current < 30 && trustScore.current > 10) {
+        // Soft mitigation: Adaptive Cooldown (UI effect only, no hard blocks)
+        document.documentElement.setAttribute('data-emotion', 'curious'); // Watchful
+      }
+    };
+
+    const handleInteraction = () => logInteraction('click');
+    window.addEventListener('click', handleInteraction);
+
+    // ── 2. SMART PAYLOAD SENSOR (High Confidence Threat Detection) ───────
+    const handleInput = (e: Event) => {
+      logInteraction('input');
+      if (isLockedDown.current) return;
+      
+      const target = e.target as HTMLInputElement | HTMLTextAreaElement;
+      if (target && target.value) {
+        const value = target.value;
+        for (const pattern of HARD_THREAT_PATTERNS) {
+          if (pattern.test(value)) {
+            // High confidence malicious intent
+            trustScore.current -= 50; 
+            handleHardThreat('MALICIOUS_PAYLOAD', `Exploit signature detected: ${pattern}`);
+            target.value = ''; // Neutralize
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener('input', handleInput, true);
+
+    // ── 3. DOM IMMUNE SYSTEM (Mutation Observer) ───────────────────────
     const observer = new MutationObserver((mutations) => {
       if (isLockedDown.current) return;
       
@@ -45,10 +99,9 @@ export default function SecurityGuardian() {
         for (const node of Array.from(mutation.addedNodes)) {
           if (node.nodeName.toLowerCase() === 'script') {
             const scriptNode = node as HTMLScriptElement;
-            // Ignore standard Next.js / trusted scripts
             if (!scriptNode.src.includes('_next') && !scriptNode.src.includes('vercel')) {
-              handleThreat('UNAUTHORIZED_SCRIPT_INJECTION', `Detected unknown script: ${scriptNode.src || 'inline'}`);
-              scriptNode.remove(); // Neutralize threat immediately
+              handleHardThreat('UNAUTHORIZED_SCRIPT_INJECTION', `Detected unknown script: ${scriptNode.src || 'inline'}`);
+              scriptNode.remove(); // Neutralize
             }
           }
         }
@@ -56,105 +109,44 @@ export default function SecurityGuardian() {
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
 
-    // ── 2. BOT/SCRAPER DETECTION (Behavioral Rate Limiting) ───────────
-    const handleInteraction = () => {
-      if (isLockedDown.current) return;
-      const now = Date.now();
-      interactionHistory.current.push(now);
+    // ── 4. THREAT RESPONSE PROTOCOL ──────────────────────────────────────
+    const handleHardThreat = (type: string, details: string) => {
+      if (trustScore.current > 0) {
+        // Progressive escalation instead of instant hard block
+        console.warn(`%c[BEHAVIORAL ENGINE] Suspicious Activity Flagged ⚠️`, 'color: #f59e0b; font-size: 13px;');
+        brain.notifyEngine('Security', 'risk_based_verification', { type, details });
+        return;
+      }
       
-      // Keep only last 10 interactions
-      if (interactionHistory.current.length > 10) {
-        interactionHistory.current.shift();
-      }
-
-      // If 10 clicks happened in less than 500ms, it's a bot
-      if (interactionHistory.current.length === 10) {
-        const timeDelta = now - interactionHistory.current[0];
-        if (timeDelta < 500) {
-          handleThreat('BOT_BEHAVIOR_DETECTED', `Impossibly fast clicks (${timeDelta}ms for 10 actions)`);
-        }
-      }
-    };
-    window.addEventListener('click', handleInteraction);
-
-    // ── 3. MALICIOUS PAYLOAD SENSOR (Input Monitoring) ────────────────
-    const handleInput = (e: Event) => {
-      if (isLockedDown.current) return;
-      const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-      if (target && target.value) {
-        const value = target.value;
-        for (const pattern of THREAT_PATTERNS) {
-          if (pattern.test(value)) {
-            handleThreat('MALICIOUS_PAYLOAD', `Detected attack signature: ${pattern}`);
-            target.value = ''; // Clear payload
-            break;
-          }
-        }
-      }
-    };
-    // Use capture phase to intercept before React state updates
-    window.addEventListener('input', handleInput, true);
-
-    // ── 4. ANTI-TAMPERING / ANTI-DEBUGGING PROTOCOLS ──────────────────
-    const preventAction = (e: Event) => {
-      e.preventDefault();
-      e.stopPropagation();
-      handleThreat('ANTI_TAMPER', 'Unauthorized inspection or data extraction attempt blocked.');
-      return false;
-    };
-
-    const handleKeydown = (e: KeyboardEvent) => {
-      // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-        (e.ctrlKey && e.key === 'u') ||
-        (e.metaKey && e.altKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
-        (e.metaKey && e.key === 'u')
-      ) {
-        preventAction(e);
-      }
-    };
-
-    window.addEventListener('contextmenu', preventAction); // Block right click
-    window.addEventListener('keydown', handleKeydown, true); // Block DevTools shortcuts
-    window.addEventListener('copy', preventAction); // Block copying
-    window.addEventListener('cut', preventAction); // Block cutting
-    window.addEventListener('dragstart', preventAction); // Block dragging images/text
-
-    // ── THREAT RESPONSE PROTOCOL ──────────────────────────────────────
-    const handleThreat = (type: string, details: string) => {
+      // Absolute minimum trust reached -> Lockdown
       isLockedDown.current = true;
-      console.warn(`%c[SECURITY GUARDIAN] THREAT NEUTRALIZED ⚠️`, 'color: #ff0000; font-size: 14px; font-weight: bold;');
+      console.warn(`%c[SECURITY GUARDIAN] THREAT NEUTRALIZED 🛑`, 'color: #ff0000; font-size: 14px; font-weight: bold;');
       console.warn(`Type: ${type}\nDetails: ${details}`);
       
-      // Dispatch stress response to organism
       brain.notifyEngine('Security', 'threat_detected', { type, details });
       
-      // Visually stress the organism (CSS override)
       document.documentElement.setAttribute('data-emotion', 'stressed');
       document.documentElement.setAttribute('data-security-lockdown', 'true');
 
-      // Auto-recover after 10 seconds
+      // Auto-recover after 15 seconds (Student friendly)
       setTimeout(() => {
         isLockedDown.current = false;
+        trustScore.current = 60; // Reset trust partially
         document.documentElement.removeAttribute('data-security-lockdown');
         document.documentElement.setAttribute('data-emotion', 'calm');
-        console.log('%c[SECURITY GUARDIAN] Lockdown lifted. Returning to monitoring state.', 'color: #00ff00;');
-      }, 10000);
+        console.log('%c[SECURITY GUARDIAN] Lockdown lifted. Rebuilding trust profile.', 'color: #00ff00;');
+      }, 15000);
     };
+
+    // NOTE: We have removed rigid UX-harming protections (anti-right-click, anti-devtools, anti-copying)
+    // as per the new adaptive intelligence directive.
 
     return () => {
       observer.disconnect();
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('input', handleInput, true);
-      window.removeEventListener('contextmenu', preventAction);
-      window.removeEventListener('keydown', handleKeydown, true);
-      window.removeEventListener('copy', preventAction);
-      window.removeEventListener('cut', preventAction);
-      window.removeEventListener('dragstart', preventAction);
     };
-  }, []); // Remove brain from dependencies to prevent infinite loops
+  }, []);
 
   return null;
 }

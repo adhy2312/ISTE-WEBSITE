@@ -47,5 +47,13 @@
     "prisma": "^7.7.0",
     "tailwindcss": "^4.2.4",
     "typescript": "^5"
-  }
+  },
+  "browserslist": [
+    "> 0.2%",
+    "last 4 versions",
+    "iOS >= 10",
+    "Safari >= 10",
+    "Android >= 6",
+    "not dead"
+  ]
 }
