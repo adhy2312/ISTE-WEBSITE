@@ -1,8 +1,0 @@
-# Browserslist config for legacy device support
-> 0.2%
-last 2 versions
-not dead
-Firefox ESR
-Safari >= 9
-Android >= 4.4
-IE 11
