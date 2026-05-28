@@ -188,22 +188,24 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
     // Engine 4: Physical (Smooth scrolling + Momentum via Lenis)
     // Dynamic import to avoid SSR issues with Lenis
     let lenis: any = null;
-    import('lenis').then(({ default: Lenis }) => {
-      lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        orientation: 'vertical',
-        gestureOrientation: 'vertical',
-        smoothWheel: true,
-        touchMultiplier: 2,
-      });
+    if (typeof ResizeObserver !== 'undefined') {
+      import('lenis').then(({ default: Lenis }) => {
+        lenis = new Lenis({
+          duration: 1.2,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          orientation: 'vertical',
+          gestureOrientation: 'vertical',
+          smoothWheel: true,
+          touchMultiplier: 2,
+        });
 
-      lenis.on('scroll', (e: any) => {
-        // Connect to Scroll and Physical engines
-        notifyEngine('Scroll', 'velocity', { velocity: e.velocity });
-        notifyEngine('Physical', 'inertia', { progress: e.progress });
-      });
-    });
+        lenis.on('scroll', (e: any) => {
+          // Connect to Scroll and Physical engines
+          notifyEngine('Scroll', 'velocity', { velocity: e.velocity });
+          notifyEngine('Physical', 'inertia', { progress: e.progress });
+        });
+      }).catch(e => console.warn('Lenis failed to load:', e));
+    }
 
     let isLooping = true;
     const measureFPSAndPhysics = (time: number) => {

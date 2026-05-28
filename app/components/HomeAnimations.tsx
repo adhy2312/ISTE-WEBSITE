@@ -99,47 +99,59 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
 
   // Scroll Reveal and Count-Up
   useEffect(() => {
-    const ro = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible')
-          ro.unobserve(e.target)
-        }
-      })
-    }, { threshold: 0, rootMargin: '0px 0px 200px 0px' })
+    let ro: IntersectionObserver | null = null;
+    let co: IntersectionObserver | null = null;
 
-    document.querySelectorAll('.reveal').forEach(el => ro.observe(el))
-
-    const co = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return
-        const el = e.target as HTMLElement
-        const targetAttr = el.getAttribute('data-to')
-        if (!targetAttr) return
-        const target = +targetAttr
-        const dur = 1800
-        let start: number | null = null
-        const stepAnim = (timestamp: number) => {
-          if (!start) start = timestamp
-          const progress = timestamp - start
-          const cur = Math.min(target * (progress / dur), target)
-          el.textContent = Math.floor(cur).toString()
-          if (progress < dur) {
-            requestAnimationFrame(stepAnim)
-          } else {
-            el.textContent = target.toString()
+    if (typeof IntersectionObserver !== 'undefined') {
+      ro = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible')
+            ro?.unobserve(e.target)
           }
-        }
-        requestAnimationFrame(stepAnim)
-        co.unobserve(el)
-      })
-    }, { threshold: 0.5 })
+        })
+      }, { threshold: 0, rootMargin: '0px 0px 200px 0px' })
 
-    document.querySelectorAll('.countup').forEach(el => co.observe(el))
+      document.querySelectorAll('.reveal').forEach(el => ro?.observe(el))
+
+      co = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return
+          const el = e.target as HTMLElement
+          const targetAttr = el.getAttribute('data-to')
+          if (!targetAttr) return
+          const target = +targetAttr
+          const dur = 1800
+          let start: number | null = null
+          const stepAnim = (timestamp: number) => {
+            if (!start) start = timestamp
+            const progress = timestamp - start
+            const cur = Math.min(target * (progress / dur), target)
+            el.textContent = Math.floor(cur).toString()
+            if (progress < dur) {
+              requestAnimationFrame(stepAnim)
+            } else {
+              el.textContent = target.toString()
+            }
+          }
+          requestAnimationFrame(stepAnim)
+          co?.unobserve(el)
+        })
+      }, { threshold: 0.5 })
+
+      document.querySelectorAll('.countup').forEach(el => co?.observe(el))
+    } else {
+      // Fallback for older devices: just show the elements immediately
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'))
+      document.querySelectorAll('.countup').forEach(el => {
+        const targetAttr = el.getAttribute('data-to')
+        if (targetAttr) el.textContent = targetAttr
+      })
+    }
 
     return () => {
-      ro.disconnect()
-      co.disconnect()
+      if (ro) ro.disconnect()
+      if (co) co.disconnect()
     }
   }, [])
 

@@ -103,22 +103,26 @@ export default function MemoryEngine() {
 
     // ── 2. Section observer — only watch major named sections ──────
     const MAJOR_SECTIONS = ['hero', 'about', 'who', 'benefits', 'execom', 'events', 'membership']
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = (entry.target as HTMLElement).id
-          if (id && !profile.sectionsExplored.includes(id)) {
-            profile.sectionsExplored.push(id)
-            profileRef.current = profile
+    let sectionObserver: IntersectionObserver | null = null;
+    
+    if (typeof IntersectionObserver !== 'undefined') {
+      sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = (entry.target as HTMLElement).id
+            if (id && !profile.sectionsExplored.includes(id)) {
+              profile.sectionsExplored.push(id)
+              profileRef.current = profile
+            }
           }
-        }
-      })
-    }, { threshold: 0.3 })
+        })
+      }, { threshold: 0.3 })
 
-    MAJOR_SECTIONS.forEach(id => {
-      const el = document.getElementById(id)
-      if (el) sectionObserver.observe(el)
-    })
+      MAJOR_SECTIONS.forEach(id => {
+        const el = document.getElementById(id)
+        if (el) sectionObserver?.observe(el)
+      })
+    }
 
     // ── 3. Motion style detector — fast vs slow user ────────────
     let mouseEvents = 0
@@ -189,7 +193,7 @@ export default function MemoryEngine() {
     )
 
     return () => {
-      sectionObserver.disconnect()
+      if (sectionObserver) sectionObserver.disconnect()
       window.removeEventListener('mousemove', detectMotionStyle)
       window.removeEventListener('beforeunload', saveSessionTime)
       clearInterval(saveInterval)
