@@ -89,25 +89,7 @@ export const testimonialsQuery = groq`
 `
 
 export const siteSettingsQuery = groq`
-  *[_type == "siteSettings"][0] {
-    heroHeadline,
-    heroDescription,
-    heroSubtitle,
-    heroTypedText,
-    heroPrimaryCtaLabel,
-    heroSecondaryCtaLabel,
-    tickerItems,
-    aboutTitle,
-    aboutBody,
-    membershipPerks,
-    navCtaLabel,
-    footerTagline,
-    chapterCode,
-    chapterLocation,
-    contactEmail,
-    instagramUrl,
-    linkedinUrl,
-  }
+  *[_type == "siteSettings"][0]
 `
 
 export const internshipsQuery = groq`

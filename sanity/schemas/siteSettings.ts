@@ -43,6 +43,13 @@ export const siteSettingsSchema = defineType({
       type: 'string',
     }),
     defineField({
+      name: 'heroStatsLabel',
+      title: 'Hero Stats Label',
+      description: 'Text shown next to the active members stat. e.g. "members are already part of the chapter"',
+      type: 'string',
+      initialValue: 'members are already part of the chapter',
+    }),
+    defineField({
       name: 'tickerItems',
       title: 'Ticker Strip Items',
       type: 'array',
@@ -116,6 +123,190 @@ export const siteSettingsSchema = defineType({
       name: 'linkedinUrl',
       title: 'LinkedIn URL',
       type: 'url',
+    }),
+    
+    // --- SECTION CUSTOMIZATION ---
+
+    // Active Events Section
+    defineField({
+      name: 'activeEventsTag',
+      title: 'Active Events Tag',
+      type: 'string',
+      initialValue: 'Live Now',
+    }),
+    defineField({
+      name: 'activeEventsTitle',
+      title: 'Active Events Title',
+      description: 'Use <em> for italic accent. e.g. "Active <em>Events</em>"',
+      type: 'string',
+      initialValue: 'Active <em>Events</em>',
+    }),
+    defineField({
+      name: 'noActiveEventsTitle',
+      title: 'No Active Events Title',
+      type: 'string',
+      initialValue: 'The silence before the storm.',
+    }),
+    defineField({
+      name: 'noActiveEventsBody',
+      title: 'No Active Events Body',
+      type: 'text',
+      initialValue: 'Our team is currently architecting the next generation of technical experiences. The grid is quiet, but something big is coming.',
+    }),
+
+    // About Section
+    defineField({
+      name: 'aboutTag',
+      title: 'About Tag',
+      type: 'string',
+      initialValue: 'About Us',
+    }),
+
+    // Who Are We Section
+    defineField({
+      name: 'whoTag',
+      title: 'Who Are We Tag',
+      type: 'string',
+      initialValue: 'Who Are We',
+    }),
+    defineField({
+      name: 'whoTitle',
+      title: 'Who Are We Title',
+      description: 'Use <em> for italic accent. e.g. "Built on Three<br /><em>Core Pillars</em>"',
+      type: 'string',
+      initialValue: 'Built on Three<br /><em>Core Pillars</em>',
+    }),
+
+    // Benefits Section
+    defineField({
+      name: 'benefitsTag',
+      title: 'Benefits Tag',
+      type: 'string',
+      initialValue: 'Member Benefits',
+    }),
+    defineField({
+      name: 'benefitsTitle',
+      title: 'Benefits Title',
+      description: 'Use <em> for italic accent.',
+      type: 'string',
+      initialValue: 'Why Join<br /><em>ISTE MBCET?</em>',
+    }),
+
+    // Execom Section
+    defineField({
+      name: 'execomTag',
+      title: 'Execom Tag',
+      type: 'string',
+      initialValue: 'Leadership 2026-27',
+    }),
+    defineField({
+      name: 'execomTitle',
+      title: 'Execom Title',
+      description: 'Use <em> for italic accent.',
+      type: 'string',
+      initialValue: 'Executive<br /><em>Committee</em>',
+    }),
+    defineField({
+      name: 'execomFacultyLabel',
+      title: 'Execom Faculty Advisors Label',
+      type: 'string',
+      initialValue: 'Faculty Advisors',
+    }),
+    defineField({
+      name: 'execomMentorsLabel',
+      title: 'Execom Student Mentors Label',
+      type: 'string',
+      initialValue: 'Student Mentors',
+    }),
+    defineField({
+      name: 'execomCoreLabel',
+      title: 'Execom Core Officers Label',
+      type: 'string',
+      initialValue: 'Core Officers',
+    }),
+    defineField({
+      name: 'execomTeamLeadsLabel',
+      title: 'Execom Team Leads Label',
+      type: 'string',
+      initialValue: 'Team Leads',
+    }),
+    defineField({
+      name: 'execomJuniorLabel',
+      title: 'Execom Junior Label',
+      type: 'string',
+      initialValue: 'Junior ExeCom',
+    }),
+
+    // Events Section
+    defineField({
+      name: 'eventsTag',
+      title: 'Events Tag',
+      type: 'string',
+      initialValue: 'Events',
+    }),
+    defineField({
+      name: 'eventsTitle',
+      title: 'Events Title',
+      description: 'Use <em> for italic accent.',
+      type: 'string',
+      initialValue: 'Recent &amp;<br /><em>Upcoming</em>',
+    }),
+
+    // Membership Section
+    defineField({
+      name: 'membershipTag',
+      title: 'Membership Tag',
+      type: 'string',
+      initialValue: 'Enroll Now',
+    }),
+    defineField({
+      name: 'membershipTitle',
+      title: 'Membership Title',
+      description: 'Use <em> for italic accent.',
+      type: 'string',
+      initialValue: 'Grab Your<br /><em>Membership</em>',
+    }),
+    defineField({
+      name: 'membershipBody',
+      title: 'Membership Body Text',
+      type: 'text',
+      initialValue: "Becoming a member of ISTE MBCET Student Chapter is your gateway to technical excellence, peer networking, and real-world professional growth. Fill in your details and we'll get you enrolled within 48 hours.",
+    }),
+
+    // Testimonials Section
+    defineField({
+      name: 'testimonialsTag',
+      title: 'Testimonials Tag',
+      type: 'string',
+      initialValue: 'Member Voices',
+    }),
+    defineField({
+      name: 'testimonialsTitle',
+      title: 'Testimonials Title',
+      description: 'Use <em> for italic accent.',
+      type: 'string',
+      initialValue: 'What Our<br /><em>Members Say</em>',
+    }),
+
+    // Launchpad Section
+    defineField({
+      name: 'launchpadTag',
+      title: 'Launchpad Tag',
+      type: 'string',
+      initialValue: 'Member Resources',
+    }),
+    defineField({
+      name: 'launchpadTitle',
+      title: 'Launchpad Title',
+      description: 'Use <em> for italic accent.',
+      type: 'string',
+      initialValue: 'Internship<br /><em>Launchpad</em>',
+    }),
+    defineField({
+      name: 'launchpadBody',
+      title: 'Launchpad Body Text',
+      type: 'text',
+      initialValue: 'Curated internship opportunities, verified and posted by the ISTE MBCET team — exclusively for our members.',
     }),
   ],
   preview: {

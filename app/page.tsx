@@ -281,7 +281,7 @@ export default async function Home() {
         {/* Stats floater */}
         <div className="hero-stat-floater" aria-hidden="true">
           <div className="stat-floater-num">{stats[0]?.value || 300}<span>+</span></div>
-          <div className="stat-floater-label">members are already part of the chapter</div>
+          <div className="stat-floater-label">{settings.heroStatsLabel || 'members are already part of the chapter'}</div>
         </div>
 
         {/* Ever-looping Marquee Strip */}
@@ -304,8 +304,8 @@ export default async function Home() {
       {/* Dynamic Active Event Section */}
       <section id="active-events" style={{ borderBottom: '1px solid var(--border)', paddingTop: 40, paddingBottom: 60 }}>
         <div className="section-inner">
-          <div className="section-tag reveal">Live Now</div>
-          <h2 className="section-title reveal d1" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Active <em>Events</em></h2>
+          <div className="section-tag reveal">{settings.activeEventsTag || 'Live Now'}</div>
+          <h2 className="section-title reveal d1" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }} dangerouslySetInnerHTML={{ __html: settings.activeEventsTitle || 'Active <em>Events</em>' }}></h2>
           
           <div className="active-events-container reveal d2" style={{ marginTop: 32 }}>
             {activeEvents.length > 0 ? (
@@ -363,13 +363,12 @@ export default async function Home() {
                   <h3 style={{ 
                     fontFamily: 'var(--font-serif)', fontSize: '1.75rem', color: 'var(--white)',
                     letterSpacing: '0.02em', marginBottom: '8px'
-                  }}>The silence before the storm.</h3>
+                  }}>{settings.noActiveEventsTitle || 'The silence before the storm.'}</h3>
                   <p style={{ 
                     color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem', maxWidth: '420px', 
                     margin: '0 auto', lineHeight: 1.6, letterSpacing: '0.01em' 
                   }}>
-                    Our team is currently architecting the next generation of technical experiences. 
-                    The grid is quiet, but something big is coming.
+                    {settings.noActiveEventsBody || 'Our team is currently architecting the next generation of technical experiences. The grid is quiet, but something big is coming.'}
                   </p>
                 </div>
               </div>
@@ -381,7 +380,7 @@ export default async function Home() {
       <section id="about">
         <div className="section-inner about-grid">
           <div>
-            <div className="section-tag reveal">About Us</div>
+            <div className="section-tag reveal">{settings.aboutTag || 'About Us'}</div>
             <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.aboutTitle || 'Shaping <em>Engineers</em><br />of Tomorrow' }}></h2>
 
             {settings.aboutBody?.length ? (
@@ -412,8 +411,8 @@ export default async function Home() {
       <section id="who">
         <div className="section-inner">
           <div className="who-header">
-            <div className="section-tag reveal">Who Are We</div>
-            <h2 className="section-title reveal d1">Built on Three<br /><em>Core Pillars</em></h2>
+            <div className="section-tag reveal">{settings.whoTag || 'Who Are We'}</div>
+            <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.whoTitle || 'Built on Three<br /><em>Core Pillars</em>' }}></h2>
           </div>
           <div className="who-grid">
             {pillars.length > 0 ? (
@@ -466,8 +465,8 @@ export default async function Home() {
 
       <section id="benefits">
         <div className="section-inner">
-          <div className="section-tag reveal">Member Benefits</div>
-          <h2 className="section-title reveal d1">Why Join<br /><em>ISTE MBCET?</em></h2>
+          <div className="section-tag reveal">{settings.benefitsTag || 'Member Benefits'}</div>
+          <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.benefitsTitle || 'Why Join<br /><em>ISTE MBCET?</em>' }}></h2>
           <div className="benefits-grid">
             {benefits.length > 0 ? (
               benefits.map((benefit: any, i: number) => (
@@ -519,15 +518,13 @@ export default async function Home() {
 
       <section id="execom">
         <div className="section-inner">
-          <div className="section-tag reveal">Leadership 2026-27</div>
-          <h2 className="section-title reveal d1" style={{ position: 'relative', zIndex: 2 }}>
-            Executive<br /><em>Committee</em>
-          </h2>
+          <div className="section-tag reveal">{settings.execomTag || 'Leadership 2026-27'}</div>
+          <h2 className="section-title reveal d1" style={{ position: 'relative', zIndex: 2 }} dangerouslySetInnerHTML={{ __html: settings.execomTitle || 'Executive<br /><em>Committee</em>' }}></h2>
           
           {/* Decorative atmospheric node for the Execom section */}
           <div className="absolute left-1/2 top-32 -translate-x-1/2 w-[800px] h-[800px] blur-[150px] opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(var(--c-alt1), 1) 0%, transparent 60%)', zIndex: 0 }} />
 
-          <div className="execom-sub-label reveal">Faculty Advisors</div>
+          <div className="execom-sub-label reveal">{settings.execomFacultyLabel || 'Faculty Advisors'}</div>
           <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
             {faculty.map((m: any, i: number) => (
               <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
@@ -558,7 +555,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <div className="execom-sub-label reveal">Student Mentors</div>
+          <div className="execom-sub-label reveal">{settings.execomMentorsLabel || 'Student Mentors'}</div>
           <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
             {mentors.map((m: any, i: number) => (
               <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
@@ -589,7 +586,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <div className="execom-sub-label reveal">Core Officers</div>
+          <div className="execom-sub-label reveal">{settings.execomCoreLabel || 'Core Officers'}</div>
           <div className="execom-core bento">
             {core.map((m: any, i: number) => (
               <div key={m._id} className={`execom-card reveal ${DELAY_CLASSES[i] || ''} ${i < 2 ? 'bento-wide' : 'bento-wide'}`}>
@@ -620,7 +617,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <div className="execom-sub-label reveal">Team Leads</div>
+          <div className="execom-sub-label reveal">{settings.execomTeamLeadsLabel || 'Team Leads'}</div>
           <div className="execom-teams">
             {teamLeads.map((tl: any, i: number) => (
               <TeamCard
@@ -635,7 +632,7 @@ export default async function Home() {
             ))}
           </div>
 
-          <div className="execom-sub-label reveal">Junior ExeCom</div>
+          <div className="execom-sub-label reveal">{settings.execomJuniorLabel || 'Junior ExeCom'}</div>
           <div className="junior-grid">
             {junior.map((m: any, i: number) => (
               <div key={m._id} className={`junior-card reveal ${DELAY_CLASSES[i] || ''}`}>
@@ -652,8 +649,8 @@ export default async function Home() {
 
       <section id="events">
         <div className="section-inner">
-          <div className="section-tag reveal">Events</div>
-          <h2 className="section-title reveal d1">Recent &amp;<br /><em>Upcoming</em></h2>
+          <div className="section-tag reveal">{settings.eventsTag || 'Events'}</div>
+          <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.eventsTitle || 'Recent &amp;<br /><em>Upcoming</em>' }}></h2>
           <div className="events-list">
             {events.map((ev: any) => (
               <Link href={ev.slug ? `/events/${ev.slug}` : '#'} key={ev._id} className={`event-row reveal ${ev.isCurrentlyHappening ? 'live-event' : ''}`}>
@@ -691,14 +688,13 @@ export default async function Home() {
 
       <section id="membership">
         <div className="section-inner">
-          <div className="section-tag reveal">Enroll Now</div>
-          <h2 className="section-title reveal d1">Grab Your<br /><em>Membership</em></h2>
+          <div className="section-tag reveal">{settings.membershipTag || 'Enroll Now'}</div>
+          <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.membershipTitle || 'Grab Your<br /><em>Membership</em>' }}></h2>
           <div className="mem-glass-card reveal d2">
             <div className="mem-grid">
               <div className="mem-left">
                 <p className="mem-body">
-                  Becoming a member of ISTE MBCET Student Chapter is your gateway to technical excellence, peer networking,
-                  and real-world professional growth. Fill in your details and we&apos;ll get you enrolled within 48 hours.
+                  {settings.membershipBody || "Becoming a member of ISTE MBCET Student Chapter is your gateway to technical excellence, peer networking, and real-world professional growth. Fill in your details and we'll get you enrolled within 48 hours."}
                 </p>
                 <div className="perks">
                   {membershipPerks.map((perk: string, i: number) => (
@@ -720,8 +716,8 @@ export default async function Home() {
 
       <section id="testimonials" className="testimonials-section">
         <div className="testi-header">
-          <div className="section-tag">Member Voices</div>
-          <h2 className="section-title">What Our<br /><em>Members Say</em></h2>
+          <div className="section-tag">{settings.testimonialsTag || 'Member Voices'}</div>
+          <h2 className="section-title" dangerouslySetInnerHTML={{ __html: settings.testimonialsTitle || 'What Our<br /><em>Members Say</em>' }}></h2>
         </div>
         <div className="marquee-wrapper">
           <div className="marquee-content">
@@ -755,12 +751,12 @@ export default async function Home() {
       {/* ===================== INTERNSHIP LAUNCHPAD TEASER ===================== */}
       <section id="launchpad" style={{ background: 'var(--black)', borderTop: '1px solid var(--border)' }}>
         <div className="section-inner">
-          <div className="section-tag reveal">Member Resources</div>
+          <div className="section-tag reveal">{settings.launchpadTag || 'Member Resources'}</div>
           <div className="launchpad-teaser-grid">
             <div>
-              <h2 className="section-title reveal d1">Internship<br /><em>Launchpad</em></h2>
+              <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.launchpadTitle || 'Internship<br /><em>Launchpad</em>' }}></h2>
               <p className="section-body reveal d2" style={{ marginTop: '24px' }}>
-                Curated internship opportunities, verified and posted by the ISTE MBCET team — exclusively for our members.
+                {settings.launchpadBody || 'Curated internship opportunities, verified and posted by the ISTE MBCET team — exclusively for our members.'}
               </p>
               <Link href="/internships" className="launchpad-cta reveal d3">
                 Explore All Opportunities →
