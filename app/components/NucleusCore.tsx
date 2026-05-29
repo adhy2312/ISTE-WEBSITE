@@ -7,11 +7,11 @@ export default function NucleusCore() {
   const brain = useBrain()
   const containerRef = useRef<HTMLDivElement>(null)
   const [isLowPerf, setIsLowPerf] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
 
-  // Wire to Performance Engine
+  // Wire to Performance Engine and OS Detection
   useEffect(() => {
-    // If the PerformanceAmplifier detects dropping FPS, it updates the brain state.
-    // We throttle our animation if FPS drops below 30 to guarantee 0 lag.
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent))
     if (brain.perfMetrics.fps > 0 && brain.perfMetrics.fps < 30) {
       setIsLowPerf(true)
     } else {
@@ -23,33 +23,37 @@ export default function NucleusCore() {
     <div className="nucleus-wrapper" ref={containerRef}>
       <div className="about-code-label" style={{ position: 'absolute', top: 20, left: 24, zIndex: 10 }}>THE NUCLEUS</div>
       
-      <div className={`nucleus-scene ${isLowPerf ? 'perf-mode' : ''}`}>
-        <div className="nucleus-core">
-          {/* Outer Ring */}
-          <div className="n-ring n-ring-1"></div>
-          {/* Middle Ring */}
-          <div className="n-ring n-ring-2"></div>
-          {/* Inner Ring */}
-          <div className="n-ring n-ring-3"></div>
-          
-          {/* Glowing Center */}
-          <div className="n-center">
-            <div className="n-center-glow"></div>
-            <div className="n-center-solid"></div>
-          </div>
-          
-          {/* Orbiting particles */}
-          <div className="n-particles">
-            <div className="n-particle p1"></div>
-            <div className="n-particle p2"></div>
-            <div className="n-particle p3"></div>
+      {isIOS ? (
+        // iOS Alternate Section — Beautiful but lightweight 2D
+        <div className="ios-nucleus-safe">
+          <div className="ios-orb"></div>
+          <div className="ios-ring"></div>
+        </div>
+      ) : (
+        // Android / Desktop — Full 3D Experience
+        <div className={`nucleus-scene ${isLowPerf ? 'perf-mode' : ''}`}>
+          <div className="nucleus-core">
+            <div className="n-ring n-ring-1"></div>
+            <div className="n-ring n-ring-2"></div>
+            <div className="n-ring n-ring-3"></div>
+            
+            <div className="n-center">
+              <div className="n-center-glow"></div>
+              <div className="n-center-solid"></div>
+            </div>
+            
+            <div className="n-particles">
+              <div className="n-particle p1"></div>
+              <div className="n-particle p2"></div>
+              <div className="n-particle p3"></div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="about-code-sub" style={{ position: 'absolute', bottom: 20, left: 24, zIndex: 10 }}>
         <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: 'rgba(var(--c-main), 1)', marginRight: 8, boxShadow: '0 0 10px rgba(var(--c-main), 0.8)' }}></span>
-        Origin · ISTE MBCET
+        {isIOS ? 'Origin · Lightweight Mode' : 'Origin · ISTE MBCET'}
       </div>
 
       <style jsx>{`
@@ -192,6 +196,44 @@ export default function NucleusCore() {
         .p1 { top: 10%; left: 50%; }
         .p2 { bottom: 20%; right: 10%; }
         .p3 { top: 40%; left: 10%; }
+
+        /* iOS Safe Mode Styles */
+        .ios-nucleus-safe {
+          position: relative;
+          width: 150px;
+          height: 150px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .ios-orb {
+          position: absolute;
+          width: 40px;
+          height: 40px;
+          background: rgba(var(--c-main), 1);
+          border-radius: 50%;
+          box-shadow: 0 0 30px rgba(var(--c-main), 0.8), inset 0 0 15px rgba(255,255,255,0.8);
+          animation: iosPulse 4s ease-in-out infinite alternate;
+        }
+
+        .ios-ring {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          border: 1px dashed rgba(var(--c-main), 0.3);
+          animation: iosSpin 20s linear infinite;
+        }
+
+        @keyframes iosPulse {
+          0% { transform: scale(1); filter: brightness(1); }
+          100% { transform: scale(1.1); filter: brightness(1.3); }
+        }
+        @keyframes iosSpin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
       `}</style>
     </div>
   )

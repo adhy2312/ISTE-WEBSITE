@@ -20,50 +20,8 @@ export const metadata: Metadata = {
   }
 }
 
-const FALLBACK_INTERNSHIPS = [
-  {
-    _id: 'i1',
-    company: 'TechCorp India',
-    role: 'Software Engineering Intern',
-    type: 'Remote',
-    domain: 'Software Engineering',
-    stipend: '₹15,000/month',
-    duration: '2 months',
-    deadlineLabel: 'May 30, 2026',
-    applyLink: '#',
-    status: 'open',
-    featured: true,
-    logo: null,
-  },
-  {
-    _id: 'i2',
-    company: 'DesignHub Studios',
-    role: 'UI/UX Design Intern',
-    type: 'Hybrid',
-    domain: 'UI/UX Design',
-    stipend: '₹10,000/month',
-    duration: '3 months',
-    deadlineLabel: 'June 10, 2026',
-    applyLink: '#',
-    status: 'open',
-    featured: false,
-    logo: null,
-  },
-  {
-    _id: 'i3',
-    company: 'DataWave Analytics',
-    role: 'Data Science Intern',
-    type: 'Remote',
-    domain: 'Data Science',
-    stipend: '₹12,000/month',
-    duration: '6 weeks',
-    deadlineLabel: 'May 20, 2026',
-    applyLink: '#',
-    status: 'open',
-    featured: false,
-    logo: null,
-  },
-]
+// No fallback data — only real CMS listings are shown
+const FALLBACK_INTERNSHIPS: any[] = []
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   open: { label: 'Open', color: '#22c55e' },

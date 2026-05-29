@@ -2,20 +2,22 @@
 
 import { useEffect, useRef } from 'react';
 import { useBrain } from './BrainProvider';
-
 import { client } from '@/lib/sanity/client';
 
-const FALLBACK_ROLES = ['Frontend Engineering Intern', 'AI/ML Research Intern', 'UI/UX Design Intern', 'Data Science Intern'];
-const FALLBACK_COMPANIES = ['Google (India)', 'Microsoft R&D', 'UST Global', 'TCS Research', 'Amazon SDE'];
-const FALLBACK_HUBS = ['Trivandrum Tech Park', 'Kochi Infopark', 'Bangalore', 'Remote (India)'];
-const FALLBACK_LINKS = ['https://careers.google.com/students/', 'https://careers.microsoft.com/students', 'https://ust.com/careers'];
-
+/**
+ * INTERNSHIP ENGINE
+ * 
+ * Fetches REAL internship data from Sanity CMS ONLY.
+ * No fake/simulated data is generated — only verified, editorial-approved listings
+ * from the CMS are surfaced to users.
+ * 
+ * The engine emits structured [FOUND_JSON] logs that LiveInternshipsList consumes.
+ */
 export default function InternshipEngine() {
   const { registerEngine, notifyEngine, activeEngines } = useBrain();
   const isRegistered = useRef(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasFetched = useRef(false);
 
-  // 1. Handle Registration
   useEffect(() => {
     if (!isRegistered.current) {
       registerEngine('Internship');
@@ -23,89 +25,39 @@ export default function InternshipEngine() {
     }
   }, [registerEngine]);
 
-  // 2. Handle Execution Loop
-  // We only depend on the specific boolean value of whether THIS engine is active.
-  // This prevents the loop from resetting if other engines register and activeEngines gets a new reference.
   const isEngineActive = activeEngines.has('Internship');
 
   useEffect(() => {
-    if (!isEngineActive) return;
+    if (!isEngineActive || hasFetched.current) return;
+    hasFetched.current = true;
 
-    notifyEngine('Internship', 'agent_status', 'BOOTING NEURAL SCRAPER...');
-    
-    let realInternships: any[] = [];
-    
-    // Fetch real internships from Sanity to simulate intelligent processing
-    client.fetch(`*[_type == "internship" && status == "open"] | order(_createdAt desc)[0...10]`).then(data => {
+    notifyEngine('Internship', 'agent_status', 'SCANNING NETWORK');
+
+    // Fetch real internships from Sanity — the ONLY source of truth
+    client.fetch(`*[_type == "internship" && status == "open" && defined(applyLink)] | order(_createdAt desc)[0...20] {
+      _id, role, company, domain, type, stipend, duration, deadlineLabel, applyLink, status, description
+    }`).then(data => {
       if (data && data.length > 0) {
-        realInternships = data;
+        notifyEngine('Internship', 'agent_status', `${data.length} OPPORTUNITIES FOUND`);
+
+        // Emit each real listing as a structured JSON log
+        data.forEach((item: any, i: number) => {
+          setTimeout(() => {
+            notifyEngine('Internship', 'agent_log', `[FOUND_JSON] ${JSON.stringify(item)}`);
+          }, i * 200); // Stagger to avoid flooding the state
+        });
+      } else {
+        notifyEngine('Internship', 'agent_status', 'NO OPEN LISTINGS');
+        notifyEngine('Internship', 'agent_log', '[INFO] No verified open internships in CMS. Check Sanity Studio to add listings.');
       }
     }).catch(err => {
-      console.warn('[InternshipEngine] Failed to fetch real data', err);
+      console.warn('[InternshipEngine] Sanity fetch failed:', err);
+      notifyEngine('Internship', 'agent_status', 'OFFLINE');
+      notifyEngine('Internship', 'agent_log', '[ERROR] Could not reach Sanity CMS. Listings unavailable.');
     });
 
-    let isActive = true;
-
-    const simulateAgentActivity = async () => {
-      if (!isActive) return;
-
-      // Phase 1: Scanning
-      notifyEngine('Internship', 'agent_status', 'SCANNING NETWORK');
-      notifyEngine('Internship', 'agent_log', `[SCAN] Traversing global subnet nodes...`);
-      
-      // Await network delay
-      await new Promise(resolve => {
-        timeoutRef.current = setTimeout(resolve, 3000 + Math.random() * 4000);
-      });
-      
-      if (!isActive) return;
-
-      // Phase 2: Analyzing or Finding
-      const foundSomething = Math.random() > 0.4; // 60% chance to find
-      
-      if (foundSomething) {
-        notifyEngine('Internship', 'agent_status', 'OPPORTUNITY DETECTED');
-        
-        let foundData;
-        if (realInternships.length > 0) {
-          // Pick a random real one to feed into the UI
-          foundData = realInternships[Math.floor(Math.random() * realInternships.length)];
-        } else {
-          // Fallback dummy data if Sanity is empty
-          foundData = {
-            _id: Math.random().toString(36).substring(7),
-            role: FALLBACK_ROLES[Math.floor(Math.random() * FALLBACK_ROLES.length)],
-            company: FALLBACK_COMPANIES[Math.floor(Math.random() * FALLBACK_COMPANIES.length)],
-            domain: FALLBACK_HUBS[Math.floor(Math.random() * FALLBACK_HUBS.length)],
-            applyLink: FALLBACK_LINKS[Math.floor(Math.random() * FALLBACK_LINKS.length)],
-            status: 'open',
-            stipend: 'Competitive',
-            type: 'Internship'
-          };
-        }
-        
-        notifyEngine('Internship', 'agent_log', `[FOUND_JSON] ${JSON.stringify(foundData)}`);
-      } else {
-        notifyEngine('Internship', 'agent_status', 'ANALYZING');
-        notifyEngine('Internship', 'agent_log', `[INFO] No match in sector ${Math.floor(Math.random() * 9999)}. Rerouting...`);
-      }
-
-      // Schedule next cycle
-      const nextDelay = 8000 + Math.random() * 10000;
-      timeoutRef.current = setTimeout(simulateAgentActivity, nextDelay);
-    };
-
-    // Start the infinite scanning loop after a short initial delay
-    timeoutRef.current = setTimeout(simulateAgentActivity, 2000);
-
-    return () => {
-      isActive = false;
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEngineActive]);
 
-  return null; // Invisible Engine
+  return null;
 }

@@ -14,8 +14,6 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
   const heroDividerRef = useRef<HTMLDivElement | null>(null)
   const heroSubRef = useRef<HTMLParagraphElement | null>(null)
 
-
-
   // Navbar Scroll
   useEffect(() => {
     const navbar = document.getElementById('navbar')
@@ -99,29 +97,32 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     return () => clearTimeout(t)
   }, [heroTypedText])
 
-  // Scroll Reveal and Count-Up using GSAP Premium Motion
+  // ── ALL GSAP SCROLL ANIMATIONS ──
   useGSAP(() => {
-    // Cinematic Reveal Animations (Replacing generic reveals)
+    // iOS guard: skip all ScrollTrigger work on iOS to prevent scroll jank
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) return;
+
+    // 1. Standard reveal animations (fade up on scroll)
     const reveals = gsap.utils.toArray('.reveal');
     reveals.forEach((el: any) => {
       gsap.fromTo(el, 
-        { y: 60, opacity: 0, scale: 0.98 }, 
+        { y: 60, opacity: 0 }, 
         {
           y: 0, 
           opacity: 1, 
-          scale: 1,
           duration: TIMING.reveal, 
           ease: EASING.premium,
           scrollTrigger: {
             trigger: el,
-            start: "top 85%",
+            start: "top 88%",
             once: true
           }
         }
       );
     });
 
-    // Count-Up Animations
+    // 2. Count-Up Animations
     const countups = gsap.utils.toArray('.countup');
     countups.forEach((el: any) => {
       const targetAttr = el.getAttribute('data-to');
@@ -141,10 +142,9 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
       });
     });
 
-    // Editorial Typography System (Vanilla DOM splitting for static HTML)
+    // 3. Editorial Typography System
     const cinematicTexts = gsap.utils.toArray('.cinematic-text') as HTMLElement[];
     cinematicTexts.forEach((el) => {
-      // Split text into words manually
       const text = el.innerText;
       el.innerHTML = '';
       const words = text.split(' ');
@@ -159,7 +159,6 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         wordSpan.innerText = word + '\u00A0';
         wordSpan.style.display = 'inline-block';
         wordSpan.style.transform = 'translateY(110%)';
-        wordSpan.style.willChange = 'transform';
         wordSpan.className = 'cinematic-word';
         
         wordWrapper.appendChild(wordSpan);
@@ -180,63 +179,221 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
       });
     });
 
-    // ── PREMIUM GSAP SCROLL TIMELINES ──
-    
-    // 1. Hero Parallax Timeline (Scrubbed)
-    // Moves the orbital rings and aurora independently of the scroll to create immense depth
-    const heroTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: '#hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 1.5 // Smooth lagging scrub
-      }
-    });
-    
-    heroTl.to('.orbital-lines', { y: 200, scale: 1.1, rotation: 5, force3D: true, willChange: 'transform', ease: 'none' }, 0)
-          .to('.aurora-ribbon', { y: 300, opacity: 0.2, force3D: true, willChange: 'transform, opacity', ease: 'none' }, 0)
-          .to('#hero-headline', { y: -50, opacity: 0, force3D: true, ease: 'none' }, 0);
+    // ── 4. HERO PARALLAX (lightweight, translate-only) ──
+    const heroSection = document.querySelector('#hero');
+    if (heroSection) {
+      gsap.to('.orbital-lines', {
+        y: 150,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+      gsap.to('.aurora-ribbon', {
+        y: 200,
+        opacity: 0.3,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+    }
 
-    // 2. About Section Pinned / Staggered Timeline
-    // As the user scrolls into the About section, the NucleusCore subtly expands and rotates
-    const aboutTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: '#about',
-        start: 'top 70%',
-        end: 'bottom 30%',
-        scrub: 2
+    // ── 5. EVENT ROWS — Horizontal slide-in from left ──
+    const eventRows = gsap.utils.toArray('.event-row') as HTMLElement[];
+    eventRows.forEach((row, i) => {
+      gsap.fromTo(row,
+        { x: -80, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: TIMING.base,
+          ease: EASING.premium,
+          scrollTrigger: {
+            trigger: row,
+            start: 'top 90%',
+            once: true
+          },
+          delay: i * 0.06
+        }
+      );
+    });
+
+    // ── 6. SECTION TITLES — Slide in from right ──
+    const sectionTitles = gsap.utils.toArray('.section-title') as HTMLElement[];
+    sectionTitles.forEach((title) => {
+      gsap.fromTo(title,
+        { x: 60, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: TIMING.reveal,
+          ease: EASING.cinematic,
+          scrollTrigger: {
+            trigger: title,
+            start: 'top 88%',
+            once: true
+          }
+        }
+      );
+    });
+
+    // ── 7. BENEFIT CARDS — Staggered fade-up ──
+    const benefitCards = gsap.utils.toArray('.benefit-card') as HTMLElement[];
+    if (benefitCards.length > 0) {
+      gsap.fromTo(benefitCards,
+        { y: 60, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: TIMING.base,
+          ease: EASING.premium,
+          stagger: 0.08,
+          scrollTrigger: {
+            trigger: '#benefits',
+            start: 'top 80%',
+            once: true
+          }
+        }
+      );
+    }
+
+    // ── 8. STATS — Scale pop ──
+    const statItems = gsap.utils.toArray('.stat-item') as HTMLElement[];
+    if (statItems.length > 0) {
+      gsap.fromTo(statItems,
+        { scale: 0.8, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: TIMING.base,
+          ease: EASING.snap,
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: '#stats',
+            start: 'top 85%',
+            once: true
+          }
+        }
+      );
+    }
+
+    // ── 9. WHO CARDS — Slide in from alternating sides ──
+    const whoCards = gsap.utils.toArray('.who-card') as HTMLElement[];
+    whoCards.forEach((card, i) => {
+      const fromX = i % 2 === 0 ? -60 : 60;
+      gsap.fromTo(card,
+        { x: fromX, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: TIMING.reveal,
+          ease: EASING.premium,
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 88%',
+            once: true
+          }
+        }
+      );
+    });
+
+    // ── 10. CHOREOGRAPHED SECTION ENTRANCES (GSAP Showcase pattern) ──
+    // Each major section's tag → title → body animate in a sequenced timeline
+    const sections = ['#about', '#benefits', '#execom', '#events', '#membership'];
+    sections.forEach(sectionId => {
+      const section = document.querySelector(sectionId);
+      if (!section) return;
+
+      const tag = section.querySelector('.section-tag');
+      const title = section.querySelector('.section-title');
+      const body = section.querySelector('.section-body');
+
+      if (tag || title) {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 80%',
+            once: true
+          }
+        });
+
+        if (tag) {
+          tl.fromTo(tag, 
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, ease: EASING.premium }
+          );
+        }
+        if (title) {
+          tl.fromTo(title,
+            { y: 30, opacity: 0 },
+            { y: 0, opacity: 1, duration: TIMING.base, ease: EASING.cinematic },
+            '-=0.3' // Overlap with tag
+          );
+        }
+        if (body) {
+          tl.fromTo(body,
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.6, ease: EASING.premium },
+            '-=0.4'
+          );
+        }
       }
     });
 
-    aboutTl.fromTo('.about-visual', 
-      { scale: 0.8, rotation: -15, opacity: 0.5 },
-      { scale: 1.05, rotation: 5, opacity: 1, ease: 'power2.out', force3D: true, willChange: 'transform, opacity' }
-    );
-    
-    // 3. Benefits Grid Stagger (Scroll-driven scrub)
-    const benefitsTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: '#benefits',
-        start: 'top 80%',
-        end: 'center center',
-        scrub: 1
-      }
-    });
-    
-    benefitsTl.from('.benefits-grid .benefit-card', {
-      y: 100,
-      opacity: 0,
-      rotateX: -15,
-      stagger: 0.1,
-      ease: 'back.out(1.2)',
-      force3D: true,
-      willChange: 'transform, opacity'
-    });
+    // ── 11. EXECOM CARDS — Cascade reveal ──
+    const execomCards = gsap.utils.toArray('.execom-card') as HTMLElement[];
+    if (execomCards.length > 0) {
+      gsap.fromTo(execomCards,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: TIMING.base,
+          ease: EASING.premium,
+          stagger: 0.06,
+          scrollTrigger: {
+            trigger: '#execom',
+            start: 'top 75%',
+            once: true
+          }
+        }
+      );
+    }
+
+    // ── 12. TESTIMONIAL CARDS — Subtle scale-in on visibility ──
+    const testiCards = gsap.utils.toArray('.testi-card') as HTMLElement[];
+    if (testiCards.length > 0) {
+      gsap.fromTo(testiCards,
+        { scale: 0.95, opacity: 0.5 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: TIMING.base,
+          ease: EASING.premium,
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: '#testimonials',
+            start: 'top 85%',
+            once: true
+          }
+        }
+      );
+    }
 
   });
 
-  // Holographic 3D Card Tilt Effect via GSAP
+  // Holographic 3D Card Tilt Effect via GSAP (desktop only)
   useGSAP(() => {
+    // Skip on touch devices
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+
     const cards = gsap.utils.toArray('.execom-card, .team-card, .junior-card') as HTMLElement[];
     
     cards.forEach(card => {

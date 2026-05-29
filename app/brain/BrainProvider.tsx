@@ -34,7 +34,7 @@ export const useBrain = () => useContext(BrainContext);
 
 export default function BrainProvider({ children }: { children: React.ReactNode }) {
   const [activeEngines, setActiveEngines] = useState<Set<EngineType>>(new Set());
-  const [fps, setFps] = useState(60);
+  const fpsRef = useRef(60);
   const [intervention, setIntervention] = useState(false);
   const [soulState, setSoulState] = useState({ isThinking: false, scrollVelocity: 0 });
   const [creativeState, setCreativeState] = useState({ immersiveMode: false, glitchIntensity: 0 });
@@ -191,7 +191,8 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
     let lenis: any = null;
     const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
     
-    if (typeof ResizeObserver !== 'undefined' && !isTouch) {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (typeof ResizeObserver !== 'undefined' && !isTouch && !isIOS) {
       import('lenis').then(({ default: Lenis }) => {
         lenis = new Lenis({
           duration: 1.2,
@@ -203,18 +204,14 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
         });
 
         lenis.on('scroll', (e: any) => {
-          // Connect to Scroll and Physical engines
           notifyEngine('Scroll', 'velocity', { velocity: e.velocity });
-          notifyEngine('Physical', 'inertia', { progress: e.progress });
-          // Synchronize ScrollTrigger
           ScrollTrigger.update();
         });
 
-        // Sync GSAP ticker with Lenis
         gsap.ticker.add((time) => {
           if (lenis) lenis.raf(time * 1000);
         });
-        gsap.ticker.lagSmoothing(0); // Lenis handles lag smoothing natively
+        gsap.ticker.lagSmoothing(0);
 
       }).catch(e => console.warn('Lenis failed to load:', e));
     }
@@ -228,14 +225,13 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       frameCount++;
       const now = performance.now();
       if (now - lastTime >= 1000) {
-        setFps(frameCount);
+        fpsRef.current = frameCount;
         
-        // AI Performance Engine: Intervene if dropping frames
-        if (frameCount < 30) {
-          notifyEngine('Performance', 'degradation_detected', { fps: frameCount });
+        // Only trigger a state update when intervention state actually changes
+        if (frameCount < 30 && !intervention) {
           setIntervention(true);
-        } else if (frameCount >= 50) {
-          setIntervention(false); // Auto-recover
+        } else if (frameCount >= 50 && intervention) {
+          setIntervention(false);
         }
 
         frameCount = 0;
@@ -356,11 +352,11 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
 
   return (
     <BrainContext.Provider value={{
-      isSmooth: fps >= 30,
+      isSmooth: !intervention,
       activeEngines,
       registerEngine,
       notifyEngine,
-      perfMetrics: { fps, loadTime: typeof window !== 'undefined' ? performance.now() : 0, intervention },
+      perfMetrics: { fps: fpsRef.current, loadTime: 0, intervention },
       soulState,
       creativeState,
       internshipState,

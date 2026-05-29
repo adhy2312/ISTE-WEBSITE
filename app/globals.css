@@ -2162,3 +2162,38 @@
       background: rgba(10, 10, 15, 0.98) !important;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
+
+    /* 5. iOS Safari — kill heavy 3D CSS animations and smooth scroll */
+    html.safari-compatibility-mode .nucleus-scene {
+      perspective: none !important;
+      transform-style: flat !important;
+    }
+    html.safari-compatibility-mode .nucleus-core,
+    html.safari-compatibility-mode .n-ring,
+    html.safari-compatibility-mode .n-particles,
+    html.safari-compatibility-mode .n-center-glow {
+      animation-duration: 20s !important;
+      will-change: auto !important;
+    }
+    html.safari-compatibility-mode .nucleus-scene .n-ring {
+      transform-style: flat !important;
+    }
+
+    /* 6. iOS — ensure native scrolling, disable Lenis interference */
+    html.ios-motion-governed,
+    html.ios-motion-governed body {
+      scroll-behavior: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: auto !important;
+    }
+
+    /* 7. iOS — make all GSAP-controlled elements visible by default */
+    html.safari-compatibility-mode .reveal,
+    html.safari-compatibility-mode .event-row,
+    html.safari-compatibility-mode .section-title,
+    html.safari-compatibility-mode .benefit-card,
+    html.safari-compatibility-mode .stat-item,
+    html.safari-compatibility-mode .who-card {
+      opacity: 1 !important;
+      transform: none !important;
+    }
