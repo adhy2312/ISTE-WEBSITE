@@ -1,8 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/utils/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
-  const response = await createClient(request)
+  const response = NextResponse.next()
 
   // Security Headers
   const cspHeader = `

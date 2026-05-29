@@ -18,18 +18,9 @@ export class WebViewSurvivalMode {
     document.documentElement.classList.add('ios-webview-survival');
     document.documentElement.classList.add('ios-gpu-throttled');
     
-    // Actively purge heavy DOM elements to prevent WebKit Jetsam kills
-    if (typeof window !== 'undefined') {
-      const purgeHeavyElements = () => {
-        const elements = document.querySelectorAll('.aurora-ribbon, .noise-overlay, .orbital-lines, .grid-lines');
-        elements.forEach(el => el.remove());
-      };
-      
-      // Purge immediately and after a short delay (post-hydration)
-      purgeHeavyElements();
-      setTimeout(purgeHeavyElements, 1000);
-      setTimeout(purgeHeavyElements, 3000);
-    }
+    // We must NOT actively purge heavy DOM elements using el.remove() 
+    // because this causes violent React Hydration mismatch errors on iOS.
+    // Instead, we let CSS handle the display: none using the .ios-webview-survival class.
     
     console.warn('[WebViewSurvivalMode] Engaged: Heavy CSS and DOM nodes purged for iOS in-app browser stability.');
 

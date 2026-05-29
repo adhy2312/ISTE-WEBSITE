@@ -23,7 +23,11 @@ export default function PresenceEngine() {
     if (!supabaseUrl || !supabaseAnonKey || mounted.current) return;
     mounted.current = true;
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false, // Prevents iOS Safari DOMException when localStorage is blocked
+      }
+    });
     
     // Create a random user ID for this session
     const userId = `visitor_${Math.floor(Math.random() * 1000000)}`;

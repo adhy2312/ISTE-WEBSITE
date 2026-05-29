@@ -173,7 +173,7 @@ export default async function RootLayout({
           {/* Secondary engines: load after content on all devices */}
           <PerformanceAmplifier />
           <InternshipEngine />
-          {!isStudio && <PresenceEngine />}
+          {/* <PresenceEngine /> Disabled temporarily to completely isolate iOS crash factors */ }
           {!isStudio && <IsteAssistant />}
           {!isStudio && <MagneticCursor />}
           {!isStudio && (process.env.NODE_ENV === 'development' || isAdmin) && <EngineObservatory />}
