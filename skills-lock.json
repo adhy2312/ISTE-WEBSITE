@@ -31,6 +31,12 @@
       "skillPath": "skills/ios-developer/SKILL.md",
       "computedHash": "fb9823d08dfd80e726b77222db416fbc075cfa4b5a32503eaba0ed33180e84eb"
     },
+    "linkedin-job-scraper": {
+      "source": "athina-ai/goose-skills",
+      "sourceType": "github",
+      "skillPath": "skills/capabilities/linkedin-job-scraper/SKILL.md",
+      "computedHash": "58076f7b38fb8e6ab48d9242ecafcd92061416637114ae4574085bf4c5a1982a"
+    },
     "micro-interactions": {
       "source": "dylantarre/animation-principles",
       "sourceType": "github",

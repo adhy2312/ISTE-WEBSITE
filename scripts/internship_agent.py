@@ -26,6 +26,8 @@ from sentence_transformers import SentenceTransformer, util
 from celery import Celery
 from sqlalchemy import create_engine, Column, String, Boolean, Float
 from sqlalchemy.orm import declarative_base, sessionmaker
+from jobspy import scrape_jobs
+import pandas as pd
 
 class Colors:
     CY='\033[96m'; GR='\033[92m'; YL='\033[93m'
@@ -110,8 +112,44 @@ class DiscoveryAgent:
             {"company": "Nissan Digital", "role": "Embedded Systems Intern", "applyLink": "https://nissan-global.com", "source": "Kerala Hub"}
         ]
 
+    async def hunt_jobspy(self):
+        log("DISCOVERY", "Launching JobSpy for LinkedIn/Indeed/Glassdoor Kerala internships...")
+        results = []
+        try:
+            # JobSpy is synchronous, run it in a thread
+            def run_jobspy():
+                return scrape_jobs(
+                    site_name=["linkedin", "indeed", "glassdoor"],
+                    search_term="internship OR intern OR fresher",
+                    location="Kerala",
+                    results_wanted=30,
+                    hours_old=72,
+                    job_type="internship"
+                )
+            
+            jobs = await asyncio.to_thread(run_jobspy)
+            
+            if jobs is not None and not jobs.empty:
+                for _, job in jobs.iterrows():
+                    title = str(job.get('title', '')).strip()
+                    company = str(job.get('company', '')).strip()
+                    url = str(job.get('job_url', '')).strip()
+                    site = str(job.get('site', 'JobSpy')).strip()
+                    
+                    if title and company and url and url != 'nan':
+                        results.append({
+                            "role": title,
+                            "company": company,
+                            "applyLink": url,
+                            "source": site.capitalize()
+                        })
+        except Exception as e:
+            log("DISCOVERY", f"JobSpy scraping error: {e}", "WARN")
+            
+        return results
+
     async def hunt_all(self):
-        results = await asyncio.gather(self.crawl_internshala(), self.fetch_kerala_hub())
+        results = await asyncio.gather(self.crawl_internshala(), self.fetch_kerala_hub(), self.hunt_jobspy())
         combined = []
         for r in results: combined.extend(r)
         
