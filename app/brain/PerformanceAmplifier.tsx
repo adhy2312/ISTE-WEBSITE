@@ -27,8 +27,8 @@ export default function PerformanceAmplifier() {
     const connection = navigator.connection?.effectiveType || '4g';
 
     // Proactive Amplifier Logic
-    if (cores <= 4 || memory <= 4 || connection === '3g' || connection === '2g') {
-      // Hardware is constrained. Engage amplifier by cutting fat preemptively.
+    if (cores < 4 || memory < 4 || connection === '3g' || connection === '2g') {
+      // Hardware is heavily constrained. Engage amplifier by cutting fat preemptively.
       if (!amplifiedRef.current) {
         amplifiedRef.current = true;
         document.documentElement.setAttribute('data-amplifier', 'engaged');

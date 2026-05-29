@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['gsap', 'lenis'],
   experimental: {
-    optimizePackageImports: ["lucide-react", "gsap"],
+    optimizePackageImports: ["lucide-react"],
     forceSwcTransforms: true,
   },
 };

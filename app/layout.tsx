@@ -19,6 +19,7 @@ const PrefetchEngine = dynamic(() => import('./brain/PrefetchEngine'));
 const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngine'));
 const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
 const IOSAdaptiveEngine = dynamic(() => import('./engines/ios/IOSAdaptiveEngine'));
+const ClientPlatformBoundary = dynamic(() => import('./brain/ClientPlatformBoundary'));
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -90,10 +91,6 @@ export default async function RootLayout({
   const isStudio = pathname.startsWith('/studio');
   const isAdmin = pathname.startsWith('/admin');
 
-  // Detect iOS server-side so we can skip heavy engines before they crash Safari
-  const userAgent = headersList.get('user-agent') || '';
-  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -152,10 +149,12 @@ export default async function RootLayout({
           <PrefetchEngine />
 
           {/* Heavy engines: skip entirely on iOS to prevent memory crash */}
-          {!isIOS && <PhysicsEngine />}
-          {!isIOS && <NeuralNetwork />}
-          {!isIOS && <ColorExtractionEngine />}
-          {!isIOS && !isStudio && <DigitalSoul />}
+          <ClientPlatformBoundary>
+            <PhysicsEngine />
+            <NeuralNetwork />
+            <ColorExtractionEngine />
+            {!isStudio && <DigitalSoul />}
+          </ClientPlatformBoundary>
 
           {/* Render page content first */}
           {children}
