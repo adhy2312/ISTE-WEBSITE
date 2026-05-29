@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typescript: {
-    // Re-enabling build errors for better code quality and security
     ignoreBuildErrors: false,
   },
   images: {
@@ -21,8 +20,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  transpilePackages: ['framer-motion', 'lenis'],
   experimental: {
-    optimizePackageImports: ["lucide-react"],
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+    forceSwcTransforms: true,
   },
 };
 
