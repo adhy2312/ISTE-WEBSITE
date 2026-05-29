@@ -93,10 +93,15 @@ export default function SecurityGuardian() {
     window.addEventListener('input', handleInput, true);
 
     // ── 3. DOM IMMUNE SYSTEM (Mutation Observer) ───────────────────────
-    const observer = new MutationObserver((mutations) => {
-      if (isLockedDown.current) return;
-      
-      for (const mutation of mutations) {
+    // DISABLED ON iOS TO PREVENT WEBKIT MEMORY CRASHES
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
+    let observer: MutationObserver | null = null;
+    if (!isIOS) {
+      observer = new MutationObserver((mutations) => {
+        if (isLockedDown.current) return;
+        
+        for (const mutation of mutations) {
         for (const node of Array.from(mutation.addedNodes)) {
           if (node.nodeName.toLowerCase() === 'script') {
             const scriptNode = node as HTMLScriptElement;
@@ -108,7 +113,8 @@ export default function SecurityGuardian() {
         }
       }
     });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
 
     // ── 4. THREAT RESPONSE PROTOCOL ──────────────────────────────────────
     const handleHardThreat = (type: string, details: string) => {
@@ -146,7 +152,7 @@ export default function SecurityGuardian() {
     // as per the new adaptive intelligence directive.
 
     return () => {
-      observer.disconnect();
+      if (observer) observer.disconnect();
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('input', handleInput, true);
       if (lockdownTimeoutRef.current) clearTimeout(lockdownTimeoutRef.current);

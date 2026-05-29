@@ -110,6 +110,31 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var ua = navigator.userAgent;
+                  var isIOS = /iPad|iPhone|iPod/.test(ua);
+                  var isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+                  var isWebView = /(FBAN|FBAV|Instagram|WhatsApp|Line)/i.test(ua);
+                  
+                  if (isIOS) {
+                    document.documentElement.classList.add('safari-compatibility-mode');
+                    document.documentElement.classList.add('ios-motion-governed');
+                    
+                    if (isWebView || !isSafari) {
+                      // Extremely aggressive memory preservation for in-app browsers
+                      document.documentElement.classList.add('ios-webview-survival');
+                      document.documentElement.classList.add('ios-gpu-throttled');
+                    }
+                  }
+                } catch(e) {}
+              })();
+            `
+          }}
+        />
       </head>
       <body
         className={`${outfit.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans`}
