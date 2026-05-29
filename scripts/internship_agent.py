@@ -12,9 +12,9 @@ Agents:
  - QualityAssessmentAgent (Advanced multi-factor scoring)
 """
 
-import os, time, hashlib, random, json, asyncio
+import os, time, hashlib, random, json, asyncio, difflib
 from dotenv import load_dotenv
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 import requests
 
 # Advanced Imports
@@ -153,18 +153,37 @@ class DiscoveryAgent:
         combined = []
         for r in results: combined.extend(r)
         
-        # Deduplication using SQLAlchemy
+        # Deduplication using SQLAlchemy and Fuzzy Matching
         db = SessionLocal()
         new_items = []
+        existing_cache = db.query(InternshipCache).all()
+        
         for item in combined:
-            uid = hashlib.md5(f"{item['company']}-{item['role']}".encode()).hexdigest()
-            if not db.query(InternshipCache).filter_by(id=uid).first():
-                db.add(InternshipCache(id=uid, company=item['company'], role=item['role']))
+            comp = item['company'].strip().lower()
+            role = item['role'].strip().lower()
+            
+            uid = hashlib.md5(f"{comp}-{role}".encode()).hexdigest()
+            if db.query(InternshipCache).filter_by(id=uid).first():
+                continue
+                
+            is_duplicate = False
+            for cached in existing_cache:
+                if cached.company and cached.company.strip().lower() == comp:
+                    cached_role = cached.role.strip().lower()
+                    if difflib.SequenceMatcher(None, role, cached_role).ratio() > 0.85:
+                        is_duplicate = True
+                        break
+                        
+            if not is_duplicate:
+                new_cache = InternshipCache(id=uid, company=item['company'], role=item['role'])
+                db.add(new_cache)
+                existing_cache.append(new_cache)
                 new_items.append(item)
+                
         db.commit()
         db.close()
         
-        log("DISCOVERY", f"Discovered {len(combined)} roles. {len(new_items)} are new.", "SUCCESS")
+        log("DISCOVERY", f"Discovered {len(combined)} roles. {len(new_items)} are new and unique.", "SUCCESS")
         return new_items
 
 # ==============================================================================
@@ -173,10 +192,16 @@ class DiscoveryAgent:
 class AuthenticityAgent:
     def __init__(self):
         self.scraper = cloudscraper.create_scraper()
-        self.scam_keywords = ['registration fee', 'deposit required', 'pay to work']
+        self.scam_keywords = [
+            'registration fee', 'deposit required', 'pay to work',
+            'processing fee', 'security deposit', 'pay us', 
+            'unpaid internship with fee', 'training fee', 
+            'laptop deposit', 'investment required', 'starter kit', 
+            'onboarding fee', 'guaranteed placement fee'
+        ]
         
     async def verify(self, item):
-        role_comp = f"{item['role']} {item['company']}".lower()
+        role_comp = f"{item.get('role', '')} {item.get('company', '')}".lower()
         if any(scam in role_comp for scam in self.scam_keywords):
             item['trust_status'] = "REJECTED"
             return item
@@ -264,6 +289,73 @@ class QualityAssessmentAgent:
         return [self.score(i) for i in items]
 
 # ==============================================================================
+# AGENT 5: SANITY CLEANUP AGENT (Fraud & Duplicate Pruner)
+# ==============================================================================
+class SanityCleanupAgent:
+    async def cleanup_live_list(self):
+        log("CLEANUP", "Fetching live CMS list for fraud, counterfeit, and semantic duplicate pruning...")
+        query = '*[_type == "internship"]{_id, company, role, applyLink}'
+        try:
+            fetch_url = f"https://{SANITY_PROJECT_ID}.api.sanity.io/v2023-01-01/data/query/{SANITY_DATASET}?query={quote(query)}"
+            resp = requests.get(fetch_url, headers=HEADERS)
+            data = resp.json().get("result", [])
+            
+            mutations = []
+            authenticity = AuthenticityAgent()
+            
+            # Phase 1: Prune dead links & advanced frauds
+            log("CLEANUP", f"Scanning {len(data)} live entries for link rot and counterfeit flags...")
+            for item in data:
+                # Skip if applyLink is missing
+                if not item.get("applyLink"):
+                    mutations.append({"delete": {"id": item["_id"]}})
+                    continue
+                verified = await authenticity.verify(item)
+                if verified.get('trust_status') == "REJECTED":
+                    log("CLEANUP", f"Counterfeit/Dead link detected: {item.get('company')} - {item.get('role')}", "WARN")
+                    mutations.append({"delete": {"id": item["_id"]}})
+            
+            # Phase 2: Deep Semantic Deduplication
+            log("CLEANUP", "Executing deep semantic deduplication on live list...")
+            company_groups = {}
+            for item in data:
+                if item["_id"] in [m.get("delete", {}).get("id") for m in mutations]:
+                    continue
+                comp = str(item.get("company", "")).strip().lower()
+                if comp not in company_groups:
+                    company_groups[comp] = []
+                company_groups[comp].append(item)
+            
+            for comp, items in company_groups.items():
+                if len(items) > 1:
+                    items_to_delete = set()
+                    for i in range(len(items)):
+                        for j in range(i + 1, len(items)):
+                            id_i = items[i]["_id"]
+                            id_j = items[j]["_id"]
+                            if id_i in items_to_delete or id_j in items_to_delete:
+                                continue
+                            role_i = str(items[i].get("role", "")).lower()
+                            role_j = str(items[j].get("role", "")).lower()
+                            
+                            # Extremely sensitive fuzzy duplicate matching (>80% similar)
+                            if difflib.SequenceMatcher(None, role_i, role_j).ratio() >= 0.80:
+                                log("CLEANUP", f"Semantic duplicate found: '{role_i}' == '{role_j}'. Pruning...", "WARN")
+                                items_to_delete.add(id_j)
+                                mutations.append({"delete": {"id": id_j}})
+
+            if mutations:
+                log("CLEANUP", f"Purging {len(mutations)} toxic/duplicate entries from live Sanity database...", "SUCCESS")
+                for i in range(0, len(mutations), 25):
+                    batch = mutations[i:i+25]
+                    requests.post(SANITY_URL, headers=HEADERS, json={"mutations": batch})
+            else:
+                log("CLEANUP", "Live list is pristine. No toxic or duplicate entries found.", "SUCCESS")
+                
+        except Exception as e:
+            log("CLEANUP", f"Live list pruning failed: {e}", "ERROR")
+
+# ==============================================================================
 # CELERY TASK RUNNER & ORCHESTRATION
 # ==============================================================================
 def sync_to_sanity(internships):
@@ -317,7 +409,9 @@ async def execute_pipeline():
         raw_data = await discovery.hunt_all()
         
         if not raw_data:
-            log("SYSTEM", "No new opportunities found. Exiting cycle.", "WARN")
+            log("SYSTEM", "No new opportunities found. Initiating live list maintenance...", "WARN")
+            cleanup = SanityCleanupAgent()
+            await cleanup.cleanup_live_list()
             return
 
         authenticity = AuthenticityAgent()
@@ -330,6 +424,10 @@ async def execute_pipeline():
         final_data = quality.assess_batch(enriched_data)
         
         sync_to_sanity(final_data)
+        
+        cleanup = SanityCleanupAgent()
+        await cleanup.cleanup_live_list()
+        
         log("SYSTEM", "AI Cycle Complete. Neural pathways resting.", "SUCCESS")
         
     except Exception as e:
