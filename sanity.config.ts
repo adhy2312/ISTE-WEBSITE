@@ -28,6 +28,7 @@ export default defineConfig({
               ),
             S.divider(),
             // Regular document types
+            S.documentTypeListItem('announcement').title('Active Event Panel'),
             S.documentTypeListItem('event').title('Events'),
             S.documentTypeListItem('execomMember').title('ExeCom Members'),
             S.documentTypeListItem('pillar').title('Who We Are (Pillars)'),
