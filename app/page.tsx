@@ -259,7 +259,8 @@ export default async function Home() {
         {/* Hero Main Content */}
         <div className="hero-content">
           <h1 className="hero-headline" id="hero-headline">
-            <span id="typed-out"></span>
+            {/* SEO Fallback: Server-rendered text for crawlers, GSAP clears this on mount */}
+            <span id="typed-out">{heroTypedText}</span>
             <span className="type-cursor" id="tcursor"></span>
           </h1>
           <div className="hero-divider" id="hero-div"></div>

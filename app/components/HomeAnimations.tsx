@@ -150,32 +150,74 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         });
       });
 
-      // Technical/Cyberpunk ScrambleText for Pillar Numbers
+      // Technical/Digital ScrambleText for Pillar Numbers
       const whoNums = gsap.utils.toArray('.who-num');
       whoNums.forEach((el: any) => {
         const target = el.innerText;
         el.innerText = ""; // clear initially
         gsap.to(el, {
-          duration: 1.5,
-          scrambleText: { text: target, chars: "01_X$", speed: 0.4 },
-          ease: "power1.inOut",
+          duration: 1.2,
+          scrambleText: { text: target, chars: "0123456789", speed: 0.5 },
+          ease: "power2.out",
           scrollTrigger: { trigger: el, start: "top 85%", once: true }
         });
       });
 
-      // Count-Up Animations
+      // Count-Up Animations (Desktop)
       const countups = gsap.utils.toArray('.countup');
       countups.forEach((el: any) => {
         const target = +(el.getAttribute('data-to') || 0);
         if (target) {
           gsap.to(el, {
             innerHTML: target,
-            duration: TIMING.cinematic,
-            ease: EASING.cinematic,
+            duration: 2,
+            ease: "power3.out",
             snap: { innerHTML: 1 },
             scrollTrigger: { trigger: el, start: "top 85%", once: true }
           });
         }
+      });
+
+      // Stat Bar Expansion
+      const statBars = gsap.utils.toArray('.stat-bar');
+      statBars.forEach((el: any) => {
+        gsap.to(el, {
+          scaleX: 1,
+          duration: 1.2,
+          ease: "power3.inOut",
+          scrollTrigger: { trigger: el, start: "top 85%", once: true }
+        });
+      });
+
+      // GSAP Hardware-Accelerated Infinite Marquee
+      const tickerTrack = document.querySelector('.hero-ticker-track');
+      if (tickerTrack) {
+        gsap.to(tickerTrack, {
+          xPercent: -33.333,
+          ease: "none",
+          duration: 30,
+          repeat: -1
+        });
+      }
+
+      // Footer Stagger Reveal
+      gsap.from('.footer-top > div', {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: 'footer', start: 'top 85%', once: true }
+      });
+
+      // Membership Form Split Reveal
+      gsap.from('.mem-left', {
+        x: -40, opacity: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: '#membership', start: 'top 80%', once: true }
+      });
+      gsap.from('.mem-form', {
+        x: 40, opacity: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: '#membership', start: 'top 80%', once: true }
       });
 
       // Subtle Parallax (Transform only)
@@ -251,6 +293,27 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
           });
         }
       });
+      // Stat Bar Expansion Mobile
+      const statBars = gsap.utils.toArray('.stat-bar');
+      statBars.forEach((el: any) => {
+        gsap.to(el, {
+          scaleX: 1,
+          duration: 1,
+          ease: "power2.inOut",
+          scrollTrigger: { trigger: el, start: "top 90%", once: true }
+        });
+      });
+
+      // GSAP Hardware-Accelerated Infinite Marquee Mobile
+      const tickerTrack = document.querySelector('.hero-ticker-track');
+      if (tickerTrack) {
+        gsap.to(tickerTrack, {
+          xPercent: -33.333,
+          ease: "none",
+          duration: 30, // Keep same speed
+          repeat: -1
+        });
+      }
       // Disable 3D tilt and heavy parallax on mobile automatically
     });
 

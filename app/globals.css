@@ -633,7 +633,7 @@
     }
     .hero-ticker-track {
       display: flex; width: max-content;
-      animation: tickerScroll 40s linear infinite;
+      will-change: transform;
     }
     .hero-ticker-set {
       display: flex; align-items: center; gap: 0;
@@ -652,10 +652,7 @@
       color: var(--g600); padding: 0 16px;
       font-weight: 300; font-size: .8rem;
     }
-    @keyframes tickerScroll {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-33.333%); }
-    }
+
 
     /* ===================== SECTION COMMON ===================== */
     .section-inner { max-width: 1200px; margin: 0 auto; }
@@ -821,7 +818,7 @@
       font-size: clamp(3.5rem,5vw,5rem); font-weight:900; line-height:1; color: var(--black);
     }
     .stat-plus { font-size:2rem; vertical-align:super; }
-    .stat-bar { width:30px; height:1px; background:#ddd; margin:14px auto 10px; }
+    .stat-bar { width:30px; height:1px; background:#ddd; margin:14px auto 10px; transform: scaleX(0); transform-origin: center; will-change: transform; }
     .stat-label { font-size:.72rem; letter-spacing:.25em; text-transform:uppercase; color:#666; }
 
     /* ===================== BENEFITS ===================== */

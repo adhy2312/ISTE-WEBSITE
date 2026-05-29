@@ -27,6 +27,16 @@ const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-mono', weight:
 const anton = Anton({ weight: '400', subsets: ['latin'], variable: '--font-anton', display: 'swap' });
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta', display: 'swap' });
 
+import type { Viewport } from 'next';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1, // Prevents iOS input zoom
+  userScalable: false,
+  themeColor: '#0a0a0c', // Matches site background
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://iste-mbcet.vercel.app'),
   title: {
