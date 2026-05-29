@@ -86,8 +86,17 @@ class DiscoveryAgent:
         
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
-            context = await browser.new_context(user_agent=self.ua.random)
+            context = await browser.new_context(
+                user_agent=self.ua.random,
+                viewport={'width': random.randint(1024, 1920), 'height': random.randint(768, 1080)}
+            )
             page = await context.new_page()
+            
+            try:
+                from playwright_stealth import stealth_async
+                await stealth_async(page)
+            except ImportError:
+                pass
             
             for kw in keywords:
                 try:
@@ -150,7 +159,12 @@ class DiscoveryAgent:
                             "role": title,
                             "company": company,
                             "applyLink": url,
-                            "source": site.capitalize()
+                            "source": site.capitalize(),
+                            "location": str(job.get('location', '')).strip(),
+                            "min_amount": job.get('min_amount'),
+                            "max_amount": job.get('max_amount'),
+                            "currency": str(job.get('currency', '₹')).strip(),
+                            "description": str(job.get('description', '')).strip()
                         })
         except Exception as e:
             log("DISCOVERY", f"JobSpy scraping error: {e}", "WARN")
@@ -275,6 +289,29 @@ class SemanticIntelligenceAgent:
             
         item['type'] = 'Remote' if 'remote' in role.lower() else 'Hybrid'
         item['ai_recommendation'] = f"AI Confidence Score: {round(score*100)}%. Semantically mapped to {item['domain']}."
+        
+        # 1. NLP Stipend & Compensation Extraction
+        import re
+        stipend = "Check listing"
+        if item.get('min_amount') and str(item.get('min_amount')) != 'nan':
+            curr = item.get('currency', '₹')
+            stipend = f"{curr}{int(item.get('min_amount'))} - {curr}{int(item.get('max_amount', item.get('min_amount')))}"
+        
+        desc = item.get('description', '') or item.get('role', '')
+        if "Check listing" in stipend and '₹' in desc:
+            match = re.search(r'₹[\d,]+(\s*-\s*₹[\d,]+)?', desc)
+            if match: stipend = match.group(0)
+        item['stipend'] = stipend
+        
+        # 2. Skill-Gap Analysis Engine
+        baseline = set(['python', 'javascript', 'html', 'css', 'c++', 'java', 'git'])
+        req_skills = set([s.lower() for s in item.get('skills', [])])
+        missing = req_skills - baseline
+        if missing:
+            item['ai_recommendation'] += f" [Skill Gap Alert: Missing {', '.join(missing).title()}]"
+        else:
+            item['ai_recommendation'] += f" [Skill Gap: None (Meets Baseline)]"
+            
         item['role_tensor'] = role_emb
         item['embedding_json'] = json.dumps(role_emb.tolist())
         return item
@@ -345,14 +382,46 @@ class EvolutionaryLearningAgent:
 class QualityAssessmentAgent:
     def __init__(self):
         self.evolution = EvolutionaryLearningAgent()
+        self.judge = None # Lazy load HuggingFace Pipeline
         
     def score(self, item):
         score = 50
         if item['domain'] in ['AI/ML & Data Science', 'Robotics & Embedded']: score += 20
         if item['source'] == 'Kerala Hub': score += 15
         
+        # Geographic Proximity & Commute Scoring
+        loc = (item.get('location', '') + " " + item.get('source', '') + " " + item.get('company', '')).lower()
+        if 'trivandrum' in loc or 'thiruvananthapuram' in loc or 'technopark' in loc:
+            score += 30
+        elif 'kochi' in loc or 'ernakulam' in loc or 'infopark' in loc:
+            score += 15
+        elif 'kerala' in loc:
+            score += 5
+        
         # Continuous ML Multiplier
         survival_prob = self.evolution.predict_survival(item['role_tensor'])
+        
+        # True Multi-Agent Orchestration (Supreme Judge LLM)
+        if 0.4 <= survival_prob <= 0.6:
+            try:
+                if self.judge is None:
+                    from transformers import pipeline
+                    log("SUPREME_JUDGE", "Loading Zero-Shot LLM for Borderline Case...", "WARN")
+                    self.judge = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+                
+                res = self.judge(
+                    f"{item['role']} at {item['company']}", 
+                    candidate_labels=["high quality technical internship", "low quality or generic role"]
+                )
+                if res['labels'][0] == "high quality technical internship":
+                    survival_prob += 0.2
+                    item['ai_recommendation'] += " [Supreme Judge: Approved]"
+                else:
+                    survival_prob -= 0.2
+                    item['ai_recommendation'] += " [Supreme Judge: Rejected]"
+            except Exception as e:
+                log("SUPREME_JUDGE", f"Judge failed: {e}", "ERROR")
+        
         score = int(score * (0.5 + survival_prob))
         
         item['quality_tier'] = "ELITE" if score > 80 else "HIGH VALUE" if score > 60 else "MODERATE"
@@ -473,7 +542,7 @@ def sync_to_sanity(internships):
             "role": item["role"],
             "type": item["type"],
             "domain": item["domain"],
-            "stipend": "Check listing",
+            "stipend": item.get("stipend", "Check listing"),
             "duration": "2-6 Months",
             "deadlineLabel": "Apply Now",
             "applyLink": item["applyLink"],
