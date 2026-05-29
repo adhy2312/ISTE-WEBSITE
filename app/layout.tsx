@@ -34,6 +34,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1, // Prevents iOS input zoom
   userScalable: false,
+  viewportFit: 'cover', // Required for env(safe-area-inset-*) to work on iPhones
   themeColor: '#0a0a0c', // Matches site background
 };
 

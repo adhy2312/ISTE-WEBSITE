@@ -120,7 +120,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
         </div>
       </div>
 
-      <main style={{ minHeight: '100vh', paddingTop: '60px' }}>
+      <main style={{ minHeight: '100dvh', paddingTop: '60px' }}>
         <div className="event-hero">
           <Link href="/#events" style={{ display: 'inline-block', marginBottom: '32px', color: 'var(--g400)', textDecoration: 'none', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', fontSize: '0.85rem' }}>← BACK TO EVENTS</Link>
           <h1 className="event-hero-title reveal">{event.title}</h1>

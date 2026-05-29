@@ -142,8 +142,8 @@ export default function IsteAssistant() {
           top: 0;
           left: 0;
           width: 380px;
-          height: 100vh;
-          max-height: 100vh;
+          height: 100dvh;
+          max-height: 100dvh;
           background: rgba(10, 10, 14, 0.95);
           border-right: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 0;

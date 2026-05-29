@@ -333,7 +333,7 @@
     
     /* ===================== HERO ===================== */
     #hero {
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       text-align: center;
@@ -1372,7 +1372,8 @@
 
     /* ===================== FOOTER ===================== */
     footer {
-      background:transparent; border-top:1px solid var(--border); padding:80px 60px 40px;
+      background:transparent; border-top:1px solid var(--border); 
+      padding:80px 60px calc(40px + env(safe-area-inset-bottom));
     }
     .footer-top {
       display:grid; grid-template-columns:2fr 1fr 1fr 1fr;
