@@ -90,6 +90,10 @@ export default async function RootLayout({
   const isStudio = pathname.startsWith('/studio');
   const isAdmin = pathname.startsWith('/admin');
 
+  // Detect iOS server-side so we can skip heavy engines before they crash Safari
+  const userAgent = headersList.get('user-agent') || '';
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -125,7 +129,6 @@ export default async function RootLayout({
                     document.documentElement.classList.add('ios-motion-governed');
                     
                     if (isWebView || !isSafari) {
-                      // Extremely aggressive memory preservation for in-app browsers
                       document.documentElement.classList.add('ios-webview-survival');
                       document.documentElement.classList.add('ios-gpu-throttled');
                     }
@@ -142,17 +145,25 @@ export default async function RootLayout({
       >
         <BrainProvider>
           <IOSAdaptiveEngine />
-          <PhysicsEngine />
-          <NeuralNetwork />
+
+          {/* Always load: critical for all devices */}
           <MemoryEngine />
-          <PerformanceAmplifier />
           <SecurityGuardian />
           <PrefetchEngine />
-          <ColorExtractionEngine />
+
+          {/* Heavy engines: skip entirely on iOS to prevent memory crash */}
+          {!isIOS && <PhysicsEngine />}
+          {!isIOS && <NeuralNetwork />}
+          {!isIOS && <ColorExtractionEngine />}
+          {!isIOS && !isStudio && <DigitalSoul />}
+
+          {/* Render page content first */}
+          {children}
+
+          {/* Secondary engines: load after content on all devices */}
+          <PerformanceAmplifier />
           <InternshipEngine />
           {!isStudio && <PresenceEngine />}
-          {!isStudio && <DigitalSoul />}
-          {children}
           {!isStudio && <IsteAssistant />}
           {!isStudio && <MagneticCursor />}
           {!isStudio && (process.env.NODE_ENV === 'development' || isAdmin) && <EngineObservatory />}
