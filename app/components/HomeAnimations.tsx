@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { gsap, ScrollTrigger, useGSAP } from '../brain/engines/GSAPCore';
+import { gsap, ScrollTrigger, useGSAP, SplitText, ScrambleTextPlugin, Observer } from '../brain/engines/GSAPCore';
 import { EASING, TIMING } from '../brain/engines/MotionTokens';
 
 interface HomeAnimationsProps {
@@ -55,34 +55,41 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     };
   }, []);
 
-  // 2. Hero Typing Logic
+  // 2. Hero Typing Logic (Powered by GSAP TextPlugin)
   useEffect(() => {
-    const typedSpan = document.getElementById('typed-out') as HTMLSpanElement | null;
-    const tcursor = document.getElementById('tcursor') as HTMLSpanElement | null;
-    const heroDivider = document.getElementById('hero-div') as HTMLDivElement | null;
-    const heroSub = document.getElementById('hero-sub') as HTMLParagraphElement | null;
+    const typedSpan = document.getElementById('typed-out');
+    const tcursor = document.getElementById('tcursor');
+    const heroDivider = document.getElementById('hero-div');
+    const heroSub = document.getElementById('hero-sub');
 
-    let ti = 0;
     if (!typedSpan) return;
-    typedSpan.textContent = '';
+    typedSpan.textContent = ''; // clear initially
 
-    const typeNext = () => {
-      if (!typedSpan || !tcursor || !heroDivider || !heroSub) return;
-      if (ti < heroTypedText.length) {
-        typedSpan.textContent += heroTypedText[ti++];
-        setTimeout(typeNext, 40); // Slightly faster, premium feel
-      } else {
+    const tl = gsap.timeline({ delay: 0.8 });
+    
+    // Type out the text elegantly
+    tl.to(typedSpan, {
+      text: heroTypedText,
+      duration: heroTypedText.length * 0.04, // 40ms per character
+      ease: "none",
+    })
+    // Stop cursor blinking and fade it out
+    .add(() => {
+      if (tcursor) {
         tcursor.style.animation = 'none';
         tcursor.style.opacity = '1';
-        setTimeout(() => {
-          tcursor.classList.add('gone');
-          heroDivider.classList.add('open');
-        }, 600);
-        setTimeout(() => heroSub.classList.add('show'), 900);
+        gsap.to(tcursor, { opacity: 0, duration: 0.6, delay: 0.6, onComplete: () => tcursor.classList.add('gone') });
       }
-    };
-    const t = setTimeout(typeNext, 800);
-    return () => clearTimeout(t);
+    })
+    // Open divider and show subtext
+    .add(() => {
+      if (heroDivider) heroDivider.classList.add('open');
+      setTimeout(() => {
+        if (heroSub) heroSub.classList.add('show');
+      }, 300);
+    }, "+=0.6");
+
+    return () => { tl.kill(); };
   }, [heroTypedText]);
 
   // 3. Premium GSAP Motion System (Refactored for iOS safety and maximum FPS)
@@ -126,31 +133,32 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         );
       });
 
-      // Cinematic Text / Typography
-      const cinematicTexts = gsap.utils.toArray('.cinematic-text');
+      // Cinematic Text / Typography (Powered by SplitText)
+      const cinematicTexts = gsap.utils.toArray('.cinematic-text, .hero-sub');
       cinematicTexts.forEach((el: any) => {
-        const text = el.innerText;
-        el.innerHTML = '';
-        text.split(' ').forEach((word: string) => {
-          const wrapper = document.createElement('span');
-          wrapper.style.display = 'inline-block';
-          wrapper.style.overflow = 'hidden';
-          
-          const inner = document.createElement('span');
-          inner.innerText = word + '\u00A0';
-          inner.style.display = 'inline-block';
-          inner.style.transform = 'translateY(110%)';
-          inner.className = 'cinematic-word will-change-transform';
-          
-          wrapper.appendChild(inner);
-          el.appendChild(wrapper);
+        const split = new SplitText(el, { type: 'words,chars' });
+        
+        gsap.from(split.chars, {
+          opacity: 0,
+          y: 20,
+          rotationX: 90,
+          transformOrigin: "0% 50% -50",
+          ease: "power2.out",
+          duration: 0.8,
+          stagger: 0.02,
+          scrollTrigger: { trigger: el, start: "top 85%", once: true }
         });
+      });
 
-        gsap.to(el.querySelectorAll('.cinematic-word'), {
-          y: '0%',
-          duration: TIMING.reveal,
-          ease: EASING.premium,
-          stagger: 0.04,
+      // Technical/Cyberpunk ScrambleText for Pillar Numbers
+      const whoNums = gsap.utils.toArray('.who-num');
+      whoNums.forEach((el: any) => {
+        const target = el.innerText;
+        el.innerText = ""; // clear initially
+        gsap.to(el, {
+          duration: 1.5,
+          scrambleText: { text: target, chars: "01_X$", speed: 0.4 },
+          ease: "power1.inOut",
           scrollTrigger: { trigger: el, start: "top 85%", once: true }
         });
       });
@@ -178,35 +186,36 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
       });
 
-      // Holographic 3D Tilt (No layout thrashing)
+      // Holographic 3D Tilt using GSAP Observer (No layout thrashing)
       const cards = gsap.utils.toArray('.execom-card, .team-card, .junior-card, .internship-card') as HTMLElement[];
       cards.forEach(card => {
-        const handleMove = (e: MouseEvent) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -4;
-          const rotateY = ((x - centerX) / centerX) * 4;
+        Observer.create({
+          target: card,
+          type: "pointer",
+          onMove: (e) => {
+            const rect = card.getBoundingClientRect();
+            // Observer provides absolute pointer x and y coordinates natively
+            const ex = e.x || 0;
+            const ey = e.y || 0;
+            const x = ex - rect.left;
+            const y = ey - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -4;
+            const rotateY = ((x - centerX) / centerX) * 4;
 
-          gsap.to(card, {
-            rotationX: rotateX,
-            rotationY: rotateY,
-            transformPerspective: 1000,
-            ease: 'power2.out',
-            duration: 0.4
-          });
-        };
-        const handleLeave = () => {
-          gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.7, ease: 'power3.out' });
-        };
-        card.addEventListener('mousemove', handleMove, { passive: true });
-        card.addEventListener('mouseleave', handleLeave, { passive: true });
-        return () => {
-          card.removeEventListener('mousemove', handleMove);
-          card.removeEventListener('mouseleave', handleLeave);
-        };
+            gsap.to(card, {
+              rotationX: rotateX,
+              rotationY: rotateY,
+              transformPerspective: 1000,
+              ease: 'power2.out',
+              duration: 0.4
+            });
+          },
+          onHoverEnd: () => {
+            gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.7, ease: 'power3.out' });
+          }
+        });
       });
     });
 

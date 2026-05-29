@@ -2,11 +2,16 @@
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { TextPlugin } from 'gsap/TextPlugin';
+import { Observer } from 'gsap/Observer';
+import { Flip } from 'gsap/Flip';
+import { SplitText } from 'gsap/SplitText';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { useGSAP } from '@gsap/react';
 
 // Register core plugins
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, useGSAP);
+  gsap.registerPlugin(ScrollTrigger, TextPlugin, Observer, Flip, SplitText, ScrambleTextPlugin, useGSAP);
   
   // Core Configuration for High Performance
   gsap.config({
@@ -39,4 +44,4 @@ if (typeof window !== 'undefined') {
   });
 }
 
-export { gsap, ScrollTrigger, useGSAP };
+export { gsap, ScrollTrigger, TextPlugin, Observer, Flip, SplitText, ScrambleTextPlugin, useGSAP };
