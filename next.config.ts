@@ -20,9 +20,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  transpilePackages: ['framer-motion', 'lenis'],
+  transpilePackages: ['gsap', 'lenis'],
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion"],
+    optimizePackageImports: ["lucide-react", "gsap"],
     forceSwcTransforms: true,
   },
 };

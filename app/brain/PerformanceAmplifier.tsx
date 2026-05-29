@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useBrain } from './BrainProvider';
+import { gsap } from './engines/GSAPCore';
 
 /**
  * ENGINE 42: PERFORMANCE AMPLIFIER
@@ -37,11 +38,16 @@ export default function PerformanceAmplifier() {
           reason: `Constrained hardware: ${cores} cores, ${memory}GB RAM`,
         });
 
-        console.log('%c[Performance Amplifier] Engaged: Hardware profiling detected low specs. Stripping volumetric layers.', 'color: #00f0ff; font-weight: bold;');
+        // Throttle GSAP animations to save CPU overhead
+        gsap.ticker.fps(30); 
+        gsap.ticker.lagSmoothing(500, 33);
+        
+        console.log('%c[Performance Amplifier] Engaged: Hardware profiling detected low specs. Stripping volumetric layers & throttling GSAP to 30fps.', 'color: #00f0ff; font-weight: bold;');
       }
     } else {
       // Hardware is powerful. Allow full cinematic rendering.
       document.documentElement.setAttribute('data-amplifier', 'max-fidelity');
+      gsap.ticker.fps(60); // Ensure butter smooth 60fps on high-end
       console.log('%c[Performance Amplifier] Max Fidelity: Hardware profiling cleared.', 'color: #39ff14; font-weight: bold;');
     }
 

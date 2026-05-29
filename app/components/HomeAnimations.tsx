@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { gsap, ScrollTrigger, useGSAP } from '../brain/engines/GSAPCore'
+import { EASING, TIMING } from '../brain/engines/MotionTokens'
 
 interface HomeAnimationsProps {
   heroTypedText?: string
@@ -97,126 +99,130 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
     return () => clearTimeout(t)
   }, [heroTypedText])
 
-  // Scroll Reveal and Count-Up
-  useEffect(() => {
-    let ro: IntersectionObserver | null = null;
-    let co: IntersectionObserver | null = null;
-
-    if (typeof IntersectionObserver !== 'undefined') {
-      ro = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible')
-            ro?.unobserve(e.target)
+  // Scroll Reveal and Count-Up using GSAP Premium Motion
+  useGSAP(() => {
+    // Cinematic Reveal Animations (Replacing generic reveals)
+    const reveals = gsap.utils.toArray('.reveal');
+    reveals.forEach((el: any) => {
+      gsap.fromTo(el, 
+        { y: 60, opacity: 0, scale: 0.98 }, 
+        {
+          y: 0, 
+          opacity: 1, 
+          scale: 1,
+          duration: TIMING.reveal, 
+          ease: EASING.premium,
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            once: true
           }
-        })
-      }, { threshold: 0, rootMargin: '0px 0px 200px 0px' })
+        }
+      );
+    });
 
-      document.querySelectorAll('.reveal').forEach(el => ro?.observe(el))
-
-      co = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          if (!e.isIntersecting) return
-          const el = e.target as HTMLElement
-          const targetAttr = el.getAttribute('data-to')
-          if (!targetAttr) return
-          const target = +targetAttr
-          const dur = 1800
-          let start: number | null = null
-          const stepAnim = (timestamp: number) => {
-            if (!start) start = timestamp
-            const progress = timestamp - start
-            const cur = Math.min(target * (progress / dur), target)
-            el.textContent = Math.floor(cur).toString()
-            if (progress < dur) {
-              requestAnimationFrame(stepAnim)
-            } else {
-              el.textContent = target.toString()
-            }
-          }
-          requestAnimationFrame(stepAnim)
-          co?.unobserve(el)
-        })
-      }, { threshold: 0.5 })
-
-      document.querySelectorAll('.countup').forEach(el => co?.observe(el))
-    } else {
-      // Fallback for older devices: just show the elements immediately
-      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'))
-      document.querySelectorAll('.countup').forEach(el => {
-        const targetAttr = el.getAttribute('data-to')
-        if (targetAttr) el.textContent = targetAttr
-      })
-    }
-
-    return () => {
-      if (ro) ro.disconnect()
-      if (co) co.disconnect()
-    }
-  }, [])
-
-  // Holographic 3D Card Tilt Effect
-  useEffect(() => {
-    const cards = document.querySelectorAll('.execom-card, .team-card, .junior-card') as NodeListOf<HTMLElement>
-    
-    // Load Dissipation: RAF Lock for physics calculations
-    let physicsLock = false;
-    
-    const handleMouseMove = (e: MouseEvent, card: HTMLElement) => {
-      if (physicsLock) return;
-      physicsLock = true;
+    // Count-Up Animations
+    const countups = gsap.utils.toArray('.countup');
+    countups.forEach((el: any) => {
+      const targetAttr = el.getAttribute('data-to');
+      if (!targetAttr) return;
+      const target = +targetAttr;
       
-      requestAnimationFrame(() => {
-        const rect = card.getBoundingClientRect()
-        const x = e.clientX - rect.left
-        const y = e.clientY - rect.top
-        
-        const centerX = rect.width / 2
-        const centerY = rect.height / 2
-        
-        // Calculate rotation (max 3 degrees for subtle, professional Apple-like parallax)
-        const rotateX = ((y - centerY) / centerY) * -3
-        const rotateY = ((x - centerX) / centerX) * 3
-        
-        card.style.setProperty('--rx', `${rotateX}deg`)
-        card.style.setProperty('--ry', `${rotateY}deg`)
-        
-        // Calculate glare position
-        const px = (x / rect.width) * 100
-        const py = (y / rect.height) * 100
-        card.style.setProperty('--mx', `${px}%`)
-        card.style.setProperty('--my', `${py}%`)
-        
-        physicsLock = false;
+      gsap.to(el, {
+        innerHTML: target,
+        duration: TIMING.cinematic,
+        ease: EASING.cinematic,
+        snap: { innerHTML: 1 },
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          once: true
+        }
       });
-    }
-    
-    const handleMouseLeave = (card: HTMLElement) => {
-      card.style.setProperty('--rx', '0deg')
-      card.style.setProperty('--ry', '0deg')
-      card.style.setProperty('--mx', '50%')
-      card.style.setProperty('--my', '50%')
-    }
-    
-    const listeners = new Map()
+    });
+
+    // Editorial Typography System (Vanilla DOM splitting for static HTML)
+    const cinematicTexts = gsap.utils.toArray('.cinematic-text') as HTMLElement[];
+    cinematicTexts.forEach((el) => {
+      // Split text into words manually
+      const text = el.innerText;
+      el.innerHTML = '';
+      const words = text.split(' ');
+      
+      words.forEach(word => {
+        const wordWrapper = document.createElement('span');
+        wordWrapper.style.display = 'inline-block';
+        wordWrapper.style.overflow = 'hidden';
+        wordWrapper.style.verticalAlign = 'top';
+        
+        const wordSpan = document.createElement('span');
+        wordSpan.innerText = word + '\u00A0';
+        wordSpan.style.display = 'inline-block';
+        wordSpan.style.transform = 'translateY(110%)';
+        wordSpan.style.willChange = 'transform';
+        wordSpan.className = 'cinematic-word';
+        
+        wordWrapper.appendChild(wordSpan);
+        el.appendChild(wordWrapper);
+      });
+
+      const wordNodes = el.querySelectorAll('.cinematic-word');
+      gsap.to(wordNodes, {
+        y: '0%',
+        duration: TIMING.reveal,
+        ease: EASING.premium,
+        stagger: 0.03,
+        scrollTrigger: {
+          trigger: el,
+          start: "top 85%",
+          once: true
+        }
+      });
+    });
+  });
+
+  // Holographic 3D Card Tilt Effect via GSAP
+  useGSAP(() => {
+    const cards = gsap.utils.toArray('.execom-card, .team-card, .junior-card') as HTMLElement[];
     
     cards.forEach(card => {
-      const move = (e: MouseEvent) => handleMouseMove(e, card)
-      const leave = () => handleMouseLeave(card)
+      card.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -3;
+        const rotateY = ((x - centerX) / centerX) * 3;
+        const px = (x / rect.width) * 100;
+        const py = (y / rect.height) * 100;
+
+        gsap.to(card, {
+          '--rx': `${rotateX}deg`,
+          '--ry': `${rotateY}deg`,
+          '--mx': `${px}%`,
+          '--my': `${py}%`,
+          duration: TIMING.base,
+          ease: EASING.premium,
+          overwrite: "auto"
+        });
+      });
       
-      card.addEventListener('mousemove', move)
-      card.addEventListener('mouseleave', leave)
-      listeners.set(card, { move, leave })
-    })
-    
-    return () => {
-      cards.forEach(card => {
-        const { move, leave } = listeners.get(card) || {}
-        if (move) card.removeEventListener('mousemove', move)
-        if (leave) card.removeEventListener('mouseleave', leave)
-      })
-    }
-  }, [])
+      card.addEventListener('mouseleave', () => {
+        gsap.to(card, {
+          '--rx': '0deg',
+          '--ry': '0deg',
+          '--mx': '50%',
+          '--my': '50%',
+          duration: TIMING.reveal,
+          ease: EASING.premium,
+          overwrite: "auto"
+        });
+      });
+    });
+  });
 
   return null // This component only runs effects, renders nothing
 }

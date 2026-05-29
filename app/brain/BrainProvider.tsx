@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
+import { gsap, ScrollTrigger } from './engines/GSAPCore';
 
 // The 38 Engines Architecture (including Membership, Haptic, Physical, Cursor, Atmosphere, Neural, Creative, Performance, Internship, and Physics Engines)
 type EngineType = 'Scroll' | 'Render' | 'Animation' | 'Interaction' | 'Data' | 'Prefetch' | 'Telemetry' | 'Resource' | 'Memory' | 'DOM' | 'Layout' | 'Paint' | 'Composite' | 'Network' | 'State' | 'Events' | 'Routing' | 'Cache' | 'Security' | 'Analytics' | 'SEO' | 'Accessibility' | 'Audio' | 'Video' | 'WebGL' | 'Workers' | 'Storage' | 'I18n' | 'PWA' | 'Sync' | 'Membership' | 'Haptic' | 'Physical' | 'Cursor' | 'Atmosphere' | 'Neural' | 'Creative' | 'Performance' | 'Internship' | 'Physics' | 'Amplifier' | 'Presence' | 'ColorExtraction';
@@ -205,14 +206,24 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
           // Connect to Scroll and Physical engines
           notifyEngine('Scroll', 'velocity', { velocity: e.velocity });
           notifyEngine('Physical', 'inertia', { progress: e.progress });
+          // Synchronize ScrollTrigger
+          ScrollTrigger.update();
         });
+
+        // Sync GSAP ticker with Lenis
+        gsap.ticker.add((time) => {
+          if (lenis) lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0); // Lenis handles lag smoothing natively
+
       }).catch(e => console.warn('Lenis failed to load:', e));
     }
 
     let isLooping = true;
     const measureFPSAndPhysics = (time: number) => {
       if (!isLooping) return;
-      if (lenis) lenis.raf(time);
+      // Do not call lenis.raf directly here if we let GSAP handle it.
+      // But we will wire it below if lenis exists.
 
       frameCount++;
       const now = performance.now();

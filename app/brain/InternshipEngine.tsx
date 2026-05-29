@@ -5,9 +5,10 @@ import { useBrain } from './BrainProvider';
 
 import { client } from '@/lib/sanity/client';
 
-const FALLBACK_ROLES = ['Frontend Developer Intern', 'AI/ML Research Intern', 'UI/UX Designer'];
-const FALLBACK_COMPANIES = ['TCS', 'Infosys', 'UST Global'];
-const FALLBACK_HUBS = ['Trivandrum Tech Park', 'Kochi Infopark', 'Remote'];
+const FALLBACK_ROLES = ['Frontend Engineering Intern', 'AI/ML Research Intern', 'UI/UX Design Intern', 'Data Science Intern'];
+const FALLBACK_COMPANIES = ['Google (India)', 'Microsoft R&D', 'UST Global', 'TCS Research', 'Amazon SDE'];
+const FALLBACK_HUBS = ['Trivandrum Tech Park', 'Kochi Infopark', 'Bangalore', 'Remote (India)'];
+const FALLBACK_LINKS = ['https://careers.google.com/students/', 'https://careers.microsoft.com/students', 'https://ust.com/careers'];
 
 export default function InternshipEngine() {
   const { registerEngine, notifyEngine, activeEngines } = useBrain();
@@ -76,8 +77,10 @@ export default function InternshipEngine() {
             role: FALLBACK_ROLES[Math.floor(Math.random() * FALLBACK_ROLES.length)],
             company: FALLBACK_COMPANIES[Math.floor(Math.random() * FALLBACK_COMPANIES.length)],
             domain: FALLBACK_HUBS[Math.floor(Math.random() * FALLBACK_HUBS.length)],
-            applyLink: '#',
-            status: 'open'
+            applyLink: FALLBACK_LINKS[Math.floor(Math.random() * FALLBACK_LINKS.length)],
+            status: 'open',
+            stipend: 'Competitive',
+            type: 'Internship'
           };
         }
         
