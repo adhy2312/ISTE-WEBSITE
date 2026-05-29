@@ -51,7 +51,11 @@ export default function PhysicsEngine() {
     }
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
-    window.addEventListener('deviceorientation', handleOrientation, { passive: true })
+    try {
+      window.addEventListener('deviceorientation', handleOrientation, { passive: true })
+    } catch (e) {
+      console.warn('[PhysicsEngine] Device orientation not supported or restricted');
+    }
 
     let raf: number
     let kineticCooldown = 0
@@ -90,7 +94,9 @@ export default function PhysicsEngine() {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('deviceorientation', handleOrientation)
+      try {
+        window.removeEventListener('deviceorientation', handleOrientation)
+      } catch(e) {}
       cancelAnimationFrame(raf)
     }
   }, []) // Empty deps — mounts once, never re-subscribes

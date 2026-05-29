@@ -2109,13 +2109,10 @@
 
     /* 1. Safari Compatibility fixes */
     html.safari-compatibility-mode {
-      min-height: 100dvh;
       scroll-behavior: auto !important;
     }
     html.safari-compatibility-mode body {
-      min-height: 100dvh;
       -webkit-overflow-scrolling: touch;
-      overflow-y: scroll;
     }
 
     /* 2. Motion Governor */
