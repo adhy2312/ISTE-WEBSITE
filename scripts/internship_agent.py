@@ -28,6 +28,9 @@ from sqlalchemy import create_engine, Column, String, Boolean, Float
 from sqlalchemy.orm import declarative_base, sessionmaker
 from jobspy import scrape_jobs
 import pandas as pd
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
 class Colors:
     CY='\033[96m'; GR='\033[92m'; YL='\033[93m'
@@ -57,6 +60,12 @@ class InternshipCache(Base):
     company = Column(String)
     role = Column(String)
     processed = Column(Boolean, default=False)
+
+class EvolutionMemory(Base):
+    __tablename__ = 'evolution_memory'
+    id = Column(String, primary_key=True)
+    embedding = Column(String)
+    survived = Column(Boolean, default=True)
 
 # In-memory SQLite for demo purposes, switch to PostgreSQL for production
 engine = create_engine('sqlite:///internships.db')
@@ -266,6 +275,8 @@ class SemanticIntelligenceAgent:
             
         item['type'] = 'Remote' if 'remote' in role.lower() else 'Hybrid'
         item['ai_recommendation'] = f"AI Confidence Score: {round(score*100)}%. Semantically mapped to {item['domain']}."
+        item['role_tensor'] = role_emb
+        item['embedding_json'] = json.dumps(role_emb.tolist())
         return item
 
     def process_batch(self, items):
@@ -273,16 +284,92 @@ class SemanticIntelligenceAgent:
         return [self.enrich(i) for i in items]
 
 # ==============================================================================
-# AGENT 4: QUALITY ASSESSMENT AGENT
+# AGENT 4: QUALITY ASSESSMENT & EVOLUTIONARY ML AGENT
 # ==============================================================================
+class AdaptiveNeuralCore(nn.Module):
+    def __init__(self, input_dim=384):
+        super(AdaptiveNeuralCore, self).__init__()
+        self.fc1 = nn.Linear(input_dim, 64)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(64, 1)
+        self.sigmoid = nn.Sigmoid()
+        
+    def forward(self, x):
+        return self.sigmoid(self.fc2(self.relu(self.fc1(x))))
+
+class EvolutionaryLearningAgent:
+    def __init__(self):
+        self.model_path = 'adaptive_core.pth'
+        self.model = AdaptiveNeuralCore()
+        if os.path.exists(self.model_path):
+            self.model.load_state_dict(torch.load(self.model_path, weights_only=True))
+        self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)
+        self.criterion = nn.BCELoss()
+        
+    def train_on_memory(self):
+        log("EVOLUTION", "Initiating Continuous ML Retraining Phase...")
+        db = SessionLocal()
+        memories = db.query(EvolutionMemory).all()
+        
+        if len(memories) < 5:
+            log("EVOLUTION", "Insufficient neural data. Gathering more memory before evolution.", "WARN")
+            db.close()
+            return
+            
+        X, Y = [], []
+        for m in memories:
+            X.append(json.loads(m.embedding))
+            Y.append([1.0 if m.survived else 0.0])
+            
+        X_t = torch.tensor(X, dtype=torch.float32)
+        Y_t = torch.tensor(Y, dtype=torch.float32)
+        
+        self.model.train()
+        for epoch in range(10):
+            self.optimizer.zero_grad()
+            outputs = self.model(X_t)
+            loss = self.criterion(outputs, Y_t)
+            loss.backward()
+            self.optimizer.step()
+            
+        torch.save(self.model.state_dict(), self.model_path)
+        log("EVOLUTION", f"Neural Core Evolved successfully. Survival Prediction Loss: {loss.item():.4f}", "SUCCESS")
+        db.close()
+        
+    def predict_survival(self, embedding_tensor):
+        self.model.eval()
+        with torch.no_grad():
+            prob = self.model(embedding_tensor).item()
+        return prob
+
 class QualityAssessmentAgent:
+    def __init__(self):
+        self.evolution = EvolutionaryLearningAgent()
+        
     def score(self, item):
         score = 50
         if item['domain'] in ['AI/ML & Data Science', 'Robotics & Embedded']: score += 20
         if item['source'] == 'Kerala Hub': score += 15
-            
+        
+        # Continuous ML Multiplier
+        survival_prob = self.evolution.predict_survival(item['role_tensor'])
+        score = int(score * (0.5 + survival_prob))
+        
         item['quality_tier'] = "ELITE" if score > 80 else "HIGH VALUE" if score > 60 else "MODERATE"
         item['learning_value_score'] = min(score, 99)
+        item['ai_recommendation'] += f" [Survival Prob: {round(survival_prob*100, 1)}%]"
+        
+        # Log to memory
+        comp = item['company'].strip().lower()
+        role = item['role'].strip().lower()
+        uid = hashlib.md5(f"{comp}-{role}".encode()).hexdigest()
+        
+        db = SessionLocal()
+        if not db.query(EvolutionMemory).filter_by(id=uid).first():
+            db.add(EvolutionMemory(id=uid, embedding=item['embedding_json'], survived=True))
+        db.commit()
+        db.close()
+        
         return item
         
     def assess_batch(self, items):
@@ -305,15 +392,28 @@ class SanityCleanupAgent:
             
             # Phase 1: Prune dead links & advanced frauds
             log("CLEANUP", f"Scanning {len(data)} live entries for link rot and counterfeit flags...")
+            
+            def mark_dead(d_item):
+                c = str(d_item.get('company', '')).strip().lower()
+                r = str(d_item.get('role', '')).strip().lower()
+                d_uid = hashlib.md5(f"{c}-{r}".encode()).hexdigest()
+                mem_db = SessionLocal()
+                mem = mem_db.query(EvolutionMemory).filter_by(id=d_uid).first()
+                if mem: mem.survived = False
+                mem_db.commit()
+                mem_db.close()
+                
             for item in data:
                 # Skip if applyLink is missing
                 if not item.get("applyLink"):
                     mutations.append({"delete": {"id": item["_id"]}})
+                    mark_dead(item)
                     continue
                 verified = await authenticity.verify(item)
                 if verified.get('trust_status') == "REJECTED":
                     log("CLEANUP", f"Counterfeit/Dead link detected: {item.get('company')} - {item.get('role')}", "WARN")
                     mutations.append({"delete": {"id": item["_id"]}})
+                    mark_dead(item)
             
             # Phase 2: Deep Semantic Deduplication
             log("CLEANUP", "Executing deep semantic deduplication on live list...")
@@ -343,6 +443,7 @@ class SanityCleanupAgent:
                                 log("CLEANUP", f"Semantic duplicate found: '{role_i}' == '{role_j}'. Pruning...", "WARN")
                                 items_to_delete.add(id_j)
                                 mutations.append({"delete": {"id": id_j}})
+                                mark_dead(items[j])
 
             if mutations:
                 log("CLEANUP", f"Purging {len(mutations)} toxic/duplicate entries from live Sanity database...", "SUCCESS")
@@ -427,6 +528,10 @@ async def execute_pipeline():
         
         cleanup = SanityCleanupAgent()
         await cleanup.cleanup_live_list()
+        
+        # Retrain the ML model on the updated memory
+        evo_agent = EvolutionaryLearningAgent()
+        evo_agent.train_on_memory()
         
         log("SYSTEM", "AI Cycle Complete. Neural pathways resting.", "SUCCESS")
         
