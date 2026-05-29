@@ -113,6 +113,20 @@ class AuthenticityAgent:
             item['trust_status'] = "REJECTED"
             return item
             
+        # 3. Active Link Validation (No 404s allowed)
+        try:
+            res = requests.head(item['applyLink'], timeout=5, allow_redirects=True, headers={'User-Agent': 'Mozilla/5.0'})
+            if res.status_code >= 400 and res.status_code not in [403, 405]:
+                # Some job portals return 403 for bots, which is fine. 404 is definitely dead.
+                item['trust_status'] = "REJECTED"
+                item['trust_reason'] = f"Dead Link (HTTP {res.status_code})"
+                return item
+        except requests.exceptions.RequestException:
+            # Domain dead or timed out
+            item['trust_status'] = "REJECTED"
+            item['trust_reason'] = "Domain Unreachable or Timed Out"
+            return item
+
         item['trust_status'] = "VERIFIED"
         item['trust_reason'] = "Passed multi-layer authenticity check."
         return item

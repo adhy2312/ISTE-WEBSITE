@@ -23,11 +23,11 @@ if (typeof window !== 'undefined') {
   });
 
   // iOS Safari Fix: normalizeScroll prevents address-bar-resize jitter
-  // and synchronizes iOS's async scroll thread with GSAP's calculations.
-  // This is the #1 recommended fix from GSAP's official docs for iOS.
+  // However, on some modern iOS versions it completely hijacked touch and caused inaccessibility.
+  // Disabled as per user bug report.
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   if (isIOS) {
-    ScrollTrigger.normalizeScroll(true);
+    // ScrollTrigger.normalizeScroll(true);
   }
 
   // Refresh ScrollTrigger after full page load to fix miscalculated positions

@@ -43,8 +43,18 @@ export default async function InternshipsPage() {
     internships = FALLBACK_INTERNSHIPS
   }
 
-  const open = internships.filter((i: any) => i.status === 'open')
-  const other = internships.filter((i: any) => i.status !== 'open')
+  const validateApplyLink = (link: string | undefined) => {
+    if (!link) return false;
+    if (link === '#' || link === '') return false;
+    if (!link.startsWith('http')) return false;
+    // Filter out known mock/botched links
+    if (link.includes('tcs.com/careers/intern') || link.includes('cognizant.com/design-intern')) return false;
+    return true;
+  };
+
+  const validInternships = internships.filter(i => validateApplyLink(i.applyLink));
+  const open = validInternships.filter((i: any) => i.status === 'open');
+  const other = validInternships.filter((i: any) => i.status !== 'open');
 
   return (
     <>
