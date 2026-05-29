@@ -18,6 +18,7 @@ const PresenceEngine = dynamic(() => import('./brain/PresenceEngine'));
 const PrefetchEngine = dynamic(() => import('./brain/PrefetchEngine'));
 const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngine'));
 const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
+const IOSAdaptiveEngine = dynamic(() => import('./engines/ios/IOSAdaptiveEngine'), { ssr: false });
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -115,6 +116,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <BrainProvider>
+          <IOSAdaptiveEngine />
           <PhysicsEngine />
           <NeuralNetwork />
           <MemoryEngine />

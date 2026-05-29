@@ -2102,3 +2102,60 @@
 
     @keyframes pageSweepIn { 0% { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(10px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); } } 
     .page-sweep-in { animation: pageSweepIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; transform-origin: top center; }
+
+    /* =========================================================
+       IOS ADAPTIVE SURVIVAL ENGINE
+       ========================================================= */
+
+    /* 1. Safari Compatibility fixes */
+    html.safari-compatibility-mode {
+      min-height: 100dvh;
+      scroll-behavior: auto !important;
+    }
+    html.safari-compatibility-mode body {
+      min-height: 100dvh;
+      -webkit-overflow-scrolling: touch;
+      overflow-y: scroll;
+    }
+
+    /* 2. Motion Governor */
+    html.ios-motion-governed .aurora-ribbon,
+    html.ios-motion-governed .orbital-lines {
+      will-change: auto; /* Remove will-change to prevent memory spikes in WebKit */
+    }
+
+    /* 3. GPU Throttled State (when FPS drops) */
+    html.ios-gpu-throttled * {
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    html.ios-gpu-throttled .aurora-ribbon,
+    html.ios-gpu-throttled .noise-overlay,
+    html.ios-gpu-throttled body::before,
+    html.ios-gpu-throttled .c-dot,
+    html.ios-gpu-throttled .c-ring {
+      display: none !important;
+      animation: none !important;
+    }
+
+    /* 4. WebView Survival Mode (WhatsApp/Instagram/FB browsers) */
+    html.ios-webview-survival * {
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    html.ios-webview-survival .aurora-ribbon,
+    html.ios-webview-survival .orbital-lines,
+    html.ios-webview-survival .noise-overlay,
+    html.ios-webview-survival .grid-lines,
+    html.ios-webview-survival body::before,
+    html.ios-webview-survival .c-dot,
+    html.ios-webview-survival .c-ring {
+      display: none !important;
+      animation: none !important;
+    }
+    html.ios-webview-survival nav.scrolled {
+      background: rgba(10, 10, 15, 0.98) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }

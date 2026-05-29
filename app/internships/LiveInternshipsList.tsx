@@ -3,28 +3,28 @@
 import { useBrain } from '@/app/brain/BrainProvider';
 import { useEffect, useState } from 'react';
 
-function LiveInternshipCard({ role, company, hub }: { role: string; company: string; hub: string }) {
+function LiveInternshipCard({ data }: { data: any }) {
   const [status, setStatus] = useState<'verifying' | 'active' | 'dead'>('verifying');
   const [faded, setFaded] = useState(false);
 
   useEffect(() => {
     let fadeTimer: NodeJS.Timeout;
     const verifyTimer = setTimeout(() => {
-      // 25% chance it's a dead/broken link
-      const isDead = Math.random() < 0.25;
+      // Intelligently check if it's dead based on data status or lack of link
+      const isDead = data.status === 'closed' || !data.applyLink;
       setStatus(isDead ? 'dead' : 'active');
 
       if (isDead) {
         // Fade it out completely after displaying the error for 4 seconds
         fadeTimer = setTimeout(() => setFaded(true), 4000);
       }
-    }, 3000 + Math.random() * 5000);
+    }, 2000 + Math.random() * 2000);
 
     return () => {
       clearTimeout(verifyTimer);
       if (fadeTimer) clearTimeout(fadeTimer);
     };
-  }, []);
+  }, [data]);
 
   if (faded) return null;
 
@@ -43,12 +43,12 @@ function LiveInternshipCard({ role, company, hub }: { role: string; company: str
             background: status === 'dead' ? '#ef4444' : status === 'active' ? '#22c55e' : '#a78bfa', 
             color: '#000' 
           }}>
-            {company.charAt(0)}
+            {data.company?.charAt(0) || '?'}
           </div>
         </div>
         <div>
-          <div className="intern-company" style={{ color: '#e2e8f0', textDecoration: status === 'dead' ? 'line-through' : 'none' }}>{company}</div>
-          <div className="intern-domain">{hub}</div>
+          <div className="intern-company" style={{ color: '#e2e8f0', textDecoration: status === 'dead' ? 'line-through' : 'none' }}>{data.company}</div>
+          <div className="intern-domain">{data.domain || 'Tech'}</div>
         </div>
         <span className="intern-status-badge" style={{ 
           background: status === 'dead' ? 'rgba(239, 68, 68, 0.2)' : status === 'active' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(167, 139, 250, 0.2)', 
@@ -58,7 +58,7 @@ function LiveInternshipCard({ role, company, hub }: { role: string; company: str
           {status === 'verifying' ? 'VERIFYING...' : status === 'active' ? 'VERIFIED' : 'BROKEN LINK'}
         </span>
       </div>
-      <h3 className="intern-role" style={{ textDecoration: status === 'dead' ? 'line-through' : 'none' }}>{role}</h3>
+      <h3 className="intern-role" style={{ textDecoration: status === 'dead' ? 'line-through' : 'none' }}>{data.role}</h3>
       <div className="intern-tags">
         <span className="intern-tag">AI Detected</span>
         <span className="intern-tag" style={{
@@ -74,19 +74,19 @@ function LiveInternshipCard({ role, company, hub }: { role: string; company: str
          'Agent encountered a 404 or closed form. Company has filled this position. Purging from list...'}
       </p>
       <div className="intern-footer" style={{ marginTop: '20px' }}>
-        <div className="intern-apply-btn" style={{ 
-          background: status === 'active' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(167, 139, 250, 0.1)', 
-          color: status === 'active' ? '#22c55e' : '#a78bfa', 
-          border: status === 'active' ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(167, 139, 250, 0.3)', 
-          cursor: status === 'active' ? 'pointer' : 'not-allowed', 
-          width: '100%', 
-          textAlign: 'center',
-          display: 'inline-block',
-          transition: 'all 0.3s ease',
-          opacity: status === 'dead' ? 0.3 : 1
-        }}>
-          {status === 'verifying' ? 'Awaiting Verification...' : status === 'active' ? 'Apply via External Portal →' : 'Link Dead'}
-        </div>
+        {status === 'active' && data.applyLink ? (
+          <a href={data.applyLink} target="_blank" rel="noopener noreferrer" className="intern-apply-btn" style={{ 
+            background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)', width: '100%', textAlign: 'center', display: 'inline-block'
+          }}>
+            Apply via External Portal →
+          </a>
+        ) : (
+          <div className="intern-apply-btn" style={{ 
+            background: 'rgba(167, 139, 250, 0.1)', color: '#a78bfa', border: '1px solid rgba(167, 139, 250, 0.3)', width: '100%', textAlign: 'center', display: 'inline-block', opacity: status === 'dead' ? 0.3 : 1
+          }}>
+            {status === 'verifying' ? 'Awaiting Verification...' : 'Link Dead'}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -95,9 +95,18 @@ function LiveInternshipCard({ role, company, hub }: { role: string; company: str
 export default function LiveInternshipsList() {
   const { internshipState } = useBrain();
 
-  // Extract the FOUND logs. Reverse to show newest at top naturally 
-  // (Assuming BrainProvider prepends them, but we want stable map).
-  const foundLogs = internshipState.logs.filter((log: string) => log.startsWith('[FOUND]'));
+  // Extract the FOUND logs that have valid JSON payloads
+  const foundLogs = internshipState.logs
+    .filter((log: string) => log.startsWith('[FOUND_JSON]'))
+    .map((log: string) => {
+      try {
+        const jsonStr = log.replace('[FOUND_JSON] ', '');
+        return JSON.parse(jsonStr);
+      } catch (e) {
+        return null;
+      }
+    })
+    .filter(Boolean);
 
   if (foundLogs.length === 0) return null;
 
@@ -123,15 +132,8 @@ export default function LiveInternshipsList() {
         Live Detected Opportunities (AI Scraper)
       </div>
       <div className="internship-grid" style={{ marginBottom: '60px' }}>
-        {foundLogs.map((log: string, i: number) => {
-          // Parse: [FOUND] Role at Company (Hub)
-          const match = log.match(/\[FOUND\] (.*?) at (.*?) \((.*?)\)/);
-          if (!match) return null;
-          const [_, role, company, hub] = match;
-
-          // We use the log string as the unique key to preserve internal component state
-          // Add 'i' to handle very rare exact duplicate strings generated in same session
-          return <LiveInternshipCard key={log + i} role={role} company={company} hub={hub} />;
+        {foundLogs.map((data: any, i: number) => {
+          return <LiveInternshipCard key={data._id || i} data={data} />;
         })}
       </div>
     </>
