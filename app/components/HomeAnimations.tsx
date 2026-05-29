@@ -179,6 +179,60 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         }
       });
     });
+
+    // ── PREMIUM GSAP SCROLL TIMELINES ──
+    
+    // 1. Hero Parallax Timeline (Scrubbed)
+    // Moves the orbital rings and aurora independently of the scroll to create immense depth
+    const heroTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1.5 // Smooth lagging scrub
+      }
+    });
+    
+    heroTl.to('.orbital-lines', { y: 200, scale: 1.1, rotation: 5, force3D: true, willChange: 'transform', ease: 'none' }, 0)
+          .to('.aurora-ribbon', { y: 300, opacity: 0.2, force3D: true, willChange: 'transform, opacity', ease: 'none' }, 0)
+          .to('#hero-headline', { y: -50, opacity: 0, force3D: true, ease: 'none' }, 0);
+
+    // 2. About Section Pinned / Staggered Timeline
+    // As the user scrolls into the About section, the NucleusCore subtly expands and rotates
+    const aboutTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#about',
+        start: 'top 70%',
+        end: 'bottom 30%',
+        scrub: 2
+      }
+    });
+
+    aboutTl.fromTo('.about-visual', 
+      { scale: 0.8, rotation: -15, opacity: 0.5 },
+      { scale: 1.05, rotation: 5, opacity: 1, ease: 'power2.out', force3D: true, willChange: 'transform, opacity' }
+    );
+    
+    // 3. Benefits Grid Stagger (Scroll-driven scrub)
+    const benefitsTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#benefits',
+        start: 'top 80%',
+        end: 'center center',
+        scrub: 1
+      }
+    });
+    
+    benefitsTl.from('.benefits-grid .benefit-card', {
+      y: 100,
+      opacity: 0,
+      rotateX: -15,
+      stagger: 0.1,
+      ease: 'back.out(1.2)',
+      force3D: true,
+      willChange: 'transform, opacity'
+    });
+
   });
 
   // Holographic 3D Card Tilt Effect via GSAP
