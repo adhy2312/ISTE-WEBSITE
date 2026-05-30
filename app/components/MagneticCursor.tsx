@@ -231,7 +231,7 @@ export default function MagneticCursor() {
         style={{
           position: 'fixed', top: 0, left: 0, width: '6px', height: '6px',
           background: 'white', borderRadius: '50%', pointerEvents: 'none',
-          zIndex: 10001, mixBlendMode: 'difference'
+          zIndex: 10001,
         }}
       />
       <div 
@@ -239,7 +239,7 @@ export default function MagneticCursor() {
         style={{
           position: 'fixed', top: 0, left: 0, width: '36px', height: '36px',
           border: '1px solid rgba(255, 255, 255, 0.5)', borderRadius: '50%', pointerEvents: 'none',
-          zIndex: 10000, mixBlendMode: 'difference',
+          zIndex: 10000,
           boxSizing: 'border-box'
         }}
       />
