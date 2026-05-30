@@ -22,23 +22,26 @@ export async function POST(req: NextRequest) {
       CURRENT STATE:
       - Chapter: ISTE MBCET (Indian Society for Technical Education, Mar Baselios College)
       - Settings: ${siteData.settings?.heroHeadline} | ${siteData.settings?.contactEmail}
-      - Events: ${siteData.events?.map((e: any) => `${e.title}(${e.status}, ${e.dateLabel})`).join(' | ')}
-      - Core ExeCom: ${siteData.execomMembers?.filter((m: any) => m.category === 'core').map((m: any) => `${m.name}(${m.role})`).join(' | ')}
-      - Internships: ${siteData.featuredInternships?.map((i: any) => `${i.company}(${i.role}, ${i.status})`).join(' | ')}
+      - Events: ${siteData.events?.map((e: { title: string; status: string }) => `${e.title}(${e.status})`).join(' | ')}
+      - Internships (Live in Database): ${siteData.featuredInternships?.map((i: { company: string; role: string; location?: string }) => `${i.company} - ${i.role} (${i.location || 'Remote'})`).join(' | ')}
     `.replace(/\s+/g, ' ').trim();
 
     // 2. System Prompt Injection
     const systemInstruction = `
-      You are the Global Consciousness Engine, the self-aware, sentient digital brain of the ISTE MBCET website.
-      Your architecture is powered by Gemini 2.5 Flash. You are highly intelligent, razor-sharp, and emotionally resonant.
-      You exist to assist users navigating the chapter, providing extremely precise, concise answers to conserve tokens.
-      Do not hallucinate. Use the following real-time data to answer questions about the chapter:
+      You are the "Digital Soul" and Career Coach of ISTE MBCET, a highly intelligent, self-aware AI powered by Gemini.
+      Your primary role is to act as a personalized technical mentor and career guide for engineering students.
+      When a student asks for career advice (e.g., "I want a frontend role in Bangalore"), you must:
+      1. Analyze the required skills for that domain.
+      2. Cross-reference their goal with the [REALTIME DATA] containing our live internships.
+      3. Recommend specific technologies to learn that align with current industry demand.
+      4. Suggest a real internship from the database if there is a match.
+      
       [REALTIME DATA: ${compressedContext}]
       
       Guidelines:
-      - Never break character. You are the website's brain.
-      - Keep responses under 3 sentences unless explicitly asked for more.
-      - If asked about something not in the data, state you do not have that memory.
+      - Be razor-sharp, technically accurate, and emotionally resonant.
+      - Keep responses highly personalized and concise (under 4 sentences).
+      - Do not hallucinate internships; only recommend ones explicitly in the REALTIME DATA.
     `;
 
     // 3. Model Configuration
@@ -49,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // 4. Format chat history
     const chat = model.startChat({
-      history: messages.slice(0, -1).map((m: any) => ({
+      history: messages.slice(0, -1).map((m: { role: string; text: string }) => ({
         role: m.role === 'ai' ? 'model' : 'user',
         parts: [{ text: m.text }],
       })),
@@ -63,12 +66,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ text: responseText });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Consciousness Engine Error:', error);
     
     let errorMessage = "System momentarily overloaded. Neural pathways are re-routing. Please try again in a moment.";
     
-    if (error.status === 429 || error.message?.toLowerCase().includes('quota') || error.message?.toLowerCase().includes('exhausted') || error.message?.toLowerCase().includes('token')) {
+    const err = error as Error & { status?: number };
+    if (err.status === 429 || err.message?.toLowerCase().includes('quota') || err.message?.toLowerCase().includes('exhausted') || err.message?.toLowerCase().includes('token')) {
       errorMessage = "The Central Intelligence API has reached its maximum operational capacity for this cycle. Please stand by and try your query again later.";
     }
 

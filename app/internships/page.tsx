@@ -5,10 +5,23 @@ import Image from 'next/image'
 import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import InternshipClientEngine from './InternshipClientEngine'
-import LiveInternshipsList from './LiveInternshipsList'
 import ResumeAnalyzer from './ResumeAnalyzer'
 import AliveClock from '@/app/components/AliveClock'
-import { InternshipData } from './LiveInternshipsList'
+export interface InternshipData {
+  _id?: string;
+  company?: string;
+  domain?: string;
+  role?: string;
+  type?: string;
+  stipend?: string;
+  duration?: string;
+  description?: string;
+  applyLink?: string;
+  deadlineLabel?: string;
+  status?: string;
+  logo?: { asset?: { url?: string } };
+  [key: string]: unknown;
+}
 
 import { Metadata } from 'next'
 
@@ -47,7 +60,10 @@ export default async function InternshipsPage() {
     internships = FALLBACK_INTERNSHIPS
   }
 
-  const validInternships = internships; // Now pre-validated by GROQ query (VERIFIED state & health score)
+  // Pre-validated by GROQ query, but enforce strict link validity to avoid dead buttons
+  const validInternships = internships.filter((i: InternshipData) => {
+    return i.applyLink && i.applyLink !== '#' && i.applyLink.startsWith('http');
+  });
   const open = validInternships.filter((i: InternshipData) => i.status === 'open');
   const other = validInternships.filter((i: InternshipData) => i.status !== 'open');
 
@@ -124,9 +140,7 @@ export default async function InternshipsPage() {
             These positions have been curated and verified by the ISTE MBCET chapter team. Apply directly via the link provided.
           </p>
 
-          {/* Dynamic AI-Scraped List */}
-          <LiveInternshipsList />
-
+          {/* Statically Generated AI-Scraped List from Sanity V12 */}
           {open.length === 0 ? (
             <div className="reveal" style={{ padding: '60px 0', textAlign: 'center', color: 'var(--g400)', borderTop: '1px solid var(--border)' }}>
               <div style={{ fontSize: '2rem', marginBottom: '16px' }}>📭</div>
