@@ -83,11 +83,21 @@
       display: none !important;
     }
 
+    html::after {
+      content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.04; mix-blend-mode: overlay;
+    }
+    html.ios-gpu-throttled::after { display: none; }
+
     body {
       counter-reset: section;
       background: var(--black);
       color: var(--white);
       font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
       line-height: 1.6;
       overflow-x: hidden;
       overflow-x: clip;
@@ -579,8 +589,9 @@
 
     .hero-btn-primary:hover {
       background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.35);
       transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 255, 255, 0.08);
     }
     .hero-btn-primary:active {
       transform: translateY(1px) scale(0.98);
@@ -693,8 +704,8 @@
 
     /* Fast Slide Reveal & Modern Features */
     ::selection {
-      background: rgba(var(--c-main), 0.3);
-      color: var(--white);
+      background: rgba(255, 255, 255, 0.99);
+      color: #000;
     }
     ::-webkit-scrollbar {
       width: 10px;
