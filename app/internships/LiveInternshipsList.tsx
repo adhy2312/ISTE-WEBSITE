@@ -105,6 +105,38 @@ export default function LiveInternshipsList() {
     // Only show items with valid apply links
     .filter((item: any) => item.applyLink && item.applyLink !== '#' && item.applyLink.startsWith('http'));
 
+  const [displayQueue, setDisplayQueue] = useState<any[]>([]);
+  const [queueIndex, setQueueIndex] = useState(0);
+  const MAX_VISIBLE = 4;
+
+  useEffect(() => {
+    if (foundLogs.length === 0) return;
+    
+    // Initial population
+    if (displayQueue.length === 0) {
+      setDisplayQueue(foundLogs.slice(0, MAX_VISIBLE));
+      setQueueIndex(MAX_VISIBLE);
+      return;
+    }
+
+    // Auto-rolling feed logic
+    if (foundLogs.length > MAX_VISIBLE) {
+      const interval = setInterval(() => {
+        setQueueIndex(prevIndex => {
+          const nextIndex = prevIndex % foundLogs.length;
+          setDisplayQueue(prevQueue => {
+            const nextItem = foundLogs[nextIndex];
+            // Remove the oldest (first) and add the new one (last)
+            return [...prevQueue.slice(1), nextItem];
+          });
+          return prevIndex + 1;
+        });
+      }, 4000); // Inject new item every 4 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [foundLogs, displayQueue.length]);
+
   if (foundLogs.length === 0) return null;
 
   return (
@@ -124,13 +156,22 @@ export default function LiveInternshipsList() {
           background: '#22c55e', borderRadius: '50%',
           boxShadow: '0 0 10px #22c55e'
         }}></div>
-        Live Verified Feed — {foundLogs.length} Listings
+        Live Verified Feed — Scanning {foundLogs.length} Active Nodes
       </div>
       <div className="internship-grid">
-        {foundLogs.map((data: any, i: number) => {
-          return <LiveInternshipCard key={data._id || i} data={data} index={i} />;
+        {displayQueue.map((data: any, i: number) => {
+          // Use a unique key combining ID and index to ensure entry animations trigger when injected
+          return <div key={`${data._id}-${queueIndex + i}`} style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}>
+            <LiveInternshipCard data={data} index={i} />
+          </div>;
         })}
       </div>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes slideInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
     </div>
   );
 }

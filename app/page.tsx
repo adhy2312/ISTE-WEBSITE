@@ -810,7 +810,7 @@ export default async function Home() {
       </section>
 
       <footer>
-        <div className="footer-watermark">v5.6</div>
+        <div className="footer-watermark">v11.2</div>
         <div className="footer-top">
           <div>
             <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={80} height={80} className="footer-logo-img" /></div>

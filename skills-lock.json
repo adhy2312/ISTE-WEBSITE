@@ -43,6 +43,18 @@
       "skillPath": "skills/01-by-domain/micro-interactions/SKILL.md",
       "computedHash": "3329f824de3660f2aef6ea2974f7410fab5865ce0250fa2191a87370c616c093"
     },
+    "playwright-best-practices": {
+      "source": "currents-dev/playwright-best-practices-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "6db654e753257e642d6507d59b4fc633a2382e93429748ba0fb6817c23ef5216"
+    },
+    "playwright-cli": {
+      "source": "microsoft/playwright-cli",
+      "sourceType": "github",
+      "skillPath": "skills/playwright-cli/SKILL.md",
+      "computedHash": "cc5d9f0cc5760217829fbebfa05a23b4ab475ed34005a9ea44e181b8112409f3"
+    },
     "professionalism-credibility": {
       "source": "dylantarre/animation-principles",
       "sourceType": "github",
