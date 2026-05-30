@@ -1,0 +1,57 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  iste-db:
+    image: postgres:16-alpine
+    container_name: iste_db_v12
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: iste_v12
+      POSTGRES_USER: operators
+      POSTGRES_PASSWORD: budget_safe
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U operators -d iste_v12"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    volumes:
+      - iste-pg-data:/var/lib/postgresql/data
+      - ./seed_fixtures.sql:/docker-entrypoint-initdb.d/seed_fixtures.sql:ro
+
+  iste-cache:
+    # Redis instance with RedisBloom module enabled natively
+    image: redislabs/rebloom:latest
+    container_name: iste_cache_v12
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - iste-redis-data:/data
+
+  iste-worker:
+    image: python:3.12-alpine
+    container_name: iste_worker_v12
+    depends_on:
+      iste-db:
+        condition: service_healthy
+      iste-cache:
+        condition: service_started
+    environment:
+      - REDIS_URL=redis://iste-cache:6379/0
+      - DB_URL=postgresql://operators:budget_safe@iste-db:5432/iste_v12
+      - NEXT_PUBLIC_SANITY_PROJECT_ID=placeholder_id
+      - SANITY_API_TOKEN=placeholder_token
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: >
+      sh -c "pip install aiohttp asyncpg redis pydantic && python pipeline_engine.py"
+    restart: on-failure
+
+volumes:
+  iste-pg-data:
+  iste-redis-data:

@@ -1,0 +1,14 @@
+# 2. Redis Cache & Filter Specification
+
+# Bloom Filter Structure
+# Target: 500,000 entities, False-positive rate: 0.001
+BF.RESERVE bf:internship:urls 0.001 500000
+
+# 7-day TTL Hash map pattern for page content caching
+# Pattern: hash:page:content:<MD5(URL)>
+# HSET hash:page:content:<MD5(URL)> body_hash "<SHA256(page_body)>" last_checked_at "<UNIX_TIMESTAMP>"
+# EXPIRE hash:page:content:<MD5(URL)> 604800
+
+# Configuration Hash Map for System Management
+# Pattern: config:feature_flags
+# HSET config:feature_flags auto_publishing "true" sanity_sync "true" ai_enrichment "false"
