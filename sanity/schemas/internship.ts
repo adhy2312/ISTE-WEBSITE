@@ -67,6 +67,24 @@ export const internshipSchema = defineType({
       rows: 4,
     }),
     defineField({
+      name: 'requiredSkills',
+      title: 'Required Skills',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'preferredSkills',
+      title: 'Preferred Skills',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'bonusSkills',
+      title: 'Bonus Skills',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
       name: 'applyLink',
       title: 'Apply Link (URL)',
       type: 'url',
@@ -98,6 +116,62 @@ export const internshipSchema = defineType({
       description: 'Featured internships appear highlighted on the homepage teaser.',
       type: 'boolean',
       initialValue: false,
+    }),
+    defineField({
+      name: 'state',
+      title: 'State Machine Status',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'New', value: 'NEW' },
+          { title: 'Active', value: 'ACTIVE' },
+          { title: 'Verified', value: 'VERIFIED' },
+          { title: 'Suspect', value: 'SUSPECT' },
+          { title: 'Expired', value: 'EXPIRED' },
+          { title: 'Archived', value: 'ARCHIVED' },
+          { title: 'Deleted', value: 'DELETED' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'NEW',
+    }),
+    defineField({
+      name: 'verificationStatus',
+      title: 'Verification Status',
+      type: 'string',
+      initialValue: 'UNVERIFIED',
+    }),
+    defineField({
+      name: 'lastVerifiedAt',
+      title: 'Last Verified At',
+      type: 'datetime',
+    }),
+    defineField({
+      name: 'linkHealthScore',
+      title: 'Link Health Score',
+      type: 'number',
+      initialValue: 0,
+    }),
+    defineField({
+      name: 'source',
+      title: 'Source',
+      type: 'string',
+    }),
+    defineField({
+      name: 'confidenceScore',
+      title: 'AI Confidence Score',
+      type: 'number',
+    }),
+    defineField({
+      name: 'qualityScore',
+      title: 'Final Quality Score',
+      type: 'number',
+    }),
+    defineField({
+      name: 'verificationFailures',
+      title: 'Consecutive Verification Failures',
+      type: 'number',
+      initialValue: 0,
     }),
     defineField({
       name: 'order',

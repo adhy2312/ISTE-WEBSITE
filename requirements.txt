@@ -1,0 +1,11 @@
+requests
+httpx
+beautifulsoup4
+playwright
+sentence-transformers
+celery
+redis
+pandas
+python-jobspy
+SQLAlchemy
+python-dotenv

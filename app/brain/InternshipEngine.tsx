@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useBrain } from './BrainProvider';
 import { client } from '@/lib/sanity/client';
+import type { InternshipData } from '@/app/internships/LiveInternshipsList';
 
 /**
  * INTERNSHIP ENGINE
@@ -34,14 +35,15 @@ export default function InternshipEngine() {
     notifyEngine('Internship', 'agent_status', 'SCANNING NETWORK');
 
     // Fetch real internships from Sanity — the ONLY source of truth
-    client.fetch(`*[_type == "internship" && status == "open" && defined(applyLink)] | order(_createdAt desc)[0...20] {
-      _id, role, company, domain, type, stipend, duration, deadlineLabel, applyLink, status, description
+    // Enforcing Hard Verification Gate: Only VERIFIED state and healthy links.
+    client.fetch(`*[_type == "internship" && state == "VERIFIED" && verificationStatus == "VERIFIED" && linkHealthScore > 50 && defined(applyLink)] | order(_createdAt desc)[0...20] {
+      _id, role, company, domain, type, stipend, duration, deadlineLabel, applyLink, status, description, state, verificationStatus, linkHealthScore
     }`).then(data => {
       if (data && data.length > 0) {
         notifyEngine('Internship', 'agent_status', `${data.length} OPPORTUNITIES FOUND`);
 
         // Emit each real listing as a structured JSON log
-        data.forEach((item: any, i: number) => {
+        data.forEach((item: InternshipData, i: number) => {
           setTimeout(() => {
             notifyEngine('Internship', 'agent_log', `[FOUND_JSON] ${JSON.stringify(item)}`);
           }, i * 200); // Stagger to avoid flooding the state

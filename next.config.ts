@@ -25,7 +25,6 @@ const nextConfig: NextConfig = {
   transpilePackages: ['gsap', 'lenis'],
   experimental: {
     optimizePackageImports: ["lucide-react"],
-    forceSwcTransforms: true,
   },
   async headers() {
     return [

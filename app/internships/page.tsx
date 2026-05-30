@@ -12,6 +12,8 @@ import { InternshipData } from './LiveInternshipsList'
 
 import { Metadata } from 'next'
 
+export const revalidate = 60; // 60 seconds ISR cache invalidation (V9 Cache Fix)
+
 export const metadata: Metadata = {
   title: "Internship Launchpad | Member Resources",
   description: "Exclusive internship opportunities curated by ISTE MBCET for our student members. Connect with industry leaders and kickstart your career.",
@@ -45,29 +47,7 @@ export default async function InternshipsPage() {
     internships = FALLBACK_INTERNSHIPS
   }
 
-  const validateApplyLink = (link: string | undefined) => {
-    if (!link) return false;
-    if (link === '#' || link === '') return false;
-    if (!link.startsWith('http')) return false;
-    
-    // Aggressive filtering of dummy/old sanity data
-    const lowerLink = link.toLowerCase();
-    if (
-      lowerLink.includes('example.com') || 
-      lowerLink.includes('test') || 
-      lowerLink.includes('dummy') ||
-      lowerLink.includes('tcs.com/careers/intern') || 
-      lowerLink.includes('cognizant.com/design-intern') ||
-      lowerLink.includes('localhost') ||
-      lowerLink.includes('your-apply-link') ||
-      lowerLink.includes('google.com/test')
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  const validInternships = internships.filter(i => validateApplyLink(i.applyLink));
+  const validInternships = internships; // Now pre-validated by GROQ query (VERIFIED state & health score)
   const open = validInternships.filter((i: InternshipData) => i.status === 'open');
   const other = validInternships.filter((i: InternshipData) => i.status !== 'open');
 

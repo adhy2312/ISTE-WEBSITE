@@ -93,7 +93,7 @@ export const siteSettingsQuery = groq`
 `
 
 export const internshipsQuery = groq`
-  *[_type == "internship"] | order(_createdAt desc) {
+  *[_type == "internship" && state == "VERIFIED" && verificationStatus == "VERIFIED" && linkHealthScore > 50] | order(_createdAt desc) {
     _id,
     company,
     role,
@@ -106,6 +106,9 @@ export const internshipsQuery = groq`
     description,
     applyLink,
     status,
+    state,
+    verificationStatus,
+    linkHealthScore,
     featured,
     order,
     logo {
@@ -117,7 +120,7 @@ export const internshipsQuery = groq`
 `
 
 export const featuredInternshipsQuery = groq`
-  *[_type == "internship" && featured == true && status == "open"] | order(_createdAt desc) [0...3] {
+  *[_type == "internship" && featured == true && state == "VERIFIED" && verificationStatus == "VERIFIED" && linkHealthScore > 50] | order(_createdAt desc) [0...3] {
     _id,
     company,
     role,
@@ -128,6 +131,9 @@ export const featuredInternshipsQuery = groq`
     deadlineLabel,
     applyLink,
     status,
+    state,
+    verificationStatus,
+    linkHealthScore,
   }
 `
 
