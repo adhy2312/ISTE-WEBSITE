@@ -14,6 +14,11 @@ from playwright.async_api import async_playwright, BrowserContext
 from sentence_transformers import SentenceTransformer, util
 from celery import Celery
 import redis
+import pandas as pd
+try:
+    from jobspy import scrape_jobs
+except ImportError:
+    scrape_jobs = None
 from sqlalchemy import create_engine, Column, String, Boolean, Integer, Float, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -173,8 +178,13 @@ class InternshipIntelligenceCore:
     def calculate_scores(self, opp: dict, scam_status: str, health_score: int):
         comp_lower = opp["company"].lower()
         
-        # Trust Score
+        # Trust Score (Base + Registry + ML Learned Weight)
         trust = COMPANY_TRUST_OVERRIDES.get(comp_lower, 50)
+        
+        # Apply Machine Learning Learned Weights
+        learned_offset = float(redis_client.get(f"ml_weight:{opp['source']}") or 0.0)
+        trust += learned_offset
+        
         if opp["source"] in [s["company"] for s in ALL_SOURCES["tier_a"] if "company" in s]:
             trust = max(trust, 90)
             
@@ -250,6 +260,46 @@ class InternshipIntelligenceCore:
         return unique
 
     # ==============================================================================
+    # CORE ENGINE 24: Reinforcement Learning Source Optimizer
+    # Self-heals the system by punishing bad sources and rewarding good ones.
+    # ==============================================================================
+    def optimize_source_weights(self):
+        print("[ML OPTIMIZER] Running Reinforcement Learning Weight Adjustments...")
+        # Get all memory
+        records = self.db.query(OpportunityMemory).all()
+        source_stats = {}
+        for r in records:
+            if r.source not in source_stats:
+                source_stats[r.source] = {"total": 0, "healthy": 0, "scam": 0, "avg_conf": 0}
+            
+            stats = source_stats[r.source]
+            stats["total"] += 1
+            if r.health_score == 100: stats["healthy"] += 1
+            if r.trust_score < 40: stats["scam"] += 1
+            stats["avg_conf"] += r.confidence_score
+            
+        # Adjust weights dynamically in cache for next run
+        for source, stats in source_stats.items():
+            if stats["total"] < 5: continue # Need statistical significance
+            
+            health_rate = stats["healthy"] / stats["total"]
+            scam_rate = stats["scam"] / stats["total"]
+            avg_conf = stats["avg_conf"] / stats["total"]
+            
+            # RL Reward Function
+            reward = 0
+            if health_rate > 0.9: reward += 5
+            if health_rate < 0.5: reward -= 15
+            if scam_rate > 0.1: reward -= 25
+            if avg_conf > 80: reward += 10
+            
+            # Store learned weight offset in Redis
+            current_offset = float(redis_client.get(f"ml_weight:{source}") or 0.0)
+            new_offset = max(-50.0, min(50.0, current_offset + (reward * 0.1))) # Learning rate = 0.1
+            redis_client.set(f"ml_weight:{source}", new_offset)
+            print(f" -> Source [{source}] new ML weight offset: {new_offset:.2f}")
+
+    # ==============================================================================
     # MAIN WORKFLOW (Discovery -> Publish)
     # ==============================================================================
     async def run_discovery_cycle(self):
@@ -276,6 +326,35 @@ class InternshipIntelligenceCore:
                     })
             except Exception as e:
                 print(f"[DISCOVERY ERROR] {e}")
+
+        # ==============================================================================
+        # CORE ENGINE 23: Dynamic Infinite Aggregator (JobSpy Integration)
+        # Pulls live from LinkedIn, Indeed, Glassdoor without hardcoded URLs
+        # ==============================================================================
+        if scrape_jobs:
+            print("[DISCOVERY] Engaging Dynamic Infinite Web Scraper (JobSpy)...")
+            try:
+                jobs_df = scrape_jobs(
+                    site_name=["linkedin", "indeed", "glassdoor"],
+                    search_term="internship OR intern OR fresher",
+                    location="Kerala, India",
+                    results_wanted=50, # Can be scaled up to infinite pagination conceptually
+                    hours_old=72,
+                    job_type="internship",
+                )
+                if jobs_df is not None and not jobs_df.empty:
+                    print(f"[DISCOVERY] Dynamic Engine found {len(jobs_df)} active listings.")
+                    for _, row in jobs_df.iterrows():
+                        raw_opps.append({
+                            "company": str(row.get("company", "Unknown")),
+                            "role": str(row.get("title", "Internship")),
+                            "applyLink": str(row.get("job_url", "")),
+                            "source": "Dynamic Aggregator (" + str(row.get("site", "Web")) + ")",
+                            "location": str(row.get("location", "Kerala")),
+                            "description": str(row.get("description", ""))[:500]
+                        })
+            except Exception as e:
+                print(f"[DYNAMIC DISCOVERY ERROR] {e}")
 
         # Normalization
         normalized = [self.normalize_opportunity(o) for o in raw_opps]
@@ -314,6 +393,10 @@ class InternshipIntelligenceCore:
                 mem.confidence_score = opp["confidenceScore"]
         
         self.db.commit()
+        
+        # Trigger Reinforcement Learning Loop
+        self.optimize_source_weights()
+        
         await self.close_browser()
         print(f"[CYCLE COMPLETE] Processed {len(final_opps)} elite opportunities.")
         return final_opps

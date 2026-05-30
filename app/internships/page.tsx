@@ -6,6 +6,7 @@ import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import InternshipClientEngine from './InternshipClientEngine'
 import LiveInternshipsList from './LiveInternshipsList'
+import ResumeAnalyzer from './ResumeAnalyzer'
 import AliveClock from '@/app/components/AliveClock'
 
 import { Metadata } from 'next'
@@ -226,6 +227,9 @@ export default async function InternshipsPage() {
               </div>
             </>
           )}
+
+          {/* AI Resume Analyzer Section */}
+          <ResumeAnalyzer />
         </div>
       </section>
 

@@ -254,6 +254,138 @@ TIER_A_SOURCES = [
         "location": "Kochi",
         "zone": "Startup"
     },
+    # ─── Tech Giants & Global MNCs (High Reliability) ───────────────────────
+    {
+        "company": "Amazon",
+        "careers_url": "https://www.amazon.jobs/en/job_categories/student-programs?country%5B%5D=IND",
+        "base_trust_score": 99,
+        "crawl_frequency_hours": 12,
+        "requires_js": True,
+        "tags": ["Software", "Cloud", "AI/ML"],
+        "location": "Remote / India",
+        "zone": "Global"
+    },
+    {
+        "company": "Microsoft",
+        "careers_url": "https://careers.microsoft.com/students/us/en/search-results?l=India",
+        "base_trust_score": 99,
+        "crawl_frequency_hours": 12,
+        "requires_js": True,
+        "tags": ["Software", "AI/ML", "Cloud"],
+        "location": "Remote / India",
+        "zone": "Global"
+    },
+    {
+        "company": "Google",
+        "careers_url": "https://www.google.com/about/careers/applications/jobs/results?location=India&jpt=INTERN",
+        "base_trust_score": 99,
+        "crawl_frequency_hours": 12,
+        "requires_js": True,
+        "tags": ["Software", "AI/ML", "Cloud"],
+        "location": "Remote / India",
+        "zone": "Global"
+    },
+    {
+        "company": "IBM",
+        "careers_url": "https://careers.ibm.com/job/search/?q=Intern&lc=India",
+        "base_trust_score": 98,
+        "crawl_frequency_hours": 24,
+        "requires_js": True,
+        "tags": ["Software", "AI", "Research"],
+        "location": "Remote / India",
+        "zone": "Global"
+    },
+    {
+        "company": "Oracle",
+        "careers_url": "https://careers.oracle.com/jobs/#en/sites/jobsearch/filter/categories/%22Student%20%2F%20Intern%22",
+        "base_trust_score": 98,
+        "crawl_frequency_hours": 24,
+        "requires_js": True,
+        "tags": ["Software", "Database", "Cloud"],
+        "location": "Trivandrum / India",
+        "zone": "Global"
+    },
+    {
+        "company": "Zoho",
+        "careers_url": "https://careers.zohocorp.com/jobs/Careers",
+        "base_trust_score": 98,
+        "crawl_frequency_hours": 24,
+        "requires_js": True,
+        "tags": ["Software", "Web", "Product"],
+        "location": "Remote / India",
+        "zone": "Product"
+    },
+    # ─── Kerala Established Enterprises (Tier A) ─────────────────────────────
+    {
+        "company": "Quest Global",
+        "careers_url": "https://careers.quest-global.com/search-results?location=Trivandrum",
+        "base_trust_score": 96,
+        "crawl_frequency_hours": 24,
+        "requires_js": True,
+        "tags": ["Software", "Embedded Systems", "Aerospace"],
+        "location": "Trivandrum",
+        "zone": "Technopark"
+    },
+    {
+        "company": "Tata Elxsi",
+        "careers_url": "https://www.tataelxsi.com/careers/search-jobs",
+        "base_trust_score": 97,
+        "crawl_frequency_hours": 24,
+        "requires_js": True,
+        "tags": ["Software", "Embedded Systems", "Design"],
+        "location": "Trivandrum",
+        "zone": "Technopark"
+    },
+    {
+        "company": "QBurst",
+        "careers_url": "https://www.qburst.com/en-in/careers/india/",
+        "base_trust_score": 95,
+        "crawl_frequency_hours": 24,
+        "requires_js": False,
+        "tags": ["Software", "Web", "Mobile"],
+        "location": "Trivandrum / Kochi",
+        "zone": "Technopark"
+    },
+    {
+        "company": "Fingent",
+        "careers_url": "https://www.fingent.com/careers/",
+        "base_trust_score": 94,
+        "crawl_frequency_hours": 48,
+        "requires_js": False,
+        "tags": ["Software", "Web", "Cloud"],
+        "location": "Kochi",
+        "zone": "Infopark"
+    },
+    {
+        "company": "Experion Technologies",
+        "careers_url": "https://experionglobal.com/careers/",
+        "base_trust_score": 94,
+        "crawl_frequency_hours": 48,
+        "requires_js": True,
+        "tags": ["Software", "Data", "Cloud"],
+        "location": "Trivandrum",
+        "zone": "Technopark"
+    },
+    {
+        "company": "LTIMindtree",
+        "careers_url": "https://www.ltimindtree.com/careers/",
+        "base_trust_score": 96,
+        "crawl_frequency_hours": 24,
+        "requires_js": True,
+        "tags": ["Software", "AI", "Cloud"],
+        "location": "Kochi",
+        "zone": "Infopark"
+    },
+    {
+        "company": "Tech Mahindra",
+        "careers_url": "https://careers.techmahindra.com/",
+        "base_trust_score": 95,
+        "crawl_frequency_hours": 24,
+        "requires_js": True,
+        "tags": ["Software", "Telecom", "Cloud"],
+        "location": "Trivandrum",
+        "zone": "Technopark"
+    }
 ]
 
 # ==============================================================================
