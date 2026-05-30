@@ -11,7 +11,10 @@ export default function NucleusCore() {
 
   // Wire to Performance Engine and OS Detection
   useEffect(() => {
-    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent))
+    const t = setTimeout(() => {
+      setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent))
+    }, 0)
+    return () => clearTimeout(t)
     if (brain.perfMetrics.fps > 0 && brain.perfMetrics.fps < 30) {
       setIsLowPerf(true)
     } else {

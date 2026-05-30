@@ -8,6 +8,7 @@ import InternshipClientEngine from './InternshipClientEngine'
 import LiveInternshipsList from './LiveInternshipsList'
 import ResumeAnalyzer from './ResumeAnalyzer'
 import AliveClock from '@/app/components/AliveClock'
+import { InternshipData } from './LiveInternshipsList'
 
 import { Metadata } from 'next'
 
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 // No fallback data — only real CMS listings are shown
-const FALLBACK_INTERNSHIPS: any[] = []
+const FALLBACK_INTERNSHIPS: InternshipData[] = []
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   open: { label: 'Open', color: '#22c55e' },
@@ -32,7 +33,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 
 export default async function InternshipsPage() {
   const { isEnabled: preview } = await draftMode()
-  let internships: any[] = []
+  let internships: InternshipData[] = []
 
   try {
     internships = await getClient(preview).fetch(internshipsQuery)
@@ -48,14 +49,27 @@ export default async function InternshipsPage() {
     if (!link) return false;
     if (link === '#' || link === '') return false;
     if (!link.startsWith('http')) return false;
-    // Filter out known mock/botched links
-    if (link.includes('tcs.com/careers/intern') || link.includes('cognizant.com/design-intern')) return false;
+    
+    // Aggressive filtering of dummy/old sanity data
+    const lowerLink = link.toLowerCase();
+    if (
+      lowerLink.includes('example.com') || 
+      lowerLink.includes('test') || 
+      lowerLink.includes('dummy') ||
+      lowerLink.includes('tcs.com/careers/intern') || 
+      lowerLink.includes('cognizant.com/design-intern') ||
+      lowerLink.includes('localhost') ||
+      lowerLink.includes('your-apply-link') ||
+      lowerLink.includes('google.com/test')
+    ) {
+      return false;
+    }
     return true;
   };
 
   const validInternships = internships.filter(i => validateApplyLink(i.applyLink));
-  const open = validInternships.filter((i: any) => i.status === 'open');
-  const other = validInternships.filter((i: any) => i.status !== 'open');
+  const open = validInternships.filter((i: InternshipData) => i.status === 'open');
+  const other = validInternships.filter((i: InternshipData) => i.status !== 'open');
 
   return (
     <>
@@ -141,25 +155,25 @@ export default async function InternshipsPage() {
             </div>
           ) : (
             <div className="internship-grid">
-              {open.map((intern: any, i: number) => (
+              {open.map((intern: InternshipData, i: number) => (
                 <div key={intern._id} className={`internship-card reveal ${['d1', 'd2', 'd3', 'd4'][i % 4]}`}>
                   <div className="intern-card-top">
                     <div className="intern-logo-wrap" style={{ position: 'relative' }}>
                       {intern.logo?.asset ? (
                         <Image
-                          src={intern.logo.asset.url}
-                          alt={intern.company}
+                          src={intern.logo.asset.url || ''}
+                          alt={intern.company || 'Company logo'}
                           fill
                           className="object-contain"
                         />
                       ) : (
                         <div className="intern-logo-placeholder">
-                          {intern.company.charAt(0)}
+                          {(intern.company || '?').charAt(0)}
                         </div>
                       )}
                     </div>
                     <div>
-                      <div className="intern-company">{intern.company}</div>
+                      <div className="intern-company">{intern.company || 'Unknown Company'}</div>
                       {intern.domain && <div className="intern-domain">{intern.domain}</div>}
                     </div>
                   </div>
@@ -201,16 +215,17 @@ export default async function InternshipsPage() {
             <>
               <div className="execom-sub-label reveal" style={{ marginTop: '80px' }}>Past & Coming Soon</div>
               <div className="internship-grid">
-                {other.map((intern: any, i: number) => {
-                  const statusInfo = STATUS_LABELS[intern.status] || { label: intern.status, color: '#888' }
+                {other.map((intern: InternshipData, i: number) => {
+                  const statusKey = typeof intern.status === 'string' ? intern.status : 'closed';
+                  const statusInfo = STATUS_LABELS[statusKey] || { label: statusKey, color: '#888' };
                   return (
                     <div key={intern._id} className={`internship-card internship-card--dim reveal ${['d1', 'd2', 'd3'][i % 3]}`}>
                       <div className="intern-card-top">
                         <div className="intern-logo-wrap">
-                          <div className="intern-logo-placeholder">{intern.company.charAt(0)}</div>
+                          <div className="intern-logo-placeholder">{(intern.company || '?').charAt(0)}</div>
                         </div>
                         <div>
-                          <div className="intern-company">{intern.company}</div>
+                          <div className="intern-company">{intern.company || 'Unknown Company'}</div>
                           {intern.domain && <div className="intern-domain">{intern.domain}</div>}
                         </div>
                         <span className="intern-status-badge" style={{ background: statusInfo.color + '22', color: statusInfo.color, borderColor: statusInfo.color + '55' }}>

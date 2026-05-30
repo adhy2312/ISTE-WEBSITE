@@ -10,7 +10,8 @@ export const HydrationSafetyLayer = ({ children }: HydrationSafetyLayerProps) =>
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    const t = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   if (!isMounted) {
@@ -28,7 +29,8 @@ export const useHydrationSafeState = <T,>(initialState: T): [T, (state: T) => vo
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    const t = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   return [state, setState, isMounted];

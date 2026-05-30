@@ -19,14 +19,13 @@
  *  - Scroll velocity real-time
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useBrain } from '../brain/BrainProvider'
 import { readMemoryProfile } from '../brain/MemoryEngine'
 
 type FPSSample = number
 
 const MAX_FPS_SAMPLES = 60
-const OBSERVATORY_KEY = 'iste_observatory_open'
 
 export default function EngineObservatory() {
   const brain = useBrain()
@@ -34,9 +33,6 @@ export default function EngineObservatory() {
   const [fpsSamples, setFpsSamples] = useState<FPSSample[]>(Array(MAX_FPS_SAMPLES).fill(60))
   const [htmlAttrs, setHtmlAttrs] = useState<Record<string, string>>({})
   const [memProfile, setMemProfile] = useState<ReturnType<typeof readMemoryProfile> | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const lastFpsUpdate = useRef(0)
-  const mounted = useRef(false)
 
   // Toggle via Ctrl+Shift+O
   useEffect(() => {
@@ -51,9 +47,11 @@ export default function EngineObservatory() {
 
   // Read memory profile when opened
   useEffect(() => {
+    let timer: NodeJS.Timeout
     if (isOpen) {
-      setMemProfile(readMemoryProfile())
+      timer = setTimeout(() => setMemProfile(readMemoryProfile()), 0)
     }
+    return () => clearTimeout(timer)
   }, [isOpen])
 
   // Poll HTML attributes (emotion, familiarity, chrono, motion)

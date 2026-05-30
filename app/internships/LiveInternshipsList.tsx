@@ -7,7 +7,23 @@ import { useEffect, useState, useRef } from 'react';
  * Displays ONLY verified internship listings from Sanity CMS.
  * Cards with invalid links (# or empty) are never rendered.
  */
-function LiveInternshipCard({ data, index }: { data: any; index: number }) {
+export interface InternshipData {
+  _id?: string;
+  company?: string;
+  domain?: string;
+  role?: string;
+  type?: string;
+  stipend?: string;
+  duration?: string;
+  description?: string;
+  applyLink?: string;
+  deadlineLabel?: string;
+  status?: string;
+  logo?: { asset?: { url?: string } };
+  [key: string]: any;
+}
+
+function LiveInternshipCard({ data }: { data: InternshipData }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Validate the link is real — not '#', not empty, must be https
@@ -92,20 +108,20 @@ export default function LiveInternshipsList() {
     .map((log: string) => {
       try {
         const jsonStr = log.replace('[FOUND_JSON] ', '');
-        return JSON.parse(jsonStr);
-      } catch (e) {
+        return JSON.parse(jsonStr) as InternshipData;
+      } catch {
         return null;
       }
     })
-    .filter(Boolean)
+    .filter((item): item is InternshipData => Boolean(item))
     // Deduplicate by _id
-    .filter((item: any, index: number, self: any[]) => 
-      index === self.findIndex((t: any) => t._id === item._id)
+    .filter((item: InternshipData, index: number, self: InternshipData[]) => 
+      index === self.findIndex((t: InternshipData) => t._id === item._id)
     )
     // Only show items with valid apply links
-    .filter((item: any) => item.applyLink && item.applyLink !== '#' && item.applyLink.startsWith('http'));
+    .filter((item: InternshipData) => item.applyLink && item.applyLink !== '#' && item.applyLink.startsWith('http'));
 
-  const [displayQueue, setDisplayQueue] = useState<any[]>([]);
+  const [displayQueue, setDisplayQueue] = useState<InternshipData[]>([]);
   const [queueIndex, setQueueIndex] = useState(0);
   const MAX_VISIBLE = 4;
 
@@ -114,9 +130,11 @@ export default function LiveInternshipsList() {
     
     // Initial population
     if (displayQueue.length === 0) {
-      setDisplayQueue(foundLogs.slice(0, MAX_VISIBLE));
-      setQueueIndex(MAX_VISIBLE);
-      return;
+      const t = setTimeout(() => {
+        setDisplayQueue(foundLogs.slice(0, MAX_VISIBLE));
+        setQueueIndex(MAX_VISIBLE);
+      }, 0);
+      return () => clearTimeout(t);
     }
 
     // Auto-rolling feed logic
@@ -137,7 +155,47 @@ export default function LiveInternshipsList() {
     }
   }, [foundLogs, displayQueue.length]);
 
-  if (foundLogs.length === 0) return null;
+  if (foundLogs.length === 0) {
+    return (
+      <div style={{ marginBottom: '80px' }}>
+        <div style={{ 
+          marginBottom: '24px',
+          color: '#94a3b8',
+          fontSize: '0.85rem',
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <div style={{ 
+            width: '6px', height: '6px', 
+            background: '#f59e0b', borderRadius: '50%',
+            boxShadow: '0 0 10px #f59e0b',
+            animation: 'pulse 1.5s infinite'
+          }}></div>
+          Live Engine Initializing — Scanning Source Nodes...
+        </div>
+        <div style={{
+          padding: '40px',
+          background: 'rgba(255,255,255,0.02)',
+          border: '1px dashed rgba(255,255,255,0.1)',
+          borderRadius: '16px',
+          textAlign: 'center',
+          color: '#94a3b8'
+        }}>
+          Waiting for first verified opportunity from the pipeline...
+        </div>
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+            100% { opacity: 0.5; transform: scale(1); }
+          }
+        `}} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ marginBottom: '80px' }}>
@@ -159,10 +217,10 @@ export default function LiveInternshipsList() {
         Live Verified Feed — Scanning {foundLogs.length} Active Nodes
       </div>
       <div className="internship-grid">
-        {displayQueue.map((data: any, i: number) => {
+        {displayQueue.map((data: InternshipData, i: number) => {
           // Use a unique key combining ID and index to ensure entry animations trigger when injected
           return <div key={`${data._id}-${queueIndex + i}`} style={{ animation: 'slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}>
-            <LiveInternshipCard data={data} index={i} />
+            <LiveInternshipCard data={data} />
           </div>;
         })}
       </div>
