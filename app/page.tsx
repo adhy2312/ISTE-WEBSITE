@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { draftMode } from 'next/headers'
 import { getClient } from '@/lib/sanity/client'
 import Image from 'next/image'
@@ -102,7 +103,7 @@ export default async function Home() {
     sanityData = await getClient(preview).fetch(homePageQuery, {}, {
       next: { revalidate: 60 }, // ISR: revalidate every 60 seconds
     })
-  } catch (e) {
+  } catch {
     // Sanity unreachable — fall through to hardcoded data
   }
 
@@ -117,7 +118,6 @@ export default async function Home() {
   const pillars: any[] = sanityData?.pillars || []
   const benefits: any[] = sanityData?.benefits || []
 
-  const heroSubtitle = settings.heroSubtitle || 'Innovation · Technology · Excellence'
   const heroTypedText = settings.heroTypedText || "ISTE MBCET STUDENT'S CHAPTER"
   const heroDescription = settings.heroDescription || "The official student chapter of the Indian Society for Technical Education at Mar Baselios College of Engineering and Technology — where engineers build the future, faster."
   const heroPrimaryCta = settings.heroPrimaryCtaLabel || "Become a Member"
@@ -729,6 +729,7 @@ export default async function Home() {
                 <div className="testi-divider"></div>
                 <div className="testi-author">
                   <div style={{ position: 'relative', width: 48, height: 48, overflow: 'hidden', borderRadius: '50%' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={t.photo ? urlForImage(t.photo).width(96).height(96).url() : `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
                       alt={t.authorName}
@@ -842,9 +843,9 @@ export default async function Home() {
             <div className="footer-col-title">Contact</div>
             <ul className="footer-links">
               <li><a href={`mailto:${settings.contactEmail || 'istestudentchapter@mbcet.ac.in'}`}>{settings.contactEmail || 'istestudentchapter@mbcet.ac.in'}</a></li>
-              <li><a href="#">MBCET, Nalanchira</a></li>
-              <li><a href="#">Thiruvananthapuram</a></li>
-              <li><a href="#">Kerala — 695 015</a></li>
+              <li><a href="https://maps.google.com/?q=Mar+Baselios+College+of+Engineering+and+Technology" target="_blank" rel="noopener noreferrer">MBCET, Nalanchira</a></li>
+              <li><a href="https://maps.google.com/?q=Thiruvananthapuram,Kerala" target="_blank" rel="noopener noreferrer">Thiruvananthapuram</a></li>
+              <li><a href="https://maps.google.com/?q=Kerala+695015" target="_blank" rel="noopener noreferrer">Kerala — 695 015</a></li>
             </ul>
           </div>
         </div>

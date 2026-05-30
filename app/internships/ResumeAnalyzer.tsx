@@ -5,7 +5,14 @@ import { useState } from 'react';
 export default function ResumeAnalyzer() {
   const [resumeText, setResumeText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{
+    score: number;
+    verdict: string;
+    criticalFlaws: string[];
+    strengths: string[];
+    lineByLineImprovements: { original_issue: string; suggested_fix: string; reason: string }[];
+    atsKeywordsMissing: string[];
+  } | null>(null);
   const [error, setError] = useState('');
 
   const handleAnalyze = async () => {
@@ -31,8 +38,9 @@ export default function ResumeAnalyzer() {
       }
 
       setResult(data.data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const e = err as Error;
+      setError(e.message || 'An unknown error occurred');
     } finally {
       setIsAnalyzing(false);
     }
@@ -133,7 +141,7 @@ export default function ResumeAnalyzer() {
             </div>
             <div style={{ flex: 1, minWidth: '300px' }}>
               <div style={{ color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.85rem', marginBottom: '8px' }}>AI Verdict</div>
-              <p style={{ fontSize: '1.2rem', color: '#f8fafc', fontStyle: 'italic', lineHeight: 1.5 }}>"{result.verdict}"</p>
+              <p style={{ fontSize: '1.2rem', color: '#f8fafc', fontStyle: 'italic', lineHeight: 1.5 }}>&quot;{result.verdict}&quot;</p>
             </div>
             <button 
               onClick={() => setResult(null)} 
@@ -162,15 +170,15 @@ export default function ResumeAnalyzer() {
           <div style={{ marginBottom: '40px' }}>
             <h3 style={{ color: '#f8fafc', marginBottom: '16px', fontSize: '1.4rem' }}>Line-by-Line AI Rewrites</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {result.lineByLineImprovements.map((item: any, i: number) => (
+              {result.lineByLineImprovements.map((item, i: number) => (
                 <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', overflow: 'hidden' }}>
                   <div style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     <div style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>Original (Weak)</div>
-                    <div style={{ color: '#f8fafc', fontFamily: 'monospace' }}>"{item.original_issue}"</div>
+                    <div style={{ color: '#f8fafc', fontFamily: 'monospace' }}>&quot;{item.original_issue}&quot;</div>
                   </div>
                   <div style={{ padding: '16px', background: 'rgba(34, 197, 94, 0.1)' }}>
                     <div style={{ color: '#22c55e', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '4px' }}>AI Suggestion (Strong)</div>
-                    <div style={{ color: '#f8fafc', fontFamily: 'monospace' }}>"{item.suggested_fix}"</div>
+                    <div style={{ color: '#f8fafc', fontFamily: 'monospace' }}>&quot;{item.suggested_fix}&quot;</div>
                     <div style={{ marginTop: '12px', color: '#94a3b8', fontSize: '0.9rem' }}>💡 <strong>Why:</strong> {item.reason}</div>
                   </div>
                 </div>

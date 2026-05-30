@@ -276,9 +276,9 @@ export default async function InternshipsPage() {
             <div className="footer-col-title">Contact</div>
             <ul className="footer-links">
               <li><a href="mailto:istestudentchapter@mbcet.ac.in">istestudentchapter@mbcet.ac.in</a></li>
-              <li><a href="#">MBCET, Nalanchira</a></li>
-              <li><a href="#">Thiruvananthapuram</a></li>
-              <li><a href="#">Kerala — 695 015</a></li>
+              <li><a href="https://maps.google.com/?q=Mar+Baselios+College+of+Engineering+and+Technology" target="_blank" rel="noopener noreferrer">MBCET, Nalanchira</a></li>
+              <li><a href="https://maps.google.com/?q=Thiruvananthapuram,Kerala" target="_blank" rel="noopener noreferrer">Thiruvananthapuram</a></li>
+              <li><a href="https://maps.google.com/?q=Kerala+695015" target="_blank" rel="noopener noreferrer">Kerala — 695 015</a></li>
             </ul>
           </div>
         </div>
