@@ -39,6 +39,7 @@ export default function ExecomAvatar({ photo, photoUrl, initials, name, size = '
   if (imgUrl) {
     return (
       <div className={`execom-avatar execom-avatar--photo execom-avatar--${size}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imgUrl} alt={name} width={px} height={px} loading="lazy" />
       </div>
     )

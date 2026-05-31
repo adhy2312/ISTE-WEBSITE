@@ -32,7 +32,7 @@ export default function TypographyEngine({
     if (!containerRef.current) return;
 
     // MatchMedia for Adaptive Performance (disables rich typography motion if reduced-motion is on)
-    let mm = gsap.matchMedia();
+    const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       const words = gsap.utils.toArray('.typo-word', containerRef.current);

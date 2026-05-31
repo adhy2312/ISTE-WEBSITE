@@ -36,7 +36,8 @@
     "resend": "^6.12.2",
     "sanity": "^5.22.0",
     "styled-components": "^6.4.1",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

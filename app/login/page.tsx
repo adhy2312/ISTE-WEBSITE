@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { cookies, headers } from 'next/headers';
+import Link from 'next/link';
 
 export default async function Login(props: {
   searchParams: Promise<{ message?: string }>;
@@ -98,9 +99,9 @@ export default async function Login(props: {
       {/* Massive Navbar / Mix-Blend Mode */}
       <nav className="fixed left-0 top-0 z-50 flex w-full items-center justify-between p-8 mix-blend-difference sm:px-12 sm:py-10">
         <div className="font-anton text-2xl tracking-widest text-white uppercase">ISTE MBCET</div>
-        <a href="/" className="font-jakarta text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-60 border border-white px-5 py-2.5 rounded-full hover:bg-white hover:text-black">
+        <Link href="/" className="font-jakarta text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-60 border border-white px-5 py-2.5 rounded-full hover:bg-white hover:text-black">
           Return
-        </a>
+        </Link>
       </nav>
 
       {/* Core Interface Container */}
