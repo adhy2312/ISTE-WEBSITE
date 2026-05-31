@@ -1,3 +1,4 @@
+import { activeEventSchema } from './activeEvent'
 import { eventSchema } from './event'
 import { execomMemberSchema } from './execomMember'
 import { statSchema } from './stat'
@@ -10,6 +11,7 @@ import { announcementSchema } from './announcement'
 import { faqSchema } from './faq'
 
 export const schemaTypes = [
+  activeEventSchema,
   eventSchema,
   execomMemberSchema,
   statSchema,

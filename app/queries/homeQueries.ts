@@ -155,8 +155,22 @@ export const benefitsQuery = groq`
   }
 `
 
+export const activeEventsQuery = groq`
+  *[_type == "activeEvent"] | order(order asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    dateLabel,
+    eventType,
+    isCurrentlyHappening,
+    link,
+    order
+  }
+`
+
 export const homePageQuery = groq`
   {
+    "activeEvents": ${activeEventsQuery},
     "events": ${eventsQuery},
     "execomMembers": ${execomMembersQuery},
     "stats": ${statsQuery},

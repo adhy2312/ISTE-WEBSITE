@@ -163,9 +163,8 @@ export default async function Home() {
     ? members.filter((m: any) => m.category === 'junior')
     : FALLBACK_EXECOM.junior
 
-  // Filter live active events
-  const activeEvents = events.filter((e: any) => e.status === 'registration_active' || e.status === 'coming_soon' || e.status === 'upcoming')
-
+  // Fetch active events from the dedicated schema
+  const activeEvents = sanityData?.activeEvents || []
   const getBenefitIcon = (iconName: string) => {
     const icons: Record<string, any> = {
       Zap: <Zap size={24} strokeWidth={1.5} />,
@@ -312,7 +311,7 @@ export default async function Home() {
             {activeEvents.length > 0 ? (
               <div className="events-list">
                 {activeEvents.map((ev: any) => (
-                  <Link href={ev.slug?.current ? `/events/${ev.slug.current}` : '#'} key={ev._id} className={`event-row ${ev.isCurrentlyHappening ? 'live-event' : ''}`} style={{ padding: '24px 0' }}>
+                  <Link href={ev.link ? ev.link : (ev.slug ? `/events/${ev.slug}` : '#')} key={ev._id} className={`event-row ${ev.isCurrentlyHappening ? 'live-event' : ''}`} style={{ padding: '24px 0' }}>
                     <div className="event-date" style={{ color: ev.isCurrentlyHappening ? '#ef4444' : 'var(--c-main)' }}>
                       {ev.isCurrentlyHappening && <span className="live-heartbeat"></span>}
                       {ev.dateLabel}
