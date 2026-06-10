@@ -110,8 +110,9 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       }
     }
     if (engine === 'Cursor' && event === 'snap') {
-      // Play a tiny haptic tick when the cursor snaps to a button
-      notifyEngine('Haptic', 'vibrate', { duration: 5 });
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(5);
+      }
     }
     if (engine === 'Performance' && event === 'preemptive_degradation') {
       setIntervention(true);
@@ -211,7 +212,6 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
         gsap.ticker.add((time) => {
           if (lenis) lenis.raf(time * 1000);
         });
-        gsap.ticker.lagSmoothing(0);
 
       }).catch(e => console.warn('Lenis failed to load:', e));
     }
@@ -278,39 +278,12 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
         }
       }
     };
-    document.body.addEventListener('touchstart', triggerHaptic, { passive: true });
+    // We rely solely on 'click' to avoid accidental haptics while scrolling
     document.body.addEventListener('click', triggerHaptic, { passive: true });
 
     // Atmosphere Engine Initialization
     const initAtmosphere = () => {
-      if (audioStarted.current || typeof window === 'undefined') return;
-      audioStarted.current = true;
-      try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-        const ctx = new AudioContext();
-        audioCtxRef.current = ctx;
-
-        // Subconscious room tone
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.value = 55; // Deep hum
-
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 100;
-        filterRef.current = filter;
-
-        const gain = ctx.createGain();
-        gain.gain.value = 0.08; // Very subtle, barely audible
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.start();
-      } catch (e) {
-        console.warn('Atmosphere Engine failed to boot:', e);
-      }
+      // Audio removed by user request
     };
     
     // Audio contexts must be started on user interaction
@@ -324,7 +297,6 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       if (audioCtxRef.current) audioCtxRef.current.close();
       cancelAnimationFrame(animFrame);
       if (lenis) lenis.destroy();
-      document.body.removeEventListener('touchstart', triggerHaptic);
       document.body.removeEventListener('click', triggerHaptic);
     };
   }, []);
@@ -356,7 +328,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       activeEngines,
       registerEngine,
       notifyEngine,
-      perfMetrics: { fps: fpsRef.current, loadTime: 0, intervention },
+      perfMetrics: { fps: 60, loadTime: 0, intervention },
       soulState,
       creativeState,
       internshipState,

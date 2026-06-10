@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-no-literals, i18next/no-literal-string, @next/next/no-literal-string, react/no-unescaped-entities */
+
 import { draftMode } from 'next/headers'
 import { getClient } from '@/lib/sanity/client'
 import { internshipsQuery } from '@/app/queries/homeQueries'

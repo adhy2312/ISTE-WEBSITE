@@ -113,7 +113,7 @@ export default function IsteAssistant() {
             <div className="title-icon-wrapper">
               <Zap size={16} className="assistant-icon" fill="#3b82f6" color="#3b82f6" />
             </div>
-            <span>ISTE Digital Soul</span>
+            <span>Assistant</span>
           </div>
           <button onClick={handleToggle} className="assistant-close"><X size={20} /></button>
         </div>

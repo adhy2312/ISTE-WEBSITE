@@ -197,6 +197,26 @@ export default function InternshipGrid({ internships }: { internships: Internshi
                     target="_blank"
                     rel="noopener noreferrer"
                     className="intern-apply-btn"
+                    onClick={() => {
+                      try {
+                        const token = typeof window !== 'undefined' ? localStorage.getItem('session_token') || 'demo-jwt-token' : '';
+                        fetch('/api/telemetry', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                          },
+                          body: JSON.stringify({
+                            action: 'click',
+                            job_id: intern._id,
+                            role: intern.role,
+                            domain: intern.domain,
+                            company: intern.company
+                          }),
+                          keepalive: true
+                        }).catch(() => {});
+                      } catch (e) {}
+                    }}
                   >
                     Apply Now →
                   </a>

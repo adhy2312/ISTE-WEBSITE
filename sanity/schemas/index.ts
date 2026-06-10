@@ -9,6 +9,7 @@ import { pillarSchema } from './pillar'
 import { benefitSchema } from './benefit'
 import { announcementSchema } from './announcement'
 import { faqSchema } from './faq'
+import telemetryLog from './telemetry_log'
 
 export const schemaTypes = [
   activeEventSchema,
@@ -22,4 +23,5 @@ export const schemaTypes = [
   benefitSchema,
   announcementSchema,
   faqSchema,
+  telemetryLog,
 ]
