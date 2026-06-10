@@ -9,6 +9,7 @@ import InternshipClientEngine from './InternshipClientEngine'
 import InternshipGrid from './InternshipGrid'
 import ResumeAnalyzer from './ResumeAnalyzer'
 import AliveClock from '@/app/components/AliveClock'
+import GLSLBackground from '@/app/components/GLSLBackground'
 export interface InternshipData {
   _id?: string;
   company?: string;
@@ -73,6 +74,7 @@ export default async function InternshipsPage() {
 
   return (
     <>
+      <GLSLBackground />
       <HomeAnimations heroTypedText="INTERNSHIP LAUNCHPAD" />
 
 

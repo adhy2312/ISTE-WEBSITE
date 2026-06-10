@@ -15,6 +15,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ status: 'ignored_no_credentials' });
     }
 
+    // [GO TELEMETRY ENGINE INTEGRATION]
+    // Attempt to offload high-throughput telemetry to our blazing-fast Go microservice
+    try {
+      const goRes = await fetch('http://localhost:8080/telemetry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(500) // Super fast timeout, don't block
+      });
+      if (goRes.ok) {
+        console.log("⚡ Telemetry successfully offloaded to Go Engine");
+        return NextResponse.json({ status: 'recorded_by_go' });
+      }
+    } catch (e) {
+      // Go engine is probably not running, fall back gracefully to standard Sanity API
+      console.log("Go Telemetry Engine not available, falling back to standard API...");
+    }
+
     // Push Telemetry to Sanity CMS as a custom "telemetry_log" document
     const mutation = {
       mutations: [

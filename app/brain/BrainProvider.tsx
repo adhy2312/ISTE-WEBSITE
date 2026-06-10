@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useRef, useCallb
 import { gsap, ScrollTrigger } from './engines/GSAPCore';
 
 // The 38 Engines Architecture (including Membership, Haptic, Physical, Cursor, Atmosphere, Neural, Creative, Performance, Internship, and Physics Engines)
-type EngineType = 'Scroll' | 'Render' | 'Animation' | 'Interaction' | 'Data' | 'Prefetch' | 'Telemetry' | 'Resource' | 'Memory' | 'DOM' | 'Layout' | 'Paint' | 'Composite' | 'Network' | 'State' | 'Events' | 'Routing' | 'Cache' | 'Security' | 'Analytics' | 'SEO' | 'Accessibility' | 'Audio' | 'Video' | 'WebGL' | 'Workers' | 'Storage' | 'I18n' | 'PWA' | 'Sync' | 'Membership' | 'Haptic' | 'Physical' | 'Cursor' | 'Atmosphere' | 'Neural' | 'Creative' | 'Performance' | 'Internship' | 'Physics' | 'Amplifier' | 'Presence' | 'ColorExtraction';
+type EngineType = 'Scroll' | 'Render' | 'Animation' | 'Interaction' | 'Data' | 'Prefetch' | 'Telemetry' | 'Resource' | 'Memory' | 'DOM' | 'Layout' | 'Paint' | 'Composite' | 'Network' | 'State' | 'Events' | 'Routing' | 'Cache' | 'Security' | 'Analytics' | 'SEO' | 'Accessibility' | 'Audio' | 'Video' | 'WebGL' | 'Workers' | 'Storage' | 'I18n' | 'PWA' | 'Sync' | 'Membership' | 'Haptic' | 'Physical' | 'Cursor' | 'Atmosphere' | 'Neural' | 'Creative' | 'Performance' | 'Internship' | 'Physics' | 'Amplifier' | 'Presence' | 'ColorExtraction' | 'Compute';
 
 interface BrainState {
   isSmooth: boolean;
