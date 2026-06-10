@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
     ],
   },
   transpilePackages: ['gsap', 'lenis'],
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },

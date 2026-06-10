@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-literals, i18next/no-literal-string, @next/next/no-literal-string, react/no-unescaped-entities */
 import { draftMode } from 'next/headers'
 import { getClient } from '@/lib/sanity/client'
 import { internshipsQuery } from '@/app/queries/homeQueries'
@@ -27,8 +28,8 @@ export interface InternshipData {
 
 import { Metadata } from 'next'
 
-// Webhook handles on-demand revalidation now
-// export const revalidate = 60; 
+// Webhook handles on-demand revalidation, but we also revalidate periodically
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Internship Launchpad | Member Resources",
@@ -143,6 +144,39 @@ export default async function InternshipsPage() {
             These positions have been curated and verified by the ISTE MBCET chapter team. Apply directly via the link provided.
           </p>
 
+          {/* SEO Structured Data for Crawlers (JobPosting schema) */}
+          {open.length > 0 && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(
+                  open.map((intern: InternshipData) => ({
+                    "@context": "https://schema.org",
+                    "@type": "JobPosting",
+                    "title": intern.role || "Internship",
+                    "description": intern.description || `Internship role at ${intern.company}`,
+                    "hiringOrganization": {
+                      "@type": "Organization",
+                      "name": intern.company || "Unknown Company",
+                      "logo": intern.logo?.asset?.url || ""
+                    },
+                    "jobLocation": {
+                      "@type": "Place",
+                      "address": {
+                        "@type": "PostalAddress",
+                        "addressCountry": "IN",
+                        "addressRegion": "Kerala"
+                      }
+                    },
+                    "employmentType": "INTERN",
+                    "validThrough": intern.deadline || "",
+                    "datePosted": intern._createdAt || new Date().toISOString()
+                  }))
+                )
+              }}
+            />
+          )}
+
           {/* Dynamic Statically Cached Grid with Search and Skeletons */}
           {open.length === 0 ? (
             <div className="reveal" style={{ padding: '60px 0', textAlign: 'center', color: 'var(--g400)', borderTop: '1px solid var(--border)' }}>
@@ -161,7 +195,7 @@ export default async function InternshipsPage() {
               <div className="internship-grid">
                 {other.map((intern: InternshipData, i: number) => {
                   const statusKey = typeof intern.status === 'string' ? intern.status : 'closed';
-                  const statusInfo = STATUS_LABELS[statusKey] || { label: statusKey, color: '#888' };
+                  const statusInfo = Object.prototype.hasOwnProperty.call(STATUS_LABELS, statusKey) ? STATUS_LABELS[statusKey] : { label: statusKey, color: '#888' };
                   return (
                     <div key={intern._id} className={`internship-card internship-card--dim reveal ${['d1', 'd2', 'd3'][i % 3]}`}>
                       <div className="intern-card-top">

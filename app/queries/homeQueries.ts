@@ -95,11 +95,10 @@ export const siteSettingsQuery = groq`
 export const internshipsQuery = groq`
   *[
     _type == "internship" &&
-    verificationStatus == "VERIFIED" &&
-    !is_likely_expired &&
-    linkHealthScore > 40
+    status == "open"
   ] | order(featured desc, qualityScore desc, _createdAt desc) {
     _id,
+    _createdAt,
     company,
     role,
     type,

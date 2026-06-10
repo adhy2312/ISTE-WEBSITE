@@ -2,7 +2,7 @@
 
     /* ===================== RESET & BASE ===================== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; overflow-y: scroll; }
 
 :root {
       /* ── Deep space base — not flat black, layered obsidian ── */

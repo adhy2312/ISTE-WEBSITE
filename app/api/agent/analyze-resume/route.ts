@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import fs from 'fs';
-import path from 'path';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const KNOWLEDGE_BASE_PATH = path.join(process.cwd(), 'resume_ml_knowledge.json');
 
-// Initialize ML Knowledge Base if it doesn't exist
-if (!fs.existsSync(KNOWLEDGE_BASE_PATH)) {
-  fs.writeFileSync(KNOWLEDGE_BASE_PATH, JSON.stringify({ commonFlaws: [], totalAnalyzed: 0 }));
-}
 
 export async function POST(req: Request) {
   try {
@@ -19,9 +12,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Resume text too short.' }, { status: 400 });
     }
 
-    // Load ML Knowledge Base
-    const mlData = JSON.parse(fs.readFileSync(KNOWLEDGE_BASE_PATH, 'utf-8'));
-    const topFlaws = mlData.commonFlaws.slice(0, 5).join(', ');
+    // In a serverless environment, we mock the historical context or fetch from a real DB like Supabase/Redis.
+    const mlData = { totalAnalyzed: 1542, commonFlaws: ['Passive voice', 'No quantifiable metrics', 'Missing technical keywords'] };
+    const topFlaws = mlData.commonFlaws.join(', ');
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
     
@@ -85,17 +78,8 @@ export async function POST(req: Request) {
     const cleanJson = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
     const analysis = JSON.parse(cleanJson);
 
-    // Update ML Knowledge Base with new learnings
-    mlData.totalAnalyzed += 1;
-    analysis.criticalFlaws.forEach((flaw: string) => {
-      // Simple frequency map for common flaws (simplified for brevity)
-      if (!mlData.commonFlaws.includes(flaw)) {
-        mlData.commonFlaws.unshift(flaw); // Add to recent flaws
-      }
-    });
-    // Keep only the 20 most recent/relevant flaws to prevent context bloat
-    mlData.commonFlaws = mlData.commonFlaws.slice(0, 20);
-    fs.writeFileSync(KNOWLEDGE_BASE_PATH, JSON.stringify(mlData, null, 2));
+    // Future enhancement: Push these new learnings (analysis.criticalFlaws) to a Redis cache or Supabase DB.
+    // For now, we skip the local filesystem write to ensure strict serverless compatibility and security.
 
     return NextResponse.json({ success: true, data: analysis });
   } catch (error: any) {

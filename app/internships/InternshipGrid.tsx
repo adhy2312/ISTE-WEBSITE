@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import Image from 'next/image'
 import type { InternshipData } from './page'
 import { Search } from 'lucide-react'
+import { gsap, useGSAP } from '@/app/brain/engines/GSAPCore'
 
 export default function InternshipGrid({ internships }: { internships: InternshipData[] }) {
   const [isHunting, setIsHunting] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // Simulate "Hunting/Deciphering" on search query changes
   useEffect(() => {
@@ -26,6 +28,23 @@ export default function InternshipGrid({ internships }: { internships: Internshi
       (i.domain?.toLowerCase() || '').includes(lower)
     )
   }, [internships, searchQuery])
+
+  useGSAP(() => {
+    if (!isHunting && filtered.length > 0 && containerRef.current) {
+      gsap.fromTo('.gsap-internship-card',
+        { y: 40, opacity: 0, scale: 0.95 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.7,
+          stagger: 0.08,
+          ease: 'power3.out',
+          clearProps: 'all' // prevents sticking inline styles
+        }
+      )
+    }
+  }, [isHunting, filtered])
 
   return (
     <div className="internship-grid-container" style={{ width: '100%' }}>
@@ -98,7 +117,7 @@ export default function InternshipGrid({ internships }: { internships: Internshi
           <div style={{ fontSize: '.9rem' }}>Try adjusting your search filters.</div>
         </div>
       ) : (
-        <div className="internship-grid">
+        <div className="internship-grid" ref={containerRef}>
           {isHunting ? (
             // Skeletons
             [...Array(Math.min(filtered.length || 4, 8))].map((_, i) => (
@@ -120,7 +139,7 @@ export default function InternshipGrid({ internships }: { internships: Internshi
           ) : (
             // Real Cards
             filtered.map((intern, i) => (
-              <div key={intern._id} className={`internship-card reveal`} style={{ animationDelay: `${i * 0.05}s`, position: 'relative' }}>
+              <div key={intern._id} className={`internship-card gsap-internship-card`} style={{ position: 'relative', opacity: 0 }}>
                 <div className="intern-card-top">
                   <div className="intern-logo-wrap" style={{ position: 'relative' }}>
                     {intern.logo?.asset ? (

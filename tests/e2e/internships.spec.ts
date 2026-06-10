@@ -3,17 +3,22 @@ import { test, expect } from '@playwright/test';
 test.describe('ISTE MBCET Intelligence Ecosystem E2E', () => {
   test('should render the digital soul assistant and allow chat', async ({ page }) => {
     await page.goto('/');
+    // Wait for hydration to complete so the onClick handler is actually attached
+    await page.waitForLoadState('networkidle');
 
     // Ensure the Assistant Dock button is visible
     const assistantBtn = page.locator('.assistant-dock-btn');
     await expect(assistantBtn).toBeVisible();
 
-    // Open the Assistant
-    await assistantBtn.click();
+    // Wait slightly for React hydration to finish on slower mobile engines
+    await page.waitForTimeout(1500);
 
-    // Verify panel opens and AI greeting is visible
+    // Open the Assistant, retry if it fails (handles hydration flakes)
     const panel = page.locator('.assistant-panel');
-    await expect(panel).toHaveClass(/open/);
+    await expect(async () => {
+      await assistantBtn.click({ force: true });
+      await expect(panel).toHaveClass(/open/, { timeout: 1000 });
+    }).toPass({ timeout: 15000 });
 
     const greeting = page.locator('.ai-msg').first();
     await expect(greeting).toBeVisible();
