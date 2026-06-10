@@ -93,7 +93,12 @@ export const siteSettingsQuery = groq`
 `
 
 export const internshipsQuery = groq`
-  *[_type == "internship" && state == "VERIFIED" && verificationStatus == "VERIFIED" && linkHealthScore > 50] | order(_createdAt desc) {
+  *[
+    _type == "internship" &&
+    verificationStatus == "VERIFIED" &&
+    !is_likely_expired &&
+    linkHealthScore > 40
+  ] | order(featured desc, qualityScore desc, _createdAt desc) {
     _id,
     company,
     role,
@@ -109,7 +114,12 @@ export const internshipsQuery = groq`
     state,
     verificationStatus,
     linkHealthScore,
+    qualityScore,
+    qualityTier,
     featured,
+    hubCategory,
+    districtLocation,
+    aiRecommendation,
     order,
     logo {
       asset->,
@@ -120,7 +130,11 @@ export const internshipsQuery = groq`
 `
 
 export const featuredInternshipsQuery = groq`
-  *[_type == "internship" && featured == true && state == "VERIFIED" && verificationStatus == "VERIFIED" && linkHealthScore > 50] | order(_createdAt desc) [0...3] {
+  *[
+    _type == "internship" &&
+    verificationStatus == "VERIFIED" &&
+    linkHealthScore > 40
+  ] | order(featured desc, qualityScore desc, _createdAt desc) [0...4] {
     _id,
     company,
     role,
@@ -130,8 +144,9 @@ export const featuredInternshipsQuery = groq`
     duration,
     deadlineLabel,
     applyLink,
+    qualityScore,
+    qualityTier,
     status,
-    state,
     verificationStatus,
     linkHealthScore,
   }

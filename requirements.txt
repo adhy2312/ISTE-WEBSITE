@@ -1,11 +1,47 @@
-requests
-httpx
-beautifulsoup4
-playwright
-sentence-transformers
-celery
-redis
-pandas
-python-jobspy
-SQLAlchemy
-python-dotenv
+# ─── Core HTTP & Async ──────────────────────────────────────────────────────
+requests>=2.32.0
+httpx>=0.27.0
+aiohttp>=3.9.0
+
+# ─── Web Scraping ────────────────────────────────────────────────────────────
+playwright>=1.44.0
+playwright-stealth>=1.0.6
+beautifulsoup4>=4.12.0
+fake-useragent>=1.5.1
+
+# ─── ML / AI Stack ───────────────────────────────────────────────────────────
+torch>=2.3.0
+sentence-transformers>=3.0.0
+transformers>=4.41.0     # For facebook/bart-large-mnli Supreme Judge (lazy-loaded)
+numpy>=1.26.0
+
+# ─── Vector Store ────────────────────────────────────────────────────────────
+faiss-cpu>=1.8.0
+
+# ─── Graph Memory ────────────────────────────────────────────────────────────
+networkx>=3.3
+
+# ─── Database & ORM ──────────────────────────────────────────────────────────
+SQLAlchemy>=2.0.0
+aiosqlite>=0.20.0
+
+# ─── Queue & Cache ───────────────────────────────────────────────────────────
+celery>=5.4.0
+redis>=5.0.0
+
+# ─── Job Aggregation ─────────────────────────────────────────────────────────
+python-jobspy>=1.1.72
+pandas>=2.2.0
+
+# ─── Scheduling ──────────────────────────────────────────────────────────────
+apscheduler>=3.10.4
+
+# ─── Output & Monitoring ─────────────────────────────────────────────────────
+rich>=13.7.0
+pydantic>=2.7.0
+
+# ─── Environment ─────────────────────────────────────────────────────────────
+python-dotenv>=1.0.1
+
+# ─── Optional (Internshala stealth) ──────────────────────────────────────────
+cloudscraper>=1.2.71

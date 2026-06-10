@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import InternshipClientEngine from './InternshipClientEngine'
+import InternshipGrid from './InternshipGrid'
 import ResumeAnalyzer from './ResumeAnalyzer'
 import AliveClock from '@/app/components/AliveClock'
 export interface InternshipData {
@@ -20,12 +21,14 @@ export interface InternshipData {
   deadlineLabel?: string;
   status?: string;
   logo?: { asset?: { url?: string } };
+  matchScore?: number;
   [key: string]: unknown;
 }
 
 import { Metadata } from 'next'
 
-export const revalidate = 60; // 60 seconds ISR cache invalidation (V9 Cache Fix)
+// Webhook handles on-demand revalidation now
+// export const revalidate = 60; 
 
 export const metadata: Metadata = {
   title: "Internship Launchpad | Member Resources",
@@ -140,7 +143,7 @@ export default async function InternshipsPage() {
             These positions have been curated and verified by the ISTE MBCET chapter team. Apply directly via the link provided.
           </p>
 
-          {/* Statically Generated AI-Scraped List from Sanity V12 */}
+          {/* Dynamic Statically Cached Grid with Search and Skeletons */}
           {open.length === 0 ? (
             <div className="reveal" style={{ padding: '60px 0', textAlign: 'center', color: 'var(--g400)', borderTop: '1px solid var(--border)' }}>
               <div style={{ fontSize: '2rem', marginBottom: '16px' }}>📭</div>
@@ -148,60 +151,7 @@ export default async function InternshipsPage() {
               <div style={{ fontSize: '.9rem' }}>Check back soon — the team updates this regularly.</div>
             </div>
           ) : (
-            <div className="internship-grid">
-              {open.map((intern: InternshipData, i: number) => (
-                <div key={intern._id} className={`internship-card reveal ${['d1', 'd2', 'd3', 'd4'][i % 4]}`}>
-                  <div className="intern-card-top">
-                    <div className="intern-logo-wrap" style={{ position: 'relative' }}>
-                      {intern.logo?.asset ? (
-                        <Image
-                          src={intern.logo.asset.url || ''}
-                          alt={intern.company || 'Company logo'}
-                          fill
-                          className="object-contain"
-                        />
-                      ) : (
-                        <div className="intern-logo-placeholder">
-                          {(intern.company || '?').charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <div className="intern-company">{intern.company || 'Unknown Company'}</div>
-                      {intern.domain && <div className="intern-domain">{intern.domain}</div>}
-                    </div>
-                  </div>
-
-                  <h3 className="intern-role">{intern.role}</h3>
-
-                  <div className="intern-tags">
-                    {intern.type && <span className="intern-tag">{intern.type}</span>}
-                    {intern.stipend && <span className="intern-tag">{intern.stipend}</span>}
-                    {intern.duration && <span className="intern-tag">{intern.duration}</span>}
-                  </div>
-
-                  {intern.description && (
-                    <p className="intern-desc">{intern.description}</p>
-                  )}
-
-                  <div className="intern-footer">
-                    {intern.deadlineLabel && (
-                      <div className="intern-deadline">
-                        <span>⏱</span> Deadline: {intern.deadlineLabel}
-                      </div>
-                    )}
-                    <a
-                      href={intern.applyLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="intern-apply-btn"
-                    >
-                      Apply Now →
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <InternshipGrid internships={open} />
           )}
 
           {/* Closed / Coming Soon */}
@@ -238,7 +188,7 @@ export default async function InternshipsPage() {
           )}
 
           {/* AI Resume Analyzer Section */}
-          <ResumeAnalyzer />
+          <ResumeAnalyzer liveInternships={open} />
         </div>
       </section>
 

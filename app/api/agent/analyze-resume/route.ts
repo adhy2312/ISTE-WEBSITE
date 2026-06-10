@@ -13,7 +13,7 @@ if (!fs.existsSync(KNOWLEDGE_BASE_PATH)) {
 
 export async function POST(req: Request) {
   try {
-    const { resumeText } = await req.json();
+    const { resumeText, liveInternships } = await req.json();
 
     if (!resumeText || resumeText.length < 50) {
       return NextResponse.json({ success: false, error: 'Resume text too short.' }, { status: 400 });
@@ -41,6 +41,13 @@ export async function POST(req: Request) {
       4. Formatting & Conciseness (Is the text rambling or focused?)
       5. Relevance to modern engineering/tech internships.
 
+      [LIVE INTERNSHIP MATCHING]
+      I am providing you an array of currently open internships. You must evaluate the candidate's resume against EACH of these specific roles.
+      For each role, calculate a "matchScore" (0-100) representing how likely their resume is to pass an ATS scan for that exact role.
+      
+      Live Internships Data:
+      ${liveInternships ? JSON.stringify(liveInternships) : '[]'}
+
       Return ONLY a raw JSON string (no markdown, no backticks, no comments) matching exactly this schema:
       {
         "score": number (0-100, be brutally honest. Average resumes should score 40-60. Only elite resumes get 80+),
@@ -54,7 +61,16 @@ export async function POST(req: Request) {
             "reason": "string"
           }
         ],
-        "atsKeywordsMissing": ["string", "string"]
+        "atsKeywordsMissing": ["string", "string"],
+        "internshipMatches": [
+          {
+            "internshipId": "string (from the provided Live Internships Data _id)",
+            "company": "string",
+            "role": "string",
+            "matchScore": number (0-100),
+            "recommendation": "string (Short sentence on why they are/aren't a fit and what to improve for this role)"
+          }
+        ]
       }
 
       RESUME TEXT TO ANALYZE:

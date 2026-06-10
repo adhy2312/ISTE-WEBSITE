@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { draftMode } from 'next/headers'
 import { getClient } from '@/lib/sanity/client'
 import Image from 'next/image'
@@ -100,9 +99,7 @@ export default async function Home() {
 
   let sanityData: any = null
   try {
-    sanityData = await getClient(preview).fetch(homePageQuery, {}, {
-      next: { revalidate: 60 }, // ISR: revalidate every 60 seconds
-    })
+    sanityData = await getClient(preview).fetch(homePageQuery)
   } catch {
     // Sanity unreachable — fall through to hardcoded data
   }
@@ -754,12 +751,33 @@ export default async function Home() {
         <div className="section-inner">
           <div className="section-tag reveal">{settings.launchpadTag || 'Member Resources'}</div>
           <div className="launchpad-teaser-grid">
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.launchpadTitle || 'Internship<br /><em>Launchpad</em>' }}></h2>
-              <p className="section-body reveal d2" style={{ marginTop: '24px' }}>
+              <p className="section-body reveal d2" style={{ marginTop: '24px', marginBottom: '24px' }}>
                 {settings.launchpadBody || 'Curated internship opportunities, verified and posted by the ISTE MBCET team — exclusively for our members.'}
               </p>
-              <Link href="/internships" className="launchpad-cta reveal d3">
+              
+              <div className="reveal d2" style={{
+                padding: '8px 14px',
+                background: 'rgba(220, 100, 80, 0.15)',
+                border: '1px solid rgba(220, 100, 80, 0.3)',
+                borderRadius: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '0.7rem',
+                color: 'var(--white)',
+                fontWeight: 600,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                boxShadow: '0 4px 12px rgba(220, 100, 80, 0.1)',
+                marginBottom: '16px'
+              }}>
+                <span style={{ fontSize: '1rem' }}>🧪</span>
+                <span>Experimental • Under Construction</span>
+              </div>
+
+              <Link href="/internships" className="launchpad-cta reveal d3" style={{ marginTop: 'auto' }}>
                 Explore All Opportunities →
               </Link>
             </div>
@@ -783,26 +801,43 @@ export default async function Home() {
                   </a>
                 ))
               ) : (
-                <>
-                  <div className="launchpad-preview-card reveal d1">
-                    <div className="lp-role">Software Engineering Intern</div>
-                    <div className="lp-company">TechCorp India</div>
-                    <div className="lp-meta"><span>Remote</span><span>₹15,000/mo</span></div>
-                    <div className="lp-arrow">→</div>
+                <div className="no-active-events-card reveal d1" style={{
+                  position: 'relative',
+                  padding: '40px 32px',
+                  textAlign: 'center',
+                  background: 'linear-gradient(180deg, rgba(16, 14, 38, 0.4) 0%, rgba(10, 10, 26, 0.8) 100%)',
+                  border: '1px solid rgba(140, 120, 240, 0.15)',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '16px',
+                  boxShadow: 'inset 0 0 40px rgba(0,0,0,0.3)',
+                  overflow: 'hidden',
+                  minHeight: '260px'
+                }}>
+                  {/* Glowing Radar Core */}
+                  <div style={{
+                    position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                    width: '120px', height: '120px',
+                    background: 'radial-gradient(circle, rgba(140, 120, 240, 0.15) 0%, transparent 70%)',
+                    borderRadius: '50%', filter: 'blur(20px)', animation: 'heartbeat 3s ease-in-out infinite',
+                    zIndex: 0, pointerEvents: 'none'
+                  }}></div>
+                  
+                  <div style={{ position: 'relative', zIndex: 1, fontSize: '2.5rem', opacity: 0.9, animation: 'float 4s ease-in-out infinite' }}>
+                    📡
                   </div>
-                  <div className="launchpad-preview-card reveal d2">
-                    <div className="lp-role">UI/UX Design Intern</div>
-                    <div className="lp-company">DesignHub Studios</div>
-                    <div className="lp-meta"><span>Hybrid</span><span>₹10,000/mo</span></div>
-                    <div className="lp-arrow">→</div>
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', color: 'var(--white)', marginBottom: '8px' }}>
+                      Hunting for Opportunities
+                    </h3>
+                    <p style={{ color: 'var(--g400)', fontSize: '0.85rem', lineHeight: 1.6, maxWidth: '280px', margin: '0 auto' }}>
+                      Our autonomous engine is currently scanning the web for premium, verified internships. They will appear here in real-time.
+                    </p>
                   </div>
-                  <div className="launchpad-preview-card reveal d3">
-                    <div className="lp-role">Data Science Intern</div>
-                    <div className="lp-company">DataWave Analytics</div>
-                    <div className="lp-meta"><span>Remote</span><span>₹12,000/mo</span></div>
-                    <div className="lp-arrow">→</div>
-                  </div>
-                </>
+                </div>
               )}
             </div>
           </div>

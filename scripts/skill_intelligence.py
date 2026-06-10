@@ -94,6 +94,39 @@ class SkillIntelligenceEngine:
                 if best_score > 0.3:
                     score_accumulator += (best_score * 0.5 * weight)
 
+        # Normalise to 0-100
+        final_match = (score_accumulator / max(weight_total, 1)) * 100
+        final_match = min(100.0, max(0.0, final_match))
+
+        prep_map = {0: "Ready to apply", 1: "~1 week", 2: "~2-4 weeks", 3: "~1-2 months"}
+        prep_time = prep_map.get(min(len(missing_skills), 3), ">2 months")
+
+        category = (
+            "Strong Match"       if final_match >= 80 else
+            "Good Match"         if final_match >= 60 else
+            "Stretch Opportunity" if final_match >= 40 else
+            "Not Recommended"
+        )
+
+        # Explainability
+        expl_parts = []
+        if matched_skills:
+            top = matched_skills[:2]
+            expl_parts.append(
+                f"Your {', '.join(m['student_skill'] for m in top)} aligns with their requirements."
+            )
+        if missing_skills:
+            expl_parts.append(f"Skill gaps: {', '.join(missing_skills[:3])}.")
+
+        return {
+            "match_score":          final_match,
+            "matched_skills":       [m["job_skill"] for m in matched_skills],
+            "missing_skills":       missing_skills,
+            "category":             category,
+            "explanation":          " ".join(expl_parts),
+            "estimated_prep_time":  prep_time
+        }
+
     def compute_personalized_score(self, student_profile: dict, internship: dict) -> dict:
         """
         v10.2 Ranking Factors

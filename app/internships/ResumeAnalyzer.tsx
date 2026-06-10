@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function ResumeAnalyzer() {
+export default function ResumeAnalyzer({ liveInternships = [] }: { liveInternships?: any[] }) {
   const [resumeText, setResumeText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<{
@@ -12,6 +12,7 @@ export default function ResumeAnalyzer() {
     strengths: string[];
     lineByLineImprovements: { original_issue: string; suggested_fix: string; reason: string }[];
     atsKeywordsMissing: string[];
+    internshipMatches?: { internshipId: string; company: string; role: string; matchScore: number; recommendation: string }[];
   } | null>(null);
   const [error, setError] = useState('');
 
@@ -29,7 +30,7 @@ export default function ResumeAnalyzer() {
       const res = await fetch('/api/agent/analyze-resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeText })
+        body: JSON.stringify({ resumeText, liveInternships: liveInternships.map(i => ({ _id: i._id, role: i.role, company: i.company, description: i.description, skills: i.skills })) })
       });
 
       const data = await res.json();
@@ -187,13 +188,40 @@ export default function ResumeAnalyzer() {
           </div>
 
           {result.atsKeywordsMissing.length > 0 && (
-            <div>
+            <div style={{ marginBottom: '40px' }}>
               <h3 style={{ color: '#f8fafc', marginBottom: '16px', fontSize: '1.4rem' }}>Missing ATS Keywords</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {result.atsKeywordsMissing.map((kw: string, i: number) => (
                   <span key={i} style={{ padding: '8px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '20px', border: '1px solid rgba(59, 130, 246, 0.3)', fontSize: '0.9rem' }}>
                     {kw}
                   </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {result.internshipMatches && result.internshipMatches.length > 0 && (
+            <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '16px', padding: '32px' }}>
+              <h3 style={{ color: '#3b82f6', marginBottom: '8px', fontSize: '1.6rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span>🎯</span> Top Live Matches
+              </h3>
+              <p style={{ color: '#94a3b8', marginBottom: '24px', fontSize: '0.95rem' }}>
+                Our Engine has cross-referenced your resume against the currently open positions. Here are your highest probability targets:
+              </p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {result.internshipMatches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 3).map((match, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '24px', background: 'rgba(0,0,0,0.4)', padding: '20px', borderRadius: '12px', borderLeft: `4px solid ${getScoreColor(match.matchScore)}` }}>
+                    <div style={{ textAlign: 'center', minWidth: '80px' }}>
+                      <div style={{ fontSize: '1.8rem', fontWeight: 800, color: getScoreColor(match.matchScore) }}>{match.matchScore}%</div>
+                      <div style={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Match</div>
+                    </div>
+                    <div>
+                      <div style={{ color: '#f8fafc', fontSize: '1.1rem', fontWeight: 600, marginBottom: '4px' }}>{match.role}</div>
+                      <div style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '12px' }}>@ {match.company}</div>
+                      <div style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.5 }}>{match.recommendation}</div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
