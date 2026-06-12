@@ -50,9 +50,15 @@ export default function DigitalSoul() {
       const docHeight = document.documentElement.scrollHeight || window.innerHeight;
 
       targetX = (window.innerWidth / 2) + Math.sin(time * 0.5) * (window.innerWidth * 0.4) + Math.cos(time * 0.8) * 50;
-      targetY = isAwake
+      let rawTargetY = isAwake
         ? (docHeight / 2) + Math.cos(time * 0.6) * (docHeight * 0.4)
         : docHeight - 150 + Math.cos(time * 0.4) * 100;
+
+      // CRITICAL: Prevent infinite scroll to darkness.
+      // The element's height is 300px with top: -150px. Its bottom edge is at targetY + 150.
+      // If targetY + 150 > docHeight, it expands the document, causing an infinite loop.
+      const safeMaxY = docHeight - 155; // 5px safety margin
+      targetY = Math.min(rawTargetY, safeMaxY);
 
       soulX += (targetX - soulX) * 0.02;
       soulY += (targetY - soulY) * 0.02;

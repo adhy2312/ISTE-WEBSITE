@@ -757,6 +757,7 @@ export default async function Home() {
                 {settings.launchpadBody || 'Curated internship opportunities, verified and posted by the ISTE MBCET team — exclusively for our members.'}
               </p>
               
+              {settings.launchpadExperimentalLabel !== '' && settings.launchpadExperimentalLabel !== undefined && (
               <div className="reveal d2" style={{
                 padding: '8px 14px',
                 background: 'rgba(220, 100, 80, 0.15)',
@@ -774,8 +775,9 @@ export default async function Home() {
                 marginBottom: '16px'
               }}>
                 <span style={{ fontSize: '1rem' }}>🧪</span>
-                <span>Experimental • Under Construction</span>
+                <span>{settings.launchpadExperimentalLabel || 'Experimental • Under Construction'}</span>
               </div>
+              )}
 
               <Link href="/internships" className="launchpad-cta reveal d3" style={{ marginTop: 'auto' }}>
                 Explore All Opportunities →
@@ -845,7 +847,7 @@ export default async function Home() {
       </section>
 
       <footer>
-        <div className="footer-watermark">v11.2</div>
+        <div className="footer-watermark">{settings.footerVersion || 'v11.2'}</div>
         <div className="footer-top">
           <div>
             <div className="footer-logo"><Image src="/iste.png" alt="ISTE SC MBCET" width={80} height={80} className="footer-logo-img" /></div>
@@ -877,14 +879,14 @@ export default async function Home() {
             <div className="footer-col-title">Contact</div>
             <ul className="footer-links">
               <li><a href={`mailto:${settings.contactEmail || 'istestudentchapter@mbcet.ac.in'}`}>{settings.contactEmail || 'istestudentchapter@mbcet.ac.in'}</a></li>
-              <li><a href="https://maps.google.com/?q=Mar+Baselios+College+of+Engineering+and+Technology" target="_blank" rel="noopener noreferrer">MBCET, Nalanchira</a></li>
-              <li><a href="https://maps.google.com/?q=Thiruvananthapuram,Kerala" target="_blank" rel="noopener noreferrer">Thiruvananthapuram</a></li>
-              <li><a href="https://maps.google.com/?q=Kerala+695015" target="_blank" rel="noopener noreferrer">Kerala — 695 015</a></li>
+              <li><a href="https://maps.google.com/?q=Mar+Baselios+College+of+Engineering+and+Technology" target="_blank" rel="noopener noreferrer">{settings.footerAddressLine1 || 'MBCET, Nalanchira'}</a></li>
+              <li><a href="https://maps.google.com/?q=Thiruvananthapuram,Kerala" target="_blank" rel="noopener noreferrer">{settings.footerAddressLine2 || 'Thiruvananthapuram'}</a></li>
+              <li><a href="https://maps.google.com/?q=Kerala+695015" target="_blank" rel="noopener noreferrer">{settings.footerAddressLine3 || 'Kerala — 695 015'}</a></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <div className="footer-copy">© 2026 ISTE MBCET Student&apos;s Chapter. All rights reserved.</div>
+          <div className="footer-copy">{settings.footerCopyright || '© 2026 ISTE MBCET Student\'s Chapter. All rights reserved.'}</div>
           <div className="footer-socials">
             <a href={settings.instagramUrl || 'https://www.instagram.com/iste_mbcet/'}>Instagram</a>
             <a href={settings.linkedinUrl || 'https://www.linkedin.com/company/istescmbcet/'}>LinkedIn</a>

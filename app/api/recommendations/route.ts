@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { client } from '@/lib/sanity/client';
-import embeddingsCache from '@/skill_embeddings_cache.json';
+import embeddingsCacheRaw from '@/skill_embeddings_cache.json';
+const embeddingsCache = embeddingsCacheRaw as Record<string, number[]>;
 
 // Observability metrics stored internally in memory
 const internalMetrics = {

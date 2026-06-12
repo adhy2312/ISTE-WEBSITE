@@ -98,6 +98,37 @@ export const siteSettingsSchema = defineType({
       type: 'text',
     }),
     defineField({
+      name: 'footerCopyright',
+      title: 'Footer Copyright Text',
+      type: 'string',
+      initialValue: '© 2026 ISTE MBCET Student\'s Chapter. All rights reserved.',
+    }),
+    defineField({
+      name: 'footerVersion',
+      title: 'Footer Version Watermark',
+      description: 'Small version text shown in the footer corner (e.g. "v11.2")',
+      type: 'string',
+      initialValue: 'v11.2',
+    }),
+    defineField({
+      name: 'footerAddressLine1',
+      title: 'Footer Address Line 1',
+      type: 'string',
+      initialValue: 'MBCET, Nalanchira',
+    }),
+    defineField({
+      name: 'footerAddressLine2',
+      title: 'Footer Address Line 2',
+      type: 'string',
+      initialValue: 'Thiruvananthapuram',
+    }),
+    defineField({
+      name: 'footerAddressLine3',
+      title: 'Footer Address Line 3',
+      type: 'string',
+      initialValue: 'Kerala — 695 015',
+    }),
+    defineField({
       name: 'chapterCode',
       title: 'Chapter Code',
       type: 'string',
@@ -307,6 +338,19 @@ export const siteSettingsSchema = defineType({
       title: 'Launchpad Body Text',
       type: 'text',
       initialValue: 'Curated internship opportunities, verified and posted by the ISTE MBCET team — exclusively for our members.',
+    }),
+    defineField({
+      name: 'launchpadExperimentalLabel',
+      title: 'Launchpad Experimental Badge Label',
+      description: 'The text on the yellow "Under Construction" badge on the homepage. Clear this field to hide the badge.',
+      type: 'string',
+      initialValue: 'Experimental • Under Construction',
+    }),
+    defineField({
+      name: 'aboutTag',
+      title: 'About Section Tag',
+      type: 'string',
+      initialValue: 'About Us',
     }),
   ],
   preview: {

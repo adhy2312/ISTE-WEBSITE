@@ -2,7 +2,7 @@
 
     /* ===================== RESET & BASE ===================== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; overflow-x: hidden; overflow-y: scroll; }
+    html { overflow-x: hidden; overflow-y: scroll; }
 
 :root {
       /* ── Deep space base — not flat black, layered obsidian ── */
@@ -565,6 +565,12 @@
       text-transform: uppercase;
       max-width: 1200px;
       text-shadow: 0 0 80px rgba(var(--c-main), 0.15);
+      will-change: transform;
+      animation: subtleFloat 8s ease-in-out infinite;
+    }
+    @keyframes subtleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
     }
 
     .type-cursor {

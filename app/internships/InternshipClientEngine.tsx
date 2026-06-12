@@ -1,19 +1,23 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useBrain } from '@/app/brain/BrainProvider'
 import TypographyEngine from '@/app/brain/engines/TypographyEngine'
+import { gsap, useGSAP } from '@/app/brain/engines/GSAPCore'
 
 const AGENTS = [
-  { id: 'discovery', name: 'Discovery Engine', role: 'Scanning Global Subnets' },
-  { id: 'authenticity', name: 'Trust & Validation', role: 'Verifying Integrity' },
-  { id: 'semantic', name: 'Semantic Analyzer', role: 'Extracting Requirements' },
+  { id: 'discovery', name: 'Quantum Discovery Engine', role: 'Scanning Global Subnets for Anomalies' },
+  { id: 'authenticity', name: 'Zero-Trust Authenticator', role: 'Cryptographically Verifying Integrity' },
+  { id: 'semantic', name: 'Neural Semantic Decoder', role: 'Extracting High-Value Requirements' },
 ]
 
 export default function InternshipClientEngine() {
   const { notifyEngine, internshipState } = useBrain()
   const [activeTab, setActiveTab] = useState('radar')
   const [ticker, setTicker] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const scanlineRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     notifyEngine('Internship', 'page_viewed')
@@ -21,12 +25,115 @@ export default function InternshipClientEngine() {
     return () => clearInterval(i)
   }, [notifyEngine])
 
+  // Canvas Node Network
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let width = canvas.width = canvas.offsetWidth
+    let height = canvas.height = canvas.offsetHeight
+    let particles: any[] = []
+
+    for (let i = 0; i < 40; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        size: Math.random() * 2 + 1
+      })
+    }
+
+    let rafId: number
+    const render = () => {
+      ctx.clearRect(0, 0, width, height)
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.4)'
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.15)'
+
+      particles.forEach((p, i) => {
+        p.x += p.vx
+        p.y += p.vy
+        if (p.x < 0 || p.x > width) p.vx *= -1
+        if (p.y < 0 || p.y > height) p.vy *= -1
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j]
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y)
+          if (dist < 100) {
+            ctx.beginPath()
+            ctx.moveTo(p.x, p.y)
+            ctx.lineTo(p2.x, p2.y)
+            ctx.stroke()
+          }
+        }
+      })
+      rafId = requestAnimationFrame(render)
+    }
+    render()
+
+    const handleResize = () => {
+      width = canvas.width = canvas.offsetWidth
+      height = canvas.height = canvas.offsetHeight
+    }
+    window.addEventListener('resize', handleResize)
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [activeTab])
+
+  // GSAP Futuristic Entrance & Interactions
+  useGSAP(() => {
+    if (!containerRef.current) return
+
+    // Master container entrance
+    gsap.fromTo(containerRef.current,
+      { y: 50, opacity: 0, scale: 0.98, rotationX: 10 },
+      { y: 0, opacity: 1, scale: 1, rotationX: 0, duration: 1.2, ease: 'expo.out' }
+    )
+
+    // Animated scanline
+    gsap.to(scanlineRef.current, {
+      top: '100%',
+      duration: 3,
+      repeat: -1,
+      ease: 'linear',
+      opacity: 0.2,
+      yoyo: true
+    })
+
+    // Content entrance when tab changes
+    gsap.fromTo('.gsap-tab-content',
+      { opacity: 0, y: 20, filter: 'blur(10px)' },
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power3.out', stagger: 0.1 }
+    )
+
+    // Numbers glitch effect
+    gsap.to('.big-num', {
+      scrambleText: { text: '{original}', chars: '01', speed: 0.3 },
+      duration: 1.5,
+      ease: 'none',
+      stagger: 0.2
+    })
+  }, [activeTab])
+
   return (
-    <div className="intel-dashboard">
-      <div className="dash-header">
+    <div className="intel-dashboard" ref={containerRef}>
+      {/* Background Canvas */}
+      <canvas ref={canvasRef} className="bg-canvas"></canvas>
+      <div className="scanline" ref={scanlineRef}></div>
+      <div className="dashboard-overlay"></div>
+
+      <div className="dash-header relative z-10">
         <div className="dh-left">
           <div className="dh-status-pulse"></div>
-          <h2>OPPORTUNITY INTELLIGENCE</h2>
+          <h2>AUTONOMOUS INTELLIGENCE CORE</h2>
         </div>
         <div className="dh-nav">
           <button className={activeTab === 'radar' ? 'active' : ''} onClick={() => setActiveTab('radar')}>LIVE RADAR</button>
@@ -34,55 +141,61 @@ export default function InternshipClientEngine() {
         </div>
       </div>
 
-      <div className="dash-body">
+      <div className="dash-body relative z-10">
         {activeTab === 'radar' && (
-          <div className="radar-view">
+          <div className="radar-view gsap-tab-content">
             <div className="rv-main">
-              <TypographyEngine text="Live Discovery Feed" type="fade-stagger" element="h3" delay={0.1} />
-              <div className="feed-container">
+              <TypographyEngine text="Data Ingestion Stream" type="fade-stagger" element="h3" delay={0.1} />
+              <div className="feed-container futuristic-border">
                 {internshipState.logs.length === 0 ? (
-                  <div className="feed-waiting">Awaiting telemetry from external scraping nodes...</div>
+                  <div className="feed-waiting glitch-text" data-text="Awaiting telemetry...">Awaiting telemetry...</div>
                 ) : (
                   internshipState.logs.map((log, i) => (
                     <div key={i} className="feed-item" style={{ animationDelay: `${Math.min(i * 0.05, 0.5)}s` }}>
-                      <span className="fi-time">{new Date().toLocaleTimeString()}</span>
-                      <span className="fi-msg">{log}</span>
+                      <span className="fi-time">[{new Date().toLocaleTimeString()}]</span>
+                      <span className="fi-msg terminal-text">{log}</span>
                     </div>
                   ))
                 )}
-                {/* Simulated recent logs for architectural demonstration */}
-                <div className="feed-item"><span className="fi-time">System</span> <span className="fi-msg" style={{color: '#94a3b8'}}>[Init] Neural filters calibrated for strict quality bounds.</span></div>
-                <div className="feed-item"><span className="fi-time">System</span> <span className="fi-msg" style={{color: '#cbd5e1'}}>[Validation] Blocking non-authoritative domains.</span></div>
+                <div className="feed-item"><span className="fi-time">[SYS]</span> <span className="fi-msg text-emerald-400">Neural filters calibrated. Quantum handshakes verified.</span></div>
+                <div className="feed-item"><span className="fi-time">[SYS]</span> <span className="fi-msg text-blue-400">Blocking non-authoritative domains with strict CSP bounds.</span></div>
               </div>
             </div>
-            <div className="rv-sidebar">
-              <div className="stat-card">
+            <div className="rv-sidebar gsap-tab-content">
+              <div className="stat-card futuristic-border">
+                <div className="corner-accent top-left"></div>
+                <div className="corner-accent bottom-right"></div>
                 <h4>Data Integrity</h4>
-                <div className="big-num">99.2%</div>
-                <div className="sub-num">High Confidence Index</div>
+                <div className="big-num text-cyan-300">99.9%</div>
+                <div className="sub-num">Cryptographic Confidence Index</div>
               </div>
-              <div className="stat-card">
+              <div className="stat-card futuristic-border">
+                <div className="corner-accent top-left"></div>
+                <div className="corner-accent bottom-right"></div>
                 <h4>Active Opportunities</h4>
-                <div className="big-num">{internshipState.foundCount > 0 ? internshipState.foundCount : 12}</div>
-                <div className="sub-num">Verified Regional Matches</div>
+                <div className="big-num text-emerald-300">{internshipState.foundCount > 0 ? internshipState.foundCount : 12}</div>
+                <div className="sub-num">Verified Regional Hyper-Matches</div>
               </div>
             </div>
           </div>
         )}
 
         {activeTab === 'agents' && (
-          <div className="agent-view">
+          <div className="agent-view gsap-tab-content">
             <TypographyEngine text="Distributed Intelligence Nodes" type="fade-stagger" element="h3" delay={0.1} className="mb-6" />
             <div className="agent-grid">
               {AGENTS.map((agent, i) => (
-                <div key={agent.id} className="agent-node">
+                <div key={agent.id} className="agent-node futuristic-border">
                   <div className="node-header">
                     <div className={`node-indicator ${ticker % (i + 2) === 0 ? 'active' : ''}`}></div>
-                    <h5>{agent.name}</h5>
+                    <h5 className="text-blue-300">{agent.name}</h5>
                   </div>
-                  <p>{agent.role}</p>
-                  <div className="node-activity">
-                    <div className="progress-bar"><div className="fill" style={{ width: `${60 + (Math.sin(ticker + i) * 20)}%` }}></div></div>
+                  <p className="font-mono text-xs mt-2 text-slate-400">{agent.role}</p>
+                  <div className="node-activity mt-4">
+                    <div className="text-[10px] text-blue-500 mb-1 font-mono uppercase tracking-widest">Compute Load</div>
+                    <div className="progress-bar">
+                      <div className="fill shadow-blue-500/50 shadow-lg" style={{ width: `${60 + (Math.sin(ticker + i) * 20)}%` }}></div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -95,20 +208,68 @@ export default function InternshipClientEngine() {
         .intel-dashboard {
           max-width: 1000px;
           margin: 60px auto;
-          background: rgba(15, 23, 42, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          border-radius: 20px;
+          background: rgba(10, 15, 26, 0.7);
+          border: 1px solid rgba(59, 130, 246, 0.2);
+          border-radius: 8px;
           backdrop-filter: blur(24px);
           overflow: hidden;
           color: #e2e8f0;
           font-family: 'Inter', sans-serif;
+          position: relative;
+          box-shadow: 0 0 40px rgba(59, 130, 246, 0.1), inset 0 0 20px rgba(59, 130, 246, 0.05);
+          transform-style: preserve-3d;
+          perspective: 1000px;
         }
+
+        .bg-canvas {
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        .scanline {
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.8), transparent);
+          box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+          z-index: 5;
+          pointer-events: none;
+        }
+
+        .dashboard-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(10,15,26,0) 0%, rgba(10,15,26,0.8) 100%);
+          z-index: 2;
+          pointer-events: none;
+        }
+
+        .futuristic-border {
+          position: relative;
+          background: rgba(15, 23, 42, 0.5);
+          border: 1px solid rgba(59, 130, 246, 0.2);
+          box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .corner-accent {
+          position: absolute;
+          width: 8px; height: 8px;
+          border-color: #3b82f6;
+          border-style: solid;
+        }
+        .top-left { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+        .bottom-right { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
         .dash-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 24px 32px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+          background: rgba(10, 15, 26, 0.8);
         }
         .dh-left {
           display: flex;
@@ -118,42 +279,53 @@ export default function InternshipClientEngine() {
         .dh-status-pulse {
           width: 8px;
           height: 8px;
-          border-radius: 50%;
-          background: #f8fafc;
-          opacity: 0.8;
+          background: #3b82f6;
+          box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6;
+          animation: pulse 2s infinite;
         }
+        @keyframes pulse {
+          0% { opacity: 1; box-shadow: 0 0 10px #3b82f6; }
+          50% { opacity: 0.4; box-shadow: 0 0 2px #3b82f6; }
+          100% { opacity: 1; box-shadow: 0 0 10px #3b82f6; }
+        }
+
         .dh-left h2 {
           margin: 0;
+          font-family: var(--font-mono);
           font-size: 0.9rem;
-          font-weight: 500;
-          letter-spacing: 0.05em;
-          color: #f8fafc;
+          font-weight: 700;
+          letter-spacing: 0.15em;
+          color: #93c5fd;
+          text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         .dh-nav {
-          background: rgba(255,255,255,0.03);
-          border-radius: 30px;
-          padding: 4px;
+          background: rgba(15, 23, 42, 0.8);
+          border: 1px solid rgba(59, 130, 246, 0.3);
+          border-radius: 4px;
           display: flex;
+          overflow: hidden;
         }
         .dh-nav button {
           background: transparent;
           border: none;
-          color: #94a3b8;
-          font-size: 0.75rem;
-          font-weight: 500;
+          color: #64748b;
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          letter-spacing: 0.1em;
           padding: 8px 16px;
           cursor: pointer;
           transition: all 0.3s ease;
-          border-radius: 20px;
         }
         .dh-nav button:hover {
-          color: #f8fafc;
+          color: #93c5fd;
+          background: rgba(59, 130, 246, 0.1);
         }
         .dh-nav button.active {
-          background: #f8fafc;
-          color: #0f172a;
-          font-weight: 600;
+          background: rgba(59, 130, 246, 0.2);
+          color: #60a5fa;
+          box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.2);
         }
+
         .dash-body {
           padding: 32px;
           min-height: 380px;
@@ -165,77 +337,84 @@ export default function InternshipClientEngine() {
         }
         .rv-main h3, .agent-view h3 {
           margin-top: 0;
-          color: #f8fafc;
-          font-size: 1.1rem;
-          font-weight: 500;
+          color: #bfdbfe;
+          font-family: var(--font-mono);
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-size: 1rem;
           margin-bottom: 24px;
         }
-        .stat-card h4, .agent-node h5 {
-          margin: 0;
-          color: #94a3b8;
-          font-size: 0.8rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          margin-bottom: 12px;
-        }
+
         .feed-container {
-          background: rgba(0,0,0,0.2);
-          border-radius: 12px;
           padding: 20px;
           height: 250px;
           overflow-y: auto;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 8px;
         }
+        .feed-container::-webkit-scrollbar { width: 4px; }
+        .feed-container::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 2px; }
+
         .feed-item {
           font-family: var(--font-mono);
-          font-size: 0.8rem;
-          padding: 10px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.03);
+          font-size: 0.75rem;
+          padding: 8px 12px;
+          background: rgba(0,0,0,0.3);
+          border-left: 2px solid rgba(59,130,246,0.5);
           display: flex;
           gap: 16px;
-          animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: typeIn 0.3s steps(20, end) forwards;
           opacity: 0;
-          transform: translateY(10px);
         }
-        .fi-time {
-          color: #64748b;
-          min-width: 80px;
+        @keyframes typeIn {
+          from { opacity: 0; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+          to { opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
         }
-        .fi-msg {
-          color: #cbd5e1;
-          word-break: break-all;
-        }
+
+        .fi-time { color: #60a5fa; min-width: 85px; }
+        .terminal-text { color: #e2e8f0; word-break: break-all; }
+
         .stat-card {
-          background: rgba(255,255,255,0.02);
           padding: 24px;
-          border-radius: 16px;
           margin-bottom: 20px;
         }
+        .stat-card h4, .agent-node h5 {
+          margin: 0;
+          font-family: var(--font-mono);
+          color: #94a3b8;
+          font-size: 0.75rem;
+          letter-spacing: 0.1em;
+          margin-bottom: 12px;
+        }
         .big-num {
-          font-size: 2.2rem;
-          font-weight: 400;
-          color: #f8fafc;
+          font-family: var(--font-mono);
+          font-size: 2.5rem;
+          font-weight: 300;
+          line-height: 1;
+          text-shadow: 0 0 20px currentColor;
         }
         .sub-num {
-          font-size: 0.8rem;
+          font-size: 0.7rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
           color: #64748b;
-          margin-top: 8px;
+          margin-top: 12px;
         }
+
         .agent-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 20px;
         }
         .agent-node {
-          background: rgba(255,255,255,0.02);
           padding: 24px;
-          border-radius: 16px;
-          transition: transform 0.3s ease;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .agent-node:hover {
-          transform: translateY(-4px);
+          transform: translateY(-5px) scale(1.02);
+          box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15), inset 0 0 20px rgba(59, 130, 246, 0.1);
+          border-color: rgba(59, 130, 246, 0.5);
         }
         .node-header {
           display: flex;
@@ -243,33 +422,26 @@ export default function InternshipClientEngine() {
           gap: 12px;
         }
         .node-indicator {
-          width: 6px; height: 6px; border-radius: 50%;
-          background: #3b82f6;
-          transition: background 0.3s ease;
+          width: 8px; height: 8px;
+          background: transparent;
+          border: 1px solid #3b82f6;
+          transition: all 0.2s ease;
         }
-        .node-indicator.active { background: #f8fafc; }
-        .agent-node p {
-          color: #94a3b8;
-          font-size: 0.85rem;
-          margin: 12px 0 20px 0;
+        .node-indicator.active { 
+          background: #3b82f6; 
+          box-shadow: 0 0 10px #3b82f6; 
         }
+
         .progress-bar {
-          height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px;
+          height: 2px; background: rgba(59, 130, 246, 0.1);
           overflow: hidden;
         }
         .progress-bar .fill {
-          height: 100%; background: #f8fafc; transition: width 2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+          height: 100%; background: #3b82f6; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         @media (max-width: 768px) {
-          .radar-view, .agent-grid {
-            grid-template-columns: 1fr;
-          }
+          .radar-view, .agent-grid { grid-template-columns: 1fr; }
           .dh-nav { width: 100%; justify-content: center; }
           .dash-header { flex-direction: column; gap: 20px; }
         }

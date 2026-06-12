@@ -31,15 +31,27 @@ export default function InternshipGrid({ internships }: { internships: Internshi
 
   useGSAP(() => {
     if (!isHunting && filtered.length > 0 && containerRef.current) {
+      // Futuristic Staggered Matrix reveal
       gsap.fromTo('.gsap-internship-card',
-        { y: 40, opacity: 0, scale: 0.95 },
+        { 
+          y: 60, 
+          opacity: 0, 
+          scale: 0.9, 
+          rotationX: 15,
+          filter: 'blur(10px) brightness(200%)' 
+        },
         {
           y: 0,
           opacity: 1,
           scale: 1,
-          duration: 0.7,
-          stagger: 0.08,
-          ease: 'power3.out',
+          rotationX: 0,
+          filter: 'blur(0px) brightness(100%)',
+          duration: 1.0,
+          stagger: {
+            amount: 0.5,
+            from: "random"
+          },
+          ease: 'expo.out',
           clearProps: 'all' // prevents sticking inline styles
         }
       )

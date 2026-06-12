@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useBrain } from './BrainProvider';
 import { client } from '@/lib/sanity/client';
-import type { InternshipData } from '@/app/internships/LiveInternshipsList';
+import type { InternshipData } from '@/app/internships/page';
 
 /**
  * INTERNSHIP ENGINE
