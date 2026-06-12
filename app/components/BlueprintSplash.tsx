@@ -10,12 +10,13 @@ export default function BlueprintSplash() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    setMounted(true);
-    // Check if the splash screen has already played in this session
-    if (!sessionStorage.getItem('iste_splash_played')) {
-      setShow(true);
-    }
+    const timer = setTimeout(() => {
+      setMounted(true);
+      if (!sessionStorage.getItem('iste_splash_played')) {
+        setShow(true);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useGSAP(() => {
