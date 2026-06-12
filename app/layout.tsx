@@ -20,6 +20,7 @@ const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngin
 const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
 const IOSAdaptiveEngine = dynamic(() => import('./engines/ios/IOSAdaptiveEngine'));
 const ClientPlatformBoundary = dynamic(() => import('./brain/ClientPlatformBoundary'));
+const BlueprintSplash = dynamic(() => import('./components/BlueprintSplash'));
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -41,11 +42,18 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://iste-mbcet.vercel.app'),
   title: {
-    default: "ISTE MBCET Student's Chapter",
+    default: "ISTE MBCET | Indian Society for Technical Education - Mar Baselios College",
     template: "%s | ISTE MBCET"
   },
-  description: "Empowering engineering students through innovation, technology, and excellence at Mar Baselios College of Engineering and Technology. Join India's premier technical community.",
-  keywords: ["ISTE", "MBCET", "Engineering", "Technical Education", "Student Chapter", "Kerala", "Innovation", "Workshops", "Internships"],
+  description: "The official Indian Society for Technical Education (ISTE) Student Chapter at Mar Baselios College of Engineering and Technology (MBCET), Trivandrum. Discover technical workshops, elite engineering internships, hackathons, and innovation communities at ISTEMBCET.",
+  keywords: [
+    "ISTE", "MBCET", "ISTEMBCET", "ISTE MBCET", 
+    "Indian Society for Technical Education", 
+    "Mar Baselios College of Engineering and Technology", 
+    "Trivandrum", "Kerala", "Engineering", "Technical Education", 
+    "Student Chapter", "Tech Community", "Workshops", "Hackathons", 
+    "Internships", "Engineering Students", "BTech"
+  ],
   authors: [{ name: "ISTE MBCET Student's Chapter" }],
   creator: "ISTE MBCET",
   publisher: "ISTE MBCET",
@@ -53,22 +61,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: "https://iste-mbcet.vercel.app",
-    title: "ISTE MBCET Student's Chapter",
-    description: "Empowering engineering students through innovation, technology, and excellence at MBCET.",
+    title: "ISTE MBCET | Indian Society for Technical Education",
+    description: "The official ISTE Student Chapter at Mar Baselios College of Engineering and Technology (MBCET). Empowering engineering students through innovation and technology.",
     siteName: "ISTE MBCET",
     images: [
       {
         url: "/iste.png",
         width: 1200,
         height: 630,
-        alt: "ISTE MBCET Student's Chapter",
+        alt: "ISTE MBCET Student's Chapter Logo",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ISTE MBCET Student's Chapter",
-    description: "Empowering engineering students through innovation, technology, and excellence at MBCET.",
+    title: "ISTE MBCET | Engineering Community",
+    description: "The official ISTE Student Chapter at Mar Baselios College of Engineering and Technology (MBCET).",
     images: ["/iste.png"],
     creator: "@iste_mbcet",
   },
@@ -105,10 +113,17 @@ export default async function RootLayout({
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: "ISTE MBCET Student's Chapter",
+    name: "ISTE MBCET - Indian Society for Technical Education",
+    alternateName: ["ISTEMBCET", "ISTE Mar Baselios", "ISTE MBCET Student Chapter"],
     url: 'https://iste-mbcet.vercel.app',
     logo: 'https://iste-mbcet.vercel.app/iste.png',
-    description: "Empowering engineering students through innovation, technology, and excellence at Mar Baselios College of Engineering and Technology.",
+    description: "The official Indian Society for Technical Education (ISTE) Student Chapter at Mar Baselios College of Engineering and Technology (MBCET).",
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Trivandrum',
+      addressRegion: 'Kerala',
+      addressCountry: 'IN'
+    },
     sameAs: [
       'https://www.instagram.com/iste_mbcet/',
       'https://www.linkedin.com/company/istescmbcet/'
@@ -151,6 +166,7 @@ export default async function RootLayout({
         className={`${outfit.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans`}
         suppressHydrationWarning
       >
+        <BlueprintSplash />
         <BrainProvider>
           <IOSAdaptiveEngine />
 

@@ -34,7 +34,7 @@ export default function InternshipClientEngine() {
 
     let width = canvas.width = canvas.offsetWidth
     let height = canvas.height = canvas.offsetHeight
-    let particles: any[] = []
+    const particles: any[] = []
 
     for (let i = 0; i < 40; i++) {
       particles.push({

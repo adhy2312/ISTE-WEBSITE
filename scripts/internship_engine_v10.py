@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║   CHANAKYAN-KV  ×  ISTE MBCET  —  INTERNSHIP INTELLIGENCE ECOSYSTEM v10.0  ║
@@ -21,7 +23,7 @@
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║  MEMORY:     SQLite (async SQLAlchemy) · Redis (optional) · FAISS vectors   ║
 ║  SCHEDULER:  APScheduler — 24h discovery / 6h revalidation / 1h cleanup    ║
-║  OUTPUTS:    Sanity CMS · SQLite · JSON export · Telegram alerts            ║
+║  OUTPUTS:    Sanity CMS · SQLite · JSON export · Local Alert Logs           ║
 ║  v10 CHANGES: Async DB · FAISS dedup · AgentBus events · AlertAgent        ║
 ║               TrendAgent · ComplianceAgent · compact 1900-line target       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -36,6 +38,19 @@ from urllib.parse import urlparse, quote
 from dataclasses import dataclass, field
 
 # ─── Third-Party ──────────────────────────────────────────────────────────────
+# Celery (optional — not used in CI, only for local worker mode)
+try:
+    from celery import Celery
+    celery_app = Celery(
+        "chanakyan",
+        broker=os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0"),
+        backend=os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0"),
+    )
+    CELERY_OK = True
+except ImportError:
+    CELERY_OK = False
+    celery_app = None
+
 import requests, httpx
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -116,16 +131,27 @@ except ImportError:
 # Pydantic
 from pydantic import BaseModel, ConfigDict
 
-# Circuit Breaker
-import pybreaker
+# Circuit Breaker (optional — installed in CI via requirements.txt, may not be
+# present in local dev environments using system Python)
 from functools import wraps
-
-# Setup Circuit Breaker for external API calls (e.g. Gemini, Sanity, APIs)
-api_breaker = pybreaker.CircuitBreaker(
-    fail_max=3,            # Open circuit after 3 consecutive failures
-    reset_timeout=60,      # Wait 60 seconds before trying again (Half-Open)
-    state_storage=pybreaker.MemoryStorage()
-)
+try:
+    import pybreaker # type: ignore
+    api_breaker = pybreaker.CircuitBreaker(
+        fail_max=3,       # Open circuit after 3 consecutive failures
+        reset_timeout=60, # Wait 60 seconds before trying again (Half-Open)
+        state_storage=pybreaker.MemoryStorage()
+    )
+    BREAKER_OK = True
+except ImportError:
+    # No-op stub — circuit breaker simply passes through when not installed
+    BREAKER_OK = False
+    class _NoOpBreaker:
+        """Transparent pass-through used when pybreaker is not installed."""
+        def __call__(self, fn):
+            return fn
+        def call(self, fn, *args, **kwargs):
+            return fn(*args, **kwargs)
+    api_breaker = _NoOpBreaker()
 
 # Source registry (from existing file)
 from source_registry import (
@@ -141,8 +167,7 @@ SANITY_TOKEN       = os.getenv("SANITY_API_TOKEN", "")
 SANITY_URL         = f"https://{SANITY_PROJECT_ID}.api.sanity.io/v2023-01-01/data/mutate/{SANITY_DATASET}"
 SANITY_HEADERS     = {"Content-Type": "application/json", "Authorization": f"Bearer {SANITY_TOKEN}"}
 GITHUB_TOKEN       = os.getenv("GITHUB_TOKEN", "")
-TELEGRAM_TOKEN     = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID   = os.getenv("TELEGRAM_CHAT_ID", "")
+# TELEGRAM REMOVED - Using LocalAlertAgent
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -755,11 +780,23 @@ class SemanticAgent:
 
     def _district(self, text: str, meta: dict) -> Tuple[str, str]:
         combined = (text + " " + meta.get("location","") + " " + meta.get("zone","")).lower()
+        
+        # Tech Hubs Check - Allow major cities outside Kerala
+        major_tech_hubs = ["bangalore", "bengaluru", "chennai", "mumbai", "delhi", "noida", "gurugram", "pune", "hyderabad"]
+        
         for zone, data in KERALA_ZONES.items():
             for alias in data["aliases"]:
                 if alias in combined:
                     return zone.title(), meta.get("zone", "Independent")
-        return "Kerala", meta.get("zone", "Independent")
+                    
+        if "remote" in combined or "work from home" in combined or "wfh" in combined:
+            return "Remote", meta.get("zone", "Independent")
+            
+        for city in major_tech_hubs:
+            if city in combined:
+                return f"Tech Hub ({city.title()})", "Independent"
+                
+        return "Unknown", "OUT_OF_BOUNDS"
 
     def enrich(self, item: dict, meta: dict = None) -> dict:
         meta = meta or {}
@@ -845,12 +882,23 @@ class QualityAgent:
         base = 50.0
         if item.get("domain") in self.ELITE_DOMAINS: base += 20.0
 
-        # Geographic proximity
+        # Geographic proximity / Strictly Kerala Bound
         d = item.get("district","").lower()
-        for zone, data in KERALA_ZONES.items():
-            if zone in d or any(a in d for a in data["aliases"]):
-                base += data["proximity_score"]
-                break
+        hub = item.get("hub_category", "").lower()
+        
+        if hub == "out_of_bounds":
+            # If it's physically out of bounds and not remote, penalize heavily
+            base -= 60.0
+            item["trust_status"] = "REJECTED"
+            item["rejection_reason"] = f"Location strictly outside Kerala bounds: {d}"
+            item["liveness_confidence"] = 0.0
+        elif "remote" in d:
+            base += 10.0
+        else:
+            for zone, data in KERALA_ZONES.items():
+                if zone in d or any(a in d for a in data["aliases"]):
+                    base += data["proximity_score"]
+                    break
 
         # Company trust
         trust = COMPANY_TRUST_OVERRIDES.get(item.get("company","").lower(), 50)
@@ -1321,75 +1369,61 @@ class ResumeAgent:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ⑪ ALERT AGENT — Instant Telegram push for ELITE listings (NEW in v10)
+# ⑪ LOCAL ALERT AGENT — Logs ELITE listings to a local JSON artifact
 # ══════════════════════════════════════════════════════════════════════════════
-class AlertAgent:
+class LocalAlertAgent:
     """
-    Sends instant Telegram notifications when ELITE internships are found.
-    Subscribe to the 'elite_found' bus event. Zero-delay, non-blocking.
+    Logs instant notifications when ELITE internships are found directly to 
+    elite_opportunities.json instead of third-party platforms.
     """
 
-    TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
-    _sent: set = set()  # Prevent duplicate alerts per session
+    _sent: set = set()
 
     def __init__(self):
-        self._active = bool(TELEGRAM_TOKEN and TELEGRAM_CHAT_ID)
-        if self._active:
-            log("ALERT", "Telegram alerting ACTIVE ✓")
-        else:
-            log("ALERT", "Telegram not configured — alerts disabled (set TELEGRAM_BOT_TOKEN)", "WARN")
+        self._active = True
+        log("ALERT", "LocalAlertAgent active — Elite roles will be logged to elite_opportunities.json ✓")
         BUS.subscribe("elite_found", self.handle_elite)
         BUS.subscribe("listing_killed", self.handle_killed)
-
-    async def _send(self, message: str) -> None:
-        if not self._active: return
-        try:
-            async with httpx.AsyncClient(timeout=8.0) as c:
-                await c.post(
-                    self.TELEGRAM_API.format(token=TELEGRAM_TOKEN),
-                    json={"chat_id": TELEGRAM_CHAT_ID, "text": message,
-                          "parse_mode": "Markdown"}
-                )
-        except Exception as e:
-            log("ALERT", f"Telegram send failed: {e}", "WARN")
 
     async def handle_elite(self, listing: InternshipListing) -> None:
         key = f"{listing.company_name}-{listing.internship_role}"
         if key in self._sent: return
         self._sent.add(key)
-        msg = (
-            f"🏆 *ELITE INTERNSHIP FOUND*\n"
-            f"🏢 *{listing.company_name}*\n"
-            f"💼 {listing.internship_role}\n"
-            f"📍 {listing.district_location} / {listing.hub_category}\n"
-            f"🧠 {listing.domain or 'Software Engineering'}\n"
-            f"💰 {listing.stipend_details or 'Check listing'}\n"
-            f"⭐ Score: {listing.quality_score:.0f}/99\n"
-            f"🔗 {listing.application_url}"
-        )
-        await self._send(msg)
-        log("ALERT", f"📨 Alert sent: {listing.company_name} — {listing.internship_role}")
+        
+        try:
+            filename = "elite_opportunities.json"
+            data = []
+            if os.path.exists(filename):
+                try:
+                    with open(filename, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                except Exception:
+                    pass
+            
+            alert = {
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "role": listing.internship_role,
+                "company": listing.company_name,
+                "domain": listing.domain,
+                "district": listing.district_location,
+                "stipend": listing.stipend_details,
+                "skills": listing.skills,
+                "link": listing.application_url
+            }
+            data.append(alert)
+            
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2)
+                
+            log("ALERT", f"🔥 ELITE OPPORTUNITY logged locally: {listing.internship_role} at {listing.company_name}")
+        except Exception as e:
+            log("ALERT", f"Local alert log failed: {e}", "WARN")
 
     async def handle_killed(self, item: dict) -> None:
-        # Silently log; don't spam for every deleted entry
         pass
 
     async def send_daily_digest(self, listings: List[InternshipListing]) -> None:
-        elite = [l for l in listings if l.quality_tier == "ELITE"]
-        high  = [l for l in listings if l.quality_tier == "HIGH VALUE"]
-        msg = (
-            f"📊 *CHANAKYAN-KV v10 Daily Report*\n"
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🏆 Elite: {len(elite)}\n"
-            f"⭐ High Value: {len(high)}\n"
-            f"📋 Total Verified: {len(listings)}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
-        )
-        if elite:
-            msg += "*Top Elite Picks:*\n"
-            for l in elite[:3]:
-                msg += f"• {l.company_name} — {l.internship_role}\n"
-        await self._send(msg)
+        pass
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1561,12 +1595,25 @@ def sync_sanity(listings: List[InternshipListing]) -> None:
         }})
 
     for i in range(0, len(mutations), 50):
-        try:
-            r = requests.post(SANITY_URL, headers=SANITY_HEADERS,
-                              json={"mutations": mutations[i:i+50]}, timeout=10)
-            log("ORCH", f"  CMS batch {i//50+1} {'✓' if r.status_code==200 else '✗'}")
-        except Exception as e:
-            log("ORCH", f"  CMS error: {e}", "ERROR")
+        batch = mutations[i:i+50]
+        success = False
+        for attempt in range(3): # Max 3 retries
+            try:
+                r = requests.post(SANITY_URL, headers=SANITY_HEADERS,
+                                  json={"mutations": batch}, timeout=15)
+                if r.status_code == 200:
+                    log("ORCH", f"  CMS batch {i//50+1} ✓")
+                    success = True
+                    break
+                else:
+                    log("ORCH", f"  CMS batch {i//50+1} returned {r.status_code}. Retrying...", "WARN")
+            except Exception as e:
+                log("ORCH", f"  CMS error (attempt {attempt+1}): {e}", "ERROR")
+                
+            time.sleep(2 ** attempt) # Exponential backoff: 1s, 2s, 4s
+            
+        if not success:
+            log("ORCH", f"  CMS batch {i//50+1} ✗ (Failed after 3 retries)", "ERROR")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1770,7 +1817,7 @@ async def execute_pipeline(
     PHASE  5  — SemanticAgent zero-shot domain mapping
     PHASE  6  — QualityAgent neural scoring + Supreme Judge
     PHASE  7  — Persist to SQLite + Sanity CMS sync
-    PHASE  8  — AlertAgent Telegram push (ELITE) + TrendAgent analytics
+    PHASE  8  — LocalAlertAgent log (ELITE) + TrendAgent analytics
     PHASE  9  — PredictiveAgent velocity forecasting
     PHASE 10  — CleanupAgent live-list pruning
     PHASE 11  — AdaptiveNeuralCore retraining + RL weight optimization
@@ -1779,7 +1826,7 @@ async def execute_pipeline(
     banner = """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║       CHANAKYAN-KV v10.0  ×  ISTE MBCET INTERNSHIP INTELLIGENCE ENGINE      ║
-║        13 Agents · Async DB · FAISS Dedup · AgentBus · Telegram Alerts      ║
+║        13 Agents · Async DB · FAISS Dedup · AgentBus · Local Alerts         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝"""
     print(f"\033[95m{banner}\033[0m\n")
 
@@ -1797,7 +1844,7 @@ async def execute_pipeline(
     predictive = PredictiveAgent()
     portfolio  = PortfolioAgent()
     resume_ag  = ResumeAgent(model)
-    alert      = AlertAgent()
+    alert      = LocalAlertAgent()
     trend      = TrendAgent()
     compliance = ComplianceAgent()
 
@@ -1932,25 +1979,27 @@ async def execute_pipeline(
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CELERY TASKS
+# CELERY TASKS — Only registered when Celery is available (local worker mode)
+# In CI (GitHub Actions), these are never called; GitHub cron handles scheduling.
 # ══════════════════════════════════════════════════════════════════════════════
-@celery_app.task(name="chanakyan.full_cycle")
-def celery_full():
-    asyncio.run(execute_pipeline(mode="full"))
+if CELERY_OK and celery_app:
+    @celery_app.task(name="chanakyan.full_cycle")
+    def celery_full():
+        asyncio.run(execute_pipeline(mode="full"))
 
-@celery_app.task(name="chanakyan.revalidate")
-def celery_revalidate():
-    asyncio.run(execute_pipeline(mode="revalidate_only", cleanup=True))
+    @celery_app.task(name="chanakyan.revalidate")
+    def celery_revalidate():
+        asyncio.run(execute_pipeline(mode="revalidate_only", cleanup=True))
 
-@celery_app.task(name="chanakyan.cleanup")
-def celery_cleanup():
-    async def _():
-        await init_db()
-        model = get_model()
-        auth = AuthenticityAgent()
-        ag   = CleanupAgent(auth)
-        await ag.run()
-    asyncio.run(_())
+    @celery_app.task(name="chanakyan.cleanup")
+    def celery_cleanup():
+        async def _():
+            await init_db()
+            model = get_model()
+            auth = AuthenticityAgent()
+            ag   = CleanupAgent(auth)
+            await ag.run()
+        asyncio.run(_())
 
 
 def record_telemetry(payload: dict):

@@ -72,11 +72,39 @@ export async function POST(req: Request) {
       """
     `;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    
-    const cleanJson = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const analysis = JSON.parse(cleanJson);
+    let analysis = null;
+    let lastError = null;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+        
+        // Robust JSON extraction
+        const cleanJson = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+        try {
+          analysis = JSON.parse(cleanJson);
+          break; // Success
+        } catch (parseError) {
+          // Fallback: try to find anything between { and }
+          const match = responseText.match(/\{[\s\S]*\}/);
+          if (match) {
+            analysis = JSON.parse(match[0]);
+            break;
+          }
+          throw new Error('Failed to parse JSON response from AI.');
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Resume Analyzer] Attempt ${attempt + 1} failed:`, err.message);
+        // Exponential backoff: 1s, 2s, 4s
+        await new Promise(res => setTimeout(res, Math.pow(2, attempt) * 1000));
+      }
+    }
+
+    if (!analysis) {
+      throw lastError || new Error('All retries failed for resume analysis.');
+    }
 
     // Future enhancement: Push these new learnings (analysis.criticalFlaws) to a Redis cache or Supabase DB.
     // For now, we skip the local filesystem write to ensure strict serverless compatibility and security.

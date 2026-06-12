@@ -82,6 +82,9 @@ export async function POST(req: Request) {
             sim = 1.0; // Exact match
           } else if (embeddingsCache[sSkill] && embeddingsCache[jSkill]) {
             sim = cosineSimilarity(embeddingsCache[sSkill], embeddingsCache[jSkill]);
+          } else if (sSkill.toLowerCase().includes(jSkill.toLowerCase()) || jSkill.toLowerCase().includes(sSkill.toLowerCase())) {
+            // Smart Fallback if embedding cache is empty or missing specific skills
+            sim = 0.8;
           }
           
           if (sim > bestScore) {

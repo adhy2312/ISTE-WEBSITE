@@ -9,8 +9,13 @@ class SkillIntelligenceEngine:
         Uses SentenceTransformers for dense vector embeddings to understand intent and conceptual proximity.
         """
         print(f"[SKILL_ENGINE] Loading neural semantic model: {model_name}...")
-        self.model = SentenceTransformer(model_name)
-        
+        try:
+            self.model = SentenceTransformer(model_name)
+            self.model_loaded = True
+        except Exception as e:
+            print(f"[SKILL_ENGINE] WARNING: SentenceTransformer failed to load ({e}). Using lightweight exact-match fallback.")
+            self.model = None
+            self.model_loaded = False
         # Canonical Normalization Map (can be expanded dynamically or loaded from DB)
         self.canonical_map = {
             "reactjs": "React", "react.js": "React", "react": "React",
@@ -28,6 +33,15 @@ class SkillIntelligenceEngine:
         """Calculates cosine similarity between all student skills and job skills."""
         if not student_skills or not job_skills:
             return np.zeros((len(student_skills), len(job_skills)))
+            
+        if not getattr(self, 'model_loaded', False):
+            # Fallback exact/substring match
+            matrix = np.zeros((len(student_skills), len(job_skills)))
+            for i, s_skill in enumerate(student_skills):
+                for j, j_skill in enumerate(job_skills):
+                    if s_skill.lower() == j_skill.lower() or s_skill.lower() in j_skill.lower() or j_skill.lower() in s_skill.lower():
+                        matrix[i, j] = 1.0
+            return matrix
         
         student_emb = self.model.encode(student_skills, convert_to_tensor=True)
         job_emb = self.model.encode(job_skills, convert_to_tensor=True)

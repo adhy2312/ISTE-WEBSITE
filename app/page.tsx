@@ -24,6 +24,8 @@ import {
   Briefcase
 } from 'lucide-react'
 import ExecomAvatar from '@/app/components/ExecomAvatar'
+import ImpactChronicle from '@/app/components/ImpactChronicle'
+
 
 // Fallback data when Sanity has no content yet
 const FALLBACK_EVENTS = [
@@ -46,12 +48,7 @@ const FALLBACK_STATS = [
   { _id: 's4', label: 'Member Satisfaction', value: 95, suffix: '%' },
 ]
 
-const FALLBACK_TESTIMONIALS = [
-  { _id: 't1', quote: '"Performance is key for us, and joining ISTE was the best decision. Highly recommended for exposure."', authorName: 'Emily Watson', authorRole: '3rd Year CSE', avatarSeed: 'Emily' },
-  { _id: 't2', quote: '"The aesthetics are top-notch. It gives my college experience a premium look without hiring a designer."', authorName: 'David Park', authorRole: 'Indie Hacker', avatarSeed: 'David' },
-  { _id: 't3', quote: '"Finally, a community that actually considers accessibility and growth as a first-class citizen. A joy to be in."', authorName: 'Jessica Li', authorRole: 'UX Researcher', avatarSeed: 'Jessica' },
-  { _id: 't4', quote: '"The peer-to-peer learning environment helped me land my first tech internship. Invaluable network."', authorName: 'Arjun M', authorRole: 'Tech Lead', avatarSeed: 'Arjun' },
-]
+
 
 const FALLBACK_EXECOM = {
   faculty: [
@@ -109,7 +106,7 @@ export default async function Home() {
   const stats = rawStats.filter((stat: any, index: number, self: any[]) =>
     index === self.findIndex((t: any) => t.label === stat.label)
   )
-  const testimonials = sanityData?.testimonials?.length ? sanityData.testimonials : FALLBACK_TESTIMONIALS
+  // Testimonials removed — replaced by ImpactChronicle section
   const settings = sanityData?.settings || {}
   const featuredInternships: any[] = sanityData?.featuredInternships || []
   const pillars: any[] = sanityData?.pillars || []
@@ -177,8 +174,7 @@ export default async function Home() {
     return icons[iconName] || <Zap size={24} strokeWidth={1.5} />
   }
 
-  // Duplicate testimonials for infinite scroll
-  const allTestimonials = [...testimonials, ...testimonials]
+
 
   return (
     <>
@@ -711,40 +707,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="testimonials" className="testimonials-section">
-        <div className="testi-header">
-          <div className="section-tag">{settings.testimonialsTag || 'Member Voices'}</div>
-          <h2 className="section-title" dangerouslySetInnerHTML={{ __html: settings.testimonialsTitle || 'What Our<br /><em>Members Say</em>' }}></h2>
-        </div>
-        <div className="marquee-wrapper">
-          <div className="marquee-content">
-            {allTestimonials.map((t: any, i: number) => (
-              <div key={`${t._id}-${i}`} className="testi-card">
-                <div className="testi-quote-icon">&ldquo;</div>
-                <div className="testi-text">{t.quote}</div>
-                <div className="testi-divider"></div>
-                <div className="testi-author">
-                  <div style={{ position: 'relative', width: 48, height: 48, overflow: 'hidden', borderRadius: '50%' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={t.photo ? urlForImage(t.photo).width(96).height(96).url() : `https://api.dicebear.com/7.x/avataaars/svg?seed=${t.avatarSeed || t.authorName}`}
-                      alt={t.authorName}
-                      width={48}
-                      height={48}
-                      loading="lazy"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </div>
-                  <div>
-                    <div className="testi-name">{t.authorName}</div>
-                    <div className="testi-role">{t.authorRole}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ImpactChronicle stats={stats} events={events} />
 
       {/* ===================== INTERNSHIP LAUNCHPAD TEASER ===================== */}
       <section id="launchpad" style={{ background: 'var(--black)', borderTop: '1px solid var(--border)' }}>

@@ -58,8 +58,7 @@ export default function InternshipEngine() {
       notifyEngine('Internship', 'agent_log', '[ERROR] Could not reach Sanity CMS. Listings unavailable.');
     });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEngineActive]);
+  }, [isEngineActive, notifyEngine]);
 
   return null;
 }

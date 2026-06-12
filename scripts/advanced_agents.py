@@ -55,30 +55,37 @@ class PortfolioAssessmentAgent:
         self.github_api = "https://api.github.com/users/{}/repos"
         
     def assess_github(self, username, target_internship_skills):
-        try:
-            res = requests.get(self.github_api.format(username), timeout=5)
-            if res.status_code == 200:
-                repos = res.json()
-                languages = set()
-                ast_complexity_score = 0
+        import time
+        for attempt in range(3):
+            try:
+                res = requests.get(self.github_api.format(username), timeout=5)
+                if res.status_code == 200:
+                    repos = res.json()
+                    languages = set()
+                    ast_complexity_score = 0
+                    
+                    for r in repos:
+                        if r.get('language'): 
+                            languages.add(r.get('language').lower())
+                        # Mock AST Complexity Metric based on size and forks
+                        ast_complexity_score += r.get('stargazers_count', 0) * 2
+                        ast_complexity_score += r.get('size', 0) / 500.0 
+                    
+                    match_score = len(languages.intersection(set([s.lower() for s in target_internship_skills])))
+                    
+                    return {
+                        "complexity_rating": "Advanced" if ast_complexity_score > 30 else "Intermediate",
+                        "skill_match": match_score,
+                        "languages_found": list(languages),
+                        "recommendation": "Perfect AST Match for Elite Role" if match_score >= 2 else "Requires Skill Upscaling"
+                    }
+            except requests.exceptions.RequestException as e:
+                print(f"[PortfolioAgent] Network error on attempt {attempt + 1}: {e}")
+                time.sleep(2 ** attempt)
+            except Exception as e:
+                print(f"[PortfolioAgent] Unexpected error analyzing {username}: {e}")
+                break
                 
-                for r in repos:
-                    if r.get('language'): 
-                        languages.add(r.get('language').lower())
-                    # Mock AST Complexity Metric based on size and forks
-                    ast_complexity_score += r.get('stargazers_count', 0) * 2
-                    ast_complexity_score += r.get('size', 0) / 500.0 
-                
-                match_score = len(languages.intersection(set([s.lower() for s in target_internship_skills])))
-                
-                return {
-                    "complexity_rating": "Advanced" if ast_complexity_score > 30 else "Intermediate",
-                    "skill_match": match_score,
-                    "languages_found": list(languages),
-                    "recommendation": "Perfect AST Match for Elite Role" if match_score >= 2 else "Requires Skill Upscaling"
-                }
-        except Exception as e:
-            pass
         return {"complexity_rating": "Unknown", "skill_match": 0, "languages_found": []}
 
 # ==============================================================================
