@@ -56,6 +56,7 @@ export async function submitMembership(formData: FormData) {
       await resend.emails.send({
         from: `ISTE MBCET <${fromEmail}>`,
         to: email,
+        bcc: process.env.ADMIN_EMAIL || 'istestudentchapter@mbcet.ac.in',
         subject: 'Welcome to ISTE MBCET! 🎉',
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

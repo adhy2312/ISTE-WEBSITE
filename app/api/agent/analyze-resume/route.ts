@@ -45,8 +45,10 @@ export async function POST(req: Request) {
       {
         "score": number (0-100, be brutally honest. Average resumes should score 40-60. Only elite resumes get 80+),
         "verdict": "string (One sentence brutal summary of the resume's quality)",
+        "executiveSummaryRewrite": "string (A punchy, ATS-optimized 2-sentence objective/summary written for the candidate to copy-paste)",
         "strengths": ["string", "string"],
         "criticalFlaws": ["string", "string"],
+        "weakVerbsToReplace": ["string", "string"],
         "lineByLineImprovements": [
           {
             "original_issue": "string (e.g. 'Responsible for fixing bugs')",

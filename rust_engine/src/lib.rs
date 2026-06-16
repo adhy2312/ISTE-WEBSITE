@@ -1,28 +1,44 @@
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn analyze_resume_fast(resume_text: &str, internships_json: &str) -> String {
-    // A blazing fast, zero-allocation-heavy Rust implementation of the resume analyzer
-    // This is a placeholder logic that proves the integration works.
-    
+pub fn analyze_resume_fast(resume_text: &str, _internships_json: &str) -> String {
+    // Advanced Structural Parseability Engine (Rust)
     let resume_lower = resume_text.to_lowercase();
+    let total_chars = resume_text.len();
     
-    // In a real scenario, we'd parse the JSON, but to keep dependencies minimal 
-    // for this demo, we'll just do a fast keyword occurrence count on the raw text.
-    
-    let mut score = 0;
-    
-    let keywords = ["react", "node", "typescript", "python", "machine learning", "design", "figma", "rust", "go", "c++", "java"];
-    
-    for kw in keywords.iter() {
-        if resume_lower.contains(kw) {
-            score += 10;
-        }
+    if total_chars < 50 {
+        return r#"{ "status": "error", "message": "Insufficient data" }"#.to_string();
     }
     
-    // Return a structured JSON response
+    // 1. Whitespace Ratio Analysis
+    let whitespace_chars = resume_text.chars().filter(|c| c.is_whitespace()).count();
+    let whitespace_ratio = (whitespace_chars as f64 / total_chars as f64) * 100.0;
+    
+    // 2. Active Verb Scan (High-impact keywords)
+    let active_verbs = ["architected", "spearheaded", "engineered", "optimized", "developed", "led", "managed", "deployed", "implemented", "reduced", "increased"];
+    let mut verb_hits = 0;
+    for verb in active_verbs.iter() {
+        if resume_lower.contains(verb) { verb_hits += 1; }
+    }
+    
+    // 3. Sentence parsing / Bullet points
+    let sentences: Vec<&str> = resume_text.split(|c| c == '.' || c == '\n').filter(|s| s.trim().len() > 10).collect();
+    let avg_sentence_length = if sentences.is_empty() { 0 } else { total_chars / sentences.len() };
+    
+    // Compute Offline Parseability Score
+    let mut score = 50.0;
+    // Ideal whitespace is ~15-25%
+    if whitespace_ratio > 10.0 && whitespace_ratio < 30.0 { score += 15.0; } else { score -= 10.0; }
+    // Reward active verbs
+    score += (verb_hits as f64 * 3.0).min(20.0);
+    // Punish massive unreadable blocks (sentences too long)
+    if avg_sentence_length > 150 { score -= 15.0; } else { score += 15.0; }
+    
+    let final_score = score.clamp(0.0, 100.0) as i32;
+    
     format!(
-        r#"{{ "status": "success", "engine": "rust-wasm", "computed_score": {}, "message": "Blazing fast compute via Rust WebAssembly" }}"#,
-        score
+        r#"{{ "status": "success", "engine": "rust-wasm", "parseability_score": {}, "metrics": {{ "whitespace_ratio": {:.1}, "active_verbs_found": {}, "avg_sentence_length": {} }} }}"#,
+        final_score, whitespace_ratio, verb_hits, avg_sentence_length
     )
 }
+

@@ -70,7 +70,8 @@ export default async function InternshipsPage() {
     return i.applyLink && i.applyLink !== '#' && i.applyLink.startsWith('http');
   });
   const open = validInternships.filter((i: InternshipData) => i.status === 'open');
-  const other = validInternships.filter((i: InternshipData) => i.status !== 'open');
+  // Explicitly remove 'closed' listings from the live list to ensure old/broken links are not displayed
+  const other = validInternships.filter((i: InternshipData) => i.status !== 'open' && i.status !== 'closed');
 
   return (
     <>

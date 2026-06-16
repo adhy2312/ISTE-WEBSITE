@@ -445,14 +445,18 @@ class ScoutAgent:
 
     async def _fresh_ctx(self) -> BrowserContext:
         await self._init()
-        return await self._browser.new_context(
-            viewport={"width": random.choice([1280, 1366, 1440, 1920]),
-                      "height": random.choice([768, 800, 900, 1080])},
-            user_agent=self.ua.random,
-            locale=random.choice(["en-IN", "en-US", "en-GB"]),
-            timezone_id="Asia/Kolkata",
-            extra_http_headers={"Accept-Language": "en-IN,en;q=0.9"}
-        )
+        proxy_url = os.getenv("SCRAPER_PROXY_URL")
+        ctx_options = {
+            "viewport": {"width": random.choice([1280, 1366, 1440, 1920]),
+                         "height": random.choice([768, 800, 900, 1080])},
+            "user_agent": self.ua.random,
+            "locale": random.choice(["en-IN", "en-US", "en-GB"]),
+            "timezone_id": "Asia/Kolkata",
+            "extra_http_headers": {"Accept-Language": "en-IN,en;q=0.9"}
+        }
+        if proxy_url:
+            ctx_options["proxy"] = {"server": proxy_url}
+        return await self._browser.new_context(**ctx_options)
 
     def _make_intercept(self, key: str):
         async def handler(resp):
@@ -520,7 +524,11 @@ class ScoutAgent:
 
         if not requires_js:
             try:
-                async with httpx.AsyncClient(timeout=12.0, follow_redirects=True) as c:
+                proxy_url = os.getenv("SCRAPER_PROXY_URL")
+                client_options = {"timeout": 12.0, "follow_redirects": True}
+                if proxy_url:
+                    client_options["proxy"] = proxy_url
+                async with httpx.AsyncClient(**client_options) as c:
                     r = await c.get(url, headers={"User-Agent": self.ua.random})
                     if r.status_code == 200:
                         h = hashlib.md5(r.text.encode()).hexdigest()
@@ -1853,7 +1861,18 @@ async def execute_pipeline(
         log("ORCH", "▶ PHASE 1: Discovery")
         raw = []
         if mode in ("full", "discovery_only"):
-            raw = await discovery.run()
+            try:
+                # Isolate the scraper as a background task to prevent catastrophic bubbling
+                task = asyncio.create_task(discovery.run())
+                raw = await asyncio.wait_for(task, timeout=3600)
+            except asyncio.TimeoutError:
+                log("ORCH", "CRITICAL: Discovery phase timed out after 60 minutes", "ERROR")
+                with open("isolated_errors.log", "a") as f:
+                    f.write(f"[{datetime.utcnow().isoformat()}] TIMEOUT in DiscoveryAgent\n")
+            except Exception as e:
+                log("ORCH", f"CRITICAL: Subsystem failure in DiscoveryAgent: {e}", "ERROR")
+                with open("isolated_errors.log", "a") as f:
+                    f.write(f"[{datetime.utcnow().isoformat()}] ERROR in DiscoveryAgent: {e}\n")
         if not raw:
             log("ORCH", "  No new listings — running cleanup only", "WARN")
             if cleanup: await cleanup_ag.run()
@@ -1973,6 +1992,9 @@ async def execute_pipeline(
     except Exception as e:
         log("ORCH", f"CRITICAL: {e}", "ERROR")
         import traceback; traceback.print_exc()
+        with open("isolated_errors.log", "a") as f:
+            f.write(f"[{datetime.utcnow().isoformat()}] GLOBAL PIPELINE ERROR: {e}\n")
+            f.write(traceback.format_exc() + "\n")
         return []
     finally:
         await scout.close()
@@ -2123,6 +2145,49 @@ def cli_trend(listings_path: str) -> None:
 # ══════════════════════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     import argparse
+    import subprocess
+    import atexit
+
+    class EngineManager:
+        def __init__(self):
+            self.processes = []
+            self.bin_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bin")
+            self.ext = ".exe" if sys.platform == "win32" else ""
+            
+        def start_engine(self, name):
+            bin_path = os.path.join(self.bin_dir, f"{name}{self.ext}")
+            if not os.path.exists(bin_path):
+                log("ENGINES", f"Binary not found: {bin_path}. Please run build_engines.ps1 (Windows) or check CI cache (Linux).", "WARN")
+                return None
+                
+            try:
+                # We pipe stdout and stderr to DEVNULL to avoid cluttering the Python logs, 
+                # but in production you might want to pipe them to isolated_errors.log
+                p = subprocess.Popen([bin_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                self.processes.append((name, p))
+                log("ENGINES", f"Successfully started native engine: {name}")
+                return p
+            except Exception as e:
+                log("ENGINES", f"Failed to start {name}: {str(e)}", "ERROR")
+                return None
+                
+        def shutdown(self):
+            for name, p in self.processes:
+                if p.poll() is None:
+                    p.terminate()
+                    p.wait(timeout=5)
+                    log("ENGINES", f"Gracefully shut down native engine: {name}")
+
+    engine_mgr = EngineManager()
+    atexit.register(engine_mgr.shutdown)
+    
+    # Spawn background native engines
+    engine_mgr.start_engine("main")         # Go Telemetry Server
+    engine_mgr.start_engine("rust_engine")  # Rust Compute Node
+    
+    # 1.5s initialization buffer to allow native daemons to bind local sockets before scraping
+    import time
+    time.sleep(1.5)
 
     p = argparse.ArgumentParser(description="CHANAKYAN-KV v10.0 — Kerala Internship Intelligence")
     p.add_argument("--mode", choices=["full","discovery_only","revalidate_only"],

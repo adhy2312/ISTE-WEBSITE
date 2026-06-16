@@ -2,8 +2,12 @@ name: Autonomous Internship Engine
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # Every 6 hours
+    - cron: '0 * * * *' # Every hour
   workflow_dispatch: # Allow manual trigger
+
+concurrency: 
+  group: internship-engine
+  cancel-in-progress: false
 
 # Declare all secrets consumed by this workflow so the linter can verify them.
 # Any secret marked optional will gracefully default to empty string if not set.
@@ -19,6 +23,31 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Cache Engines
+        id: cache-engines
+        uses: actions/cache@v4
+        with:
+          path: scripts/bin
+          key: ${{ runner.os }}-engines-${{ hashFiles('go_engine/**', 'rust_engine/**') }}
+
+      - name: Set up Go
+        if: steps.cache-engines.outputs.cache-hit != 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Set up Rust
+        if: steps.cache-engines.outputs.cache-hit != 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Go and Rust Engines
+        if: steps.cache-engines.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p scripts/bin
+          cd go_engine && go build -o ../scripts/bin/main && cd ..
+          cd rust_engine && cargo build --release && cp target/release/rust_engine ../scripts/bin/rust_engine && cd ..
+
+
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -29,21 +58,40 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Install playwright browsers (with system deps)
-        # --with-deps installs required OS libraries (libglib, libnss, etc.)
-        # Without this, Chromium launch fails on Ubuntu runners
+      - name: Install playwright browsers and system deps
         run: python -m playwright install --with-deps chromium
 
+      - name: Defensive Execution Permissions
+        run: chmod +x scripts/bin/* || true
+
       - name: Run Engine
+        if: always()
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
           SANITY_API_TOKEN: ${{ secrets.SANITY_API_TOKEN }}
-        # Run as a single pipeline pass — GitHub cron handles recurrence.
-        # Do NOT use --autonomous: that flag starts an infinite sleep loop
-        # which wastes runner time and gets killed at the 6h GitHub timeout.
-        run: python scripts/internship_engine_v10.py --mode full
+          SCRAPER_PROXY_URL: ${{ secrets.SCRAPER_PROXY_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          HOUR=$(date +%H)
+          if [ $((10#$HOUR % 12)) -eq 0 ]; then
+            MODE="full"
+          else
+            MODE="revalidate_only"
+          fi
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" python scripts/internship_engine_v10.py --mode $MODE
+
+      - name: Report Silent Failures
+        if: always()
+        run: |
+          if [ -s isolated_errors.log ]; then
+            echo "## ⚠️ Engine Subsystem Failures Detected" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat isolated_errors.log >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
 
   nightly-ml-retrain:
     runs-on: ubuntu-latest

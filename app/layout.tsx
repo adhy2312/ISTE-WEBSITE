@@ -100,6 +100,8 @@ export const metadata: Metadata = {
   },
 };
 
+import LenisProvider from './components/LenisProvider';
+
 export default async function RootLayout({
   children,
 }: {
@@ -184,7 +186,9 @@ export default async function RootLayout({
           </ClientPlatformBoundary>
 
           {/* Render page content first */}
-          {children}
+          <LenisProvider>
+            {children}
+          </LenisProvider>
 
           {/* Secondary engines: load after content on all devices */}
           <PerformanceAmplifier />

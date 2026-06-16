@@ -16,6 +16,8 @@ export default function ResumeAnalyzer({ liveInternships = [] }: { liveInternshi
   const [result, setResult] = useState<{
     score: number;
     verdict: string;
+    executiveSummaryRewrite?: string;
+    weakVerbsToReplace?: string[];
     criticalFlaws: string[];
     strengths: string[];
     lineByLineImprovements: { original_issue: string; suggested_fix: string; reason: string }[];
@@ -300,6 +302,23 @@ export default function ResumeAnalyzer({ liveInternships = [] }: { liveInternshi
               </div>
             </div>
 
+            {/* AI Executive Summary Rewrite */}
+            {result.executiveSummaryRewrite && (
+              <div className="result-item" style={{ background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(15, 23, 42, 0.8))', border: '1px solid rgba(14, 165, 233, 0.2)', borderRadius: '24px', padding: '32px', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: '#0ea5e9', borderTopLeftRadius: '24px', borderBottomLeftRadius: '24px' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <Bot size={24} color="#0ea5e9" />
+                  <h4 style={{ color: '#fff', fontSize: '1.25rem', margin: 0 }}>Executive Summary Rewrite</h4>
+                </div>
+                <p style={{ color: '#e2e8f0', fontSize: '1.1rem', lineHeight: 1.6, fontStyle: 'italic', margin: 0, paddingLeft: '16px', borderLeft: '2px dashed rgba(14, 165, 233, 0.3)' }}>
+                  &quot;{result.executiveSummaryRewrite}&quot;
+                </p>
+                <div style={{ marginTop: '16px', fontSize: '0.8rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <Sparkles size={12} style={{ display: 'inline', marginRight: '4px', marginBottom: '-2px' }}/> Copy-paste this into your objective section
+                </div>
+              </div>
+            )}
+
             {/* Split Grid: Strengths & Weaknesses */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               <div className="result-item" style={{ background: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.1)', borderRadius: '24px', padding: '32px' }}>
@@ -334,6 +353,24 @@ export default function ResumeAnalyzer({ liveInternships = [] }: { liveInternshi
                 ) : <div style={{ color: '#475569', fontStyle: 'italic' }}>No critical flaws detected.</div>}
               </div>
             </div>
+
+            {/* Weak Verbs Audit */}
+            {result.weakVerbsToReplace && result.weakVerbsToReplace.length > 0 && (
+              <div className="result-item" style={{ background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.15)', borderRadius: '24px', padding: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                  <Target size={20} color="#f59e0b" />
+                  <h4 style={{ color: '#fff', fontSize: '1.2rem', margin: 0 }}>Weak Action Verbs Detected</h4>
+                </div>
+                <div style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: '16px' }}>The ATS flagged these passive words. Replace them with strong verbs like &quot;Architected&quot;, &quot;Spearheaded&quot;, or &quot;Engineered&quot;.</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  {result.weakVerbsToReplace.map((verb, i) => (
+                    <span key={i} style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '6px 14px', borderRadius: '8px', fontSize: '0.9rem', textDecoration: 'line-through' }}>
+                      {verb}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Keyword Extraction */}
             {result.atsKeywordsMissing.length > 0 && (
