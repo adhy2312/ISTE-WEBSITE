@@ -50,14 +50,12 @@ const FALLBACK_STATS = [
 
 const DELAY_CLASSES = ['', 'd1', 'd2', 'd3', 'd1', 'd2', 'd3', 'd4', '', 'd1', 'd2', 'd3']
 
-export const revalidate = 60;
-
 export default async function Home() {
   const { isEnabled: preview } = await draftMode()
 
   let sanityData: any = null
   try {
-    sanityData = await getClient(preview).fetch(homePageQuery)
+    sanityData = await getClient(preview).fetch(homePageQuery, {}, { next: { revalidate: 60 } })
   } catch {
     // Sanity unreachable — fall through to hardcoded data
   }

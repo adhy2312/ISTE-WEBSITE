@@ -30,7 +30,6 @@ export interface InternshipData {
 import { Metadata } from 'next'
 
 // Webhook handles on-demand revalidation, but we also revalidate periodically
-export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Internship Launchpad | Member Resources",
@@ -56,7 +55,7 @@ export default async function InternshipsPage() {
   let internships: InternshipData[] = []
 
   try {
-    internships = await getClient(preview).fetch(internshipsQuery)
+    internships = await getClient(preview).fetch(internshipsQuery, {}, { next: { revalidate: 60 } })
   } catch (err) {
     console.warn('Sanity fetch failed:', err)
   }
