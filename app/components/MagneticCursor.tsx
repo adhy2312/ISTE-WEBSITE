@@ -170,7 +170,7 @@ export default function MagneticCursor() {
       el.addEventListener('mouseleave', onMouseLeave)
     })
 
-    let raf: number;
+
     const loop = () => {
       // Fluid physics lerp for the outer ring tracking the mouse
       const dx = mouseX - ringX
@@ -196,10 +196,9 @@ export default function MagneticCursor() {
         setRingScaleY(scaleY)
       }
 
-      raf = requestAnimationFrame(loop)
     }
     
-    raf = requestAnimationFrame(loop)
+    gsap.ticker.add(loop)
     window.addEventListener('mousemove', onMouseMove)
 
     // Hide native cursor site-wide
@@ -209,7 +208,7 @@ export default function MagneticCursor() {
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
-      cancelAnimationFrame(raf)
+      gsap.ticker.remove(loop)
       clearTimeout(idleTimer)
       breathingAnim.kill()
       

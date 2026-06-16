@@ -972,56 +972,16 @@
       box-shadow: 0 4px 32px rgba(0,0,0,0.65), inset 0 1px 0 rgba(180,160,255,0.06);
       border-radius: 16px;
       position: relative;
-      transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-      transition: transform 0.1s, box-shadow 0.3s, background 0.3s;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, background 0.3s;
       overflow: hidden;
+      will-change: transform;
     }
     
-    /* Magnetic Light-Tracing Borders */
-    .execom-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1.5px; /* Border thickness */
-      background: radial-gradient(
-        400px circle at var(--mx, 50%) var(--my, 50%), 
-        rgba(255, 255, 255, 0.7) 0%, 
-        transparent 40%
-      );
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s;
-      z-index: 5;
-    }
-    
-    /* Holographic Glare Overlay */
-    .execom-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(
-        circle at var(--mx, 50%) var(--my, 50%),
-        rgba(255, 255, 255, 0.15) 0%,
-        transparent 60%
-      );
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-      z-index: 2;
-      mix-blend-mode: overlay;
-    }
-
     .execom-card:hover {
       background: linear-gradient(160deg, rgba(24, 20, 56, 0.98) 0%, rgba(16, 14, 38, 0.99) 100%);
       box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 50px rgba(var(--c-main), 0.12), 0 0 30px rgba(80,60,200,0.10);
+      transform: translateY(-8px);
     }
-    .execom-card:hover::before,
-    .execom-card:hover::after { opacity: 1; }
     
     .execom-card-content {
       position: relative;
@@ -1134,24 +1094,17 @@
       background: linear-gradient(160deg, rgba(15, 13, 34, 0.9) 0%, rgba(11, 11, 24, 0.95) 100%);
       border-radius: 16px;
       cursor: pointer;
-      transform-style: preserve-3d;
-      transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-      transition: transform 0.1s, border-color 0.3s, box-shadow 0.3s, background 0.3s;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s, background 0.3s;
       overflow: hidden;
-    }
-    
-    .team-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.15) 0%, transparent 60%);
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2; mix-blend-mode: overlay;
+      will-change: transform;
     }
     
     .team-card:hover {
       border-color: rgba(140, 120, 240, 0.28);
       background: linear-gradient(160deg, rgba(22, 18, 50, 0.97) 0%, rgba(15, 13, 34, 0.99) 100%);
       box-shadow: 0 15px 50px rgba(0,0,0,0.85), 0 0 30px rgba(var(--c-main), 0.12), 0 0 20px rgba(80,60,200,0.10);
+      transform: translateY(-5px);
     }
-    .team-card:hover::before { opacity: 1; }
     .team-card.open  { border-color:rgba(255,255,255,.3); }
     .team-head {
       display:flex; align-items:center; justify-content:space-between;
@@ -1214,24 +1167,17 @@
       background: linear-gradient(160deg, rgba(14, 12, 30, 0.92) 0%, rgba(10, 10, 22, 0.97) 100%);
       border-radius: 12px;
       position: relative;
-      transform-style: preserve-3d;
-      transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-      transition: transform 0.1s, border-color 0.3s, box-shadow 0.3s, background 0.3s;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s, background 0.3s;
       overflow: hidden;
-    }
-    
-    .junior-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.15) 0%, transparent 60%);
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 2; mix-blend-mode: overlay;
+      will-change: transform;
     }
     
     .junior-card:hover {
       border-color: rgba(140, 120, 240, 0.22);
       background: linear-gradient(160deg, rgba(20, 16, 46, 0.96) 0%, rgba(14, 12, 30, 0.99) 100%);
       box-shadow: 0 10px 40px rgba(0,0,0,0.78), 0 0 24px rgba(var(--c-main), 0.10), 0 0 14px rgba(80,60,200,0.09);
+      transform: translateY(-5px);
     }
-    .junior-card:hover::before { opacity: 1; }
     .junior-avatar {
       width:52px; height:52px; border-radius:50%;
       background:var(--g800); border:1px solid var(--border);
@@ -1698,8 +1644,7 @@
       box-shadow:
         0 4px 36px rgba(0, 0, 0, 0.65),
         inset 0 1px 0 rgba(180,160,255,0.07);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      /* Backdrop filter removed for performance */
     }
     
     .internship-card:hover {

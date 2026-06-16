@@ -1,13 +1,14 @@
 'use client';
 
 import { getActiveProfile } from './AdaptiveRenderingProfiles';
+import { gsap } from '../../brain/engines/GSAPCore';
 
 export class GPUProfiler {
   private static fpsBuffer: number[] = [];
   private static lastTime: number = 0;
   private static frameCount: number = 0;
   private static isThrottled: boolean = false;
-  private static animationFrameId: number | null = null;
+
   
   static start() {
     if (typeof window === 'undefined') return;
@@ -19,14 +20,11 @@ export class GPUProfiler {
     }
 
     this.lastTime = performance.now();
-    this.loop();
+    gsap.ticker.add(this.loop);
   }
 
   static stop() {
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
+    gsap.ticker.remove(this.loop);
   }
 
   private static loop() {
@@ -49,7 +47,6 @@ export class GPUProfiler {
       this.lastTime = now;
     }
     
-    this.animationFrameId = requestAnimationFrame(() => this.loop());
   }
 
   private static evaluatePressure() {

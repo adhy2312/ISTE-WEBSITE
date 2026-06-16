@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { gsap } from '../brain/engines/GSAPCore';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -110,10 +111,13 @@ export function GlowingEdgeCard({
       
       const startTime = performance.now();
       
-      const animate = (now: number) => {
-        if (!cardRef.current || !cardRef.current.classList.contains('animating')) return;
+      const animate = (time: number) => {
+        if (!cardRef.current || !cardRef.current.classList.contains('animating')) {
+            gsap.ticker.remove(animate);
+            return;
+        }
         
-        const elapsed = now - startTime;
+        const elapsed = (time * 1000) - startTime;
         
         if (elapsed > 500 && elapsed < 1000) {
             const t = (elapsed - 500) / 500;
@@ -141,15 +145,14 @@ export function GlowingEdgeCard({
             cardRef.current.style.setProperty('--pointer-d', `${(1 - ease) * 100}`);
         }
         
-        if (elapsed < 4500) {
-            requestAnimationFrame(animate);
-        } else {
+        if (elapsed >= 4500) {
             setIsAnimating(false);
             cardRef.current?.classList.remove('animating');
+            gsap.ticker.remove(animate);
         }
       };
       
-      requestAnimationFrame(animate);
+      gsap.ticker.add(animate);
     };
 
     const timer = setTimeout(() => {

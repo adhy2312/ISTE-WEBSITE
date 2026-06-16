@@ -46,7 +46,6 @@ export default function InternshipClientEngine() {
       })
     }
 
-    let rafId: number
     const render = () => {
       ctx.clearRect(0, 0, width, height)
       ctx.fillStyle = 'rgba(59, 130, 246, 0.4)'
@@ -73,9 +72,8 @@ export default function InternshipClientEngine() {
           }
         }
       })
-      rafId = requestAnimationFrame(render)
-    }
-    render()
+      }
+      gsap.ticker.add(render)
 
     const handleResize = () => {
       width = canvas.width = canvas.offsetWidth
@@ -83,7 +81,7 @@ export default function InternshipClientEngine() {
     }
     window.addEventListener('resize', handleResize)
     return () => {
-      cancelAnimationFrame(rafId)
+      gsap.ticker.remove(render)
       window.removeEventListener('resize', handleResize)
     }
   }, [activeTab])

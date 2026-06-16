@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { urlForImage } from '@/lib/sanity/image'
 import { homePageQuery } from '@/app/queries/homeQueries'
 import HomeAnimations from '@/app/components/HomeAnimations'
-// import LiveEventBanner from '@/app/components/LiveEventBanner'
 import TeamCard from '@/app/components/TeamCard'
 import dynamic from 'next/dynamic'
 const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'))
@@ -24,7 +23,6 @@ import {
   Briefcase
 } from 'lucide-react'
 import ExecomAvatar from '@/app/components/ExecomAvatar'
-import ImpactChronicle from '@/app/components/ImpactChronicle'
 
 
 // Fallback data when Sanity has no content yet
@@ -50,45 +48,6 @@ const FALLBACK_STATS = [
 
 
 
-const FALLBACK_EXECOM = {
-  faculty: [
-    { _id: 'f1', name: 'Melvin Jacob', initials: 'MJ', role: 'Faculty Advisor', category: 'faculty' },
-    { _id: 'f2', name: 'Dr. Soumya A V', initials: 'S', role: 'Faculty Advisor', category: 'faculty' },
-  ],
-  mentors: [
-    { _id: 'm1', name: 'Kiran Biju', initials: 'KB', role: 'Student Mentor', category: 'mentor' },
-    { _id: 'm2', name: 'Krishna Prashanth', initials: 'KP', role: 'Student Mentor', category: 'mentor' },
-  ],
-  core: [
-    { _id: 'c1', name: 'Aarya Ramesh', initials: 'AR', role: 'Chairperson', category: 'core' },
-    { _id: 'c2', name: 'Snith Shibu', initials: 'SS', role: 'Vice Chairperson', category: 'core' },
-    { _id: 'c3', name: 'Pushkala S S', initials: 'PS', role: 'Secretary', category: 'core' },
-    { _id: 'c4', name: 'Sidharth Sumitra Gireesh', initials: 'SG', role: 'Treasurer', category: 'core' },
-  ],
-  teamLeads: [
-    { _id: 'tl1', name: 'Jenza Mary Jose', initials: 'EM', role: 'Team Lead', team: 'Event Management Team', subMembers: [{ name: 'Adithyan M S', initials: 'AM' }, { name: 'Dhiya K', initials: 'DK' }, { name: 'Avantika Ajaykumar', initials: 'AA' }, { name: 'Devanandan P Unnithan', initials: 'DU' }, { name: 'Firose Muhammed S', initials: 'FM' }] },
-    { _id: 'tl2', name: '[Design Lead]', initials: 'DT', role: 'Team Lead', team: 'Design Team', subMembers: [{ name: 'Devananda S R', initials: 'DS' }, { name: 'Neha Nevin', initials: 'NN' }] },
-    { _id: 'tl3', name: 'Neil Philip Koshy', initials: 'ST', role: 'Team Lead', team: 'Sponsorship Team', subMembers: [{ name: 'Abhishek S S', initials: 'AS' }, { name: 'Christopher George', initials: 'CG' }] },
-    { _id: 'tl4', name: 'Adhithya Mohan S', initials: 'PR', role: 'Team Lead', team: 'PR and Media Team', subMembers: [{ name: 'Rohin Daniel John', initials: 'RD' }, { name: 'Rogin', initials: 'RG' }, { name: 'Abhishek S', initials: 'AS' }, { name: 'Vishwabala P', initials: 'VP' }] },
-    { _id: 'tl5', name: 'Aparna Rajagopal', initials: 'CD', role: 'Team Lead', team: 'Content & Documentation Team', subMembers: [{ name: 'Angelina R Nambiar', initials: 'AN' }, { name: 'Devikrishna A R', initials: 'DA' }, { name: 'Sneha A Oommen', initials: 'SO' }] },
-    { _id: 'tl6', name: 'Angel Rose Prince', initials: 'SH', role: 'Team Lead', team: 'SHE Team', subMembers: [{ name: 'Adia Ani', initials: 'AA' }, { name: 'Aishwarya Balakrishnan Menon', initials: 'AB' }, { name: 'Anagha S', initials: 'AS' }] },
-  ],
-  junior: [
-    { _id: 'j1', name: 'Govind Warrier', initials: 'GW', role: 'Event Management Team' },
-    { _id: 'j2', name: 'S. Abarna Prasad', initials: 'AP', role: 'Event Management Team' },
-    { _id: 'j3', name: 'R. Vishakh', initials: 'RV', role: 'Design Team' },
-    { _id: 'j4', name: 'Charu B. Eshwar', initials: 'CB', role: 'Design Team' },
-    { _id: 'j5', name: 'Gopika J.R.', initials: 'GJ', role: 'PR & Media Team' },
-    { _id: 'j6', name: 'Eshan M.S.', initials: 'EM', role: 'PR & Media Team' },
-    { _id: 'j7', name: 'R. Hari Krishnan', initials: 'RH', role: 'PR & Media Team' },
-    { _id: 'j8', name: 'Sona Biju', initials: 'SB', role: 'PR & Media Team' },
-    { _id: 'j9', name: 'Gourilekshmi Prashanth', initials: 'GP', role: 'PR & Media Team' },
-    { _id: 'j10', name: 'Ashiya Noufal', initials: 'AN', role: 'SHE Team' },
-    { _id: 'j11', name: 'Sreya Krishna', initials: 'SK', role: 'SHE Team' },
-    { _id: 'j12', name: 'Ganga A.B.', initials: 'GA', role: 'Content & Documentation' },
-  ],
-}
-
 const DELAY_CLASSES = ['', 'd1', 'd2', 'd3', 'd1', 'd2', 'd3', 'd4', '', 'd1', 'd2', 'd3']
 
 export default async function Home() {
@@ -106,7 +65,6 @@ export default async function Home() {
   const stats = rawStats.filter((stat: any, index: number, self: any[]) =>
     index === self.findIndex((t: any) => t.label === stat.label)
   )
-  // Testimonials removed — replaced by ImpactChronicle section
   const settings = sanityData?.settings || {}
   const featuredInternships: any[] = sanityData?.featuredInternships || []
   const pillars: any[] = sanityData?.pillars || []
@@ -139,23 +97,35 @@ export default async function Home() {
     'Certificates of participation for every ISTE event'
   ]
 
-  // Build execom lists from Sanity or fallback
+  // Build execom lists from Sanity (No fallback data per user request)
   const members = sanityData?.execomMembers || []
-  const faculty = members.filter((m: any) => m.category === 'faculty').length
-    ? members.filter((m: any) => m.category === 'faculty')
-    : FALLBACK_EXECOM.faculty
-  const mentors = members.filter((m: any) => m.category === 'mentor').length
-    ? members.filter((m: any) => m.category === 'mentor')
-    : FALLBACK_EXECOM.mentors
-  const core = members.filter((m: any) => m.category === 'core').length
-    ? members.filter((m: any) => m.category === 'core')
-    : FALLBACK_EXECOM.core
-  const teamLeads = members.filter((m: any) => m.category === 'teamLead').length
-    ? members.filter((m: any) => m.category === 'teamLead')
-    : FALLBACK_EXECOM.teamLeads
-  const junior = members.filter((m: any) => m.category === 'junior').length
-    ? members.filter((m: any) => m.category === 'junior')
-    : FALLBACK_EXECOM.junior
+  const faculty = members.filter((m: any) => m.category === 'faculty')
+  const mentors = members.filter((m: any) => m.category === 'mentor')
+  const core = members.filter((m: any) => m.category === 'core')
+  
+  const teamCategories = [
+    { id: 'pr_media', name: 'PR and Media Team' },
+    { id: 'design', name: 'Design Team' },
+    { id: 'content_doc', name: 'Content and Documentation Team' },
+    { id: 'event_management', name: 'Event Management Team' },
+    { id: 'she', name: 'SHE Team' },
+    { id: 'internship_launchpad', name: 'Internship Launchpad Team' },
+  ]
+
+  const teams = teamCategories.map(tc => {
+    const head = members.find((m: any) => m.category === tc.id)
+    if (!head) return null
+    return {
+      _id: head._id,
+      initials: head.initials,
+      name: head.name,
+      team: tc.name,
+      subMembers: head.subMembers || [],
+      photo: head.photo,
+    }
+  }).filter(Boolean)
+
+  const junior = members.filter((m: any) => m.category === 'junior')
 
   // Fetch active events from the dedicated schema
   const activeEvents = sanityData?.activeEvents || []
@@ -341,7 +311,7 @@ export default async function Home() {
                   position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
                   width: '150px', height: '150px',
                   background: 'radial-gradient(circle, rgba(var(--c-main), 0.2) 0%, transparent 70%)',
-                  borderRadius: '50%', filter: 'blur(40px)', animation: 'heartbeat 4s ease-in-out infinite',
+                  borderRadius: '50%', opacity: 0.15, animation: 'pulseOpacity 4s ease-in-out infinite',
                   zIndex: 0, pointerEvents: 'none'
                 }}></div>
                 
@@ -515,128 +485,171 @@ export default async function Home() {
           <h2 className="section-title reveal d1" style={{ position: 'relative', zIndex: 2 }} dangerouslySetInnerHTML={{ __html: settings.execomTitle || 'Executive<br /><em>Committee</em>' }}></h2>
           
           {/* Decorative atmospheric node for the Execom section */}
-          <div className="absolute left-1/2 top-32 -translate-x-1/2 w-[800px] h-[800px] blur-[150px] opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(var(--c-alt1), 1) 0%, transparent 60%)', zIndex: 0 }} />
+          <div className="absolute left-1/2 top-32 -translate-x-1/2 w-[800px] h-[800px] opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(var(--c-alt1), 0.8) 0%, transparent 70%)', zIndex: 0 }} />
 
-          <div className="execom-sub-label reveal">{settings.execomFacultyLabel || 'Faculty Advisors'}</div>
-          <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
-            {faculty.map((m: any, i: number) => (
-              <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
-                <div className="execom-card-content">
-                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
-                  <div className="execom-name">{m.name}</div>
-                  <div className="execom-role">{m.role}</div>
-                  {(m.linkedinUrl || m.instagramUrl) && (
-                    <div className="flex items-center justify-center gap-3 mt-4">
-                      {m.linkedinUrl && (
-                        <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
-                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                          </svg>
-                        </a>
-                      )}
-                      {m.instagramUrl && (
-                        <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
-                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-                          </svg>
-                        </a>
+          {faculty.length > 0 && (
+            <>
+              <div className="execom-sub-label reveal">{settings.execomFacultyLabel || 'Faculty Advisors'}</div>
+              <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
+                {faculty.map((m: any, i: number) => (
+                  <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
+                    <div className="execom-card-content">
+                      <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
+                      <div className="execom-name">{m.name}</div>
+                      <div className="execom-role">{m.role}</div>
+                      {(m.linkedinUrl || m.instagramUrl) && (
+                        <div className="flex items-center justify-center gap-3 mt-4">
+                          {m.linkedinUrl && (
+                            <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                            </a>
+                          )}
+                          {m.instagramUrl && (
+                            <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" /></svg>
+                            </a>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
-          <div className="execom-sub-label reveal">{settings.execomMentorsLabel || 'Student Mentors'}</div>
-          <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
-            {mentors.map((m: any, i: number) => (
-              <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
-                <div className="execom-card-content">
-                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
-                  <div className="execom-name">{m.name}</div>
-                  <div className="execom-role">{m.role}</div>
-                  {(m.linkedinUrl || m.instagramUrl) && (
-                    <div className="flex items-center justify-center gap-3 mt-4">
-                      {m.linkedinUrl && (
-                        <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
-                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                          </svg>
-                        </a>
-                      )}
-                      {m.instagramUrl && (
-                        <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
-                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-                          </svg>
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="execom-sub-label reveal">{settings.execomCoreLabel || 'Core Officers'}</div>
-          <div className="execom-core bento">
-            {core.map((m: any, i: number) => (
-              <div key={m._id} className={`execom-card reveal ${DELAY_CLASSES[i] || ''} ${i < 2 ? 'bento-wide' : 'bento-wide'}`}>
-                <div className="execom-card-content">
-                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
-                  <div className="execom-name">{m.name}</div>
-                  <div className="execom-role">{m.role}</div>
-                  {(m.linkedinUrl || m.instagramUrl) && (
-                    <div className="flex items-center justify-center gap-3 mt-4">
-                      {m.linkedinUrl && (
-                        <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
-                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                          </svg>
-                        </a>
-                      )}
-                      {m.instagramUrl && (
-                        <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
-                          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-                          </svg>
-                        </a>
+          {mentors.length > 0 && (
+            <>
+              <div className="execom-sub-label reveal">{settings.execomMentorsLabel || 'Student Mentors'}</div>
+              <div className="execom-core" style={{ gridTemplateColumns: 'repeat(2,1fr)', maxWidth: 560 }}>
+                {mentors.map((m: any, i: number) => (
+                  <div key={m._id} className={`execom-card reveal ${i > 0 ? 'd1' : ''}`}>
+                    <div className="execom-card-content">
+                      <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
+                      <div className="execom-name">{m.name}</div>
+                      <div className="execom-role">{m.role}</div>
+                      {(m.linkedinUrl || m.instagramUrl) && (
+                        <div className="flex items-center justify-center gap-3 mt-4">
+                          {m.linkedinUrl && (
+                            <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                            </a>
+                          )}
+                          {m.instagramUrl && (
+                            <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" /></svg>
+                            </a>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {members.length === 0 ? (
+            <div className="reveal d1" style={{
+              padding: '80px 40px',
+              textAlign: 'center',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.05) 100%)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '24px',
+              boxShadow: 'inset 0 0 80px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.2)',
+              margin: '40px 0',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%)',
+                opacity: 0.2, pointerEvents: 'none'
+              }} />
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', color: '#f8fafc', marginBottom: '16px', position: 'relative', zIndex: 1 }}>
+                Building the Future
+              </h3>
+              <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '600px', margin: '0 auto', fontSize: '1.1rem', lineHeight: 1.6, position: 'relative', zIndex: 1 }}>
+                The next generation of leaders for the Executive Committee is currently being selected. The new team will be announced very soon.
+              </p>
+              <div className="mt-8 relative z-10 flex justify-center">
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-sky-400">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                  </span>
+                  Selection Ongoing
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="execom-sub-label reveal">{settings.execomTeamLeadsLabel || 'Team Leads'}</div>
-          <div className="execom-teams">
-            {teamLeads.map((tl: any, i: number) => (
-              <TeamCard
-                key={tl._id}
-                id={tl.initials}
-                name={tl.name}
-                team={tl.team || ''}
-                delay={DELAY_CLASSES[i % 4]}
-                subs={tl.subMembers || []}
-                photo={tl.photo}
-              />
-            ))}
-          </div>
-
-          <div className="execom-sub-label reveal">{settings.execomJuniorLabel || 'Junior ExeCom'}</div>
-          <div className="junior-grid">
-            {junior.map((m: any, i: number) => (
-              <div key={m._id} className={`junior-card reveal ${DELAY_CLASSES[i] || ''}`}>
-                <div className="execom-card-content">
-                  <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} size="sm" />
-                  <div className="junior-name">{m.name}</div>
-                  <div className="junior-role">{m.team || m.role}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <>
+              {core.length > 0 && (
+                <>
+                  <div className="execom-sub-label reveal">{settings.execomCoreLabel || 'Core Officers'}</div>
+                  <div className="execom-core bento">
+                    {core.map((m: any, i: number) => (
+                      <div key={m._id} className={`execom-card reveal ${DELAY_CLASSES[i] || ''} ${i < 2 ? 'bento-wide' : 'bento-wide'}`}>
+                        <div className="execom-card-content">
+                          <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} />
+                          <div className="execom-name">{m.name}</div>
+                          <div className="execom-role">{m.role}</div>
+                          {(m.linkedinUrl || m.instagramUrl) && (
+                            <div className="flex items-center justify-center gap-3 mt-4">
+                              {m.linkedinUrl && (
+                                <a href={m.linkedinUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`LinkedIn of ${m.name}`}>
+                                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                                </a>
+                              )}
+                              {m.instagramUrl && (
+                                <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity" aria-label={`Instagram of ${m.name}`}>
+                                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.46 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" /></svg>
+                                </a>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+              {teams.length > 0 && (
+                <>
+                  <div className="execom-sub-label reveal">{settings.execomTeamLeadsLabel || 'Teams'}</div>
+                  <div className="execom-teams">
+                    {teams.map((tl: any, i: number) => (
+                      <TeamCard
+                        key={tl._id}
+                        id={tl.initials}
+                        name={tl.name}
+                        team={tl.team || ''}
+                        delay={DELAY_CLASSES[i % 4]}
+                        subs={tl.subMembers || []}
+                        photo={tl.photo}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+              {junior.length > 0 && (
+                <>
+                  <div className="execom-sub-label reveal">{settings.execomJuniorLabel || 'Junior ExeCom'}</div>
+                  <div className="junior-grid">
+                    {junior.map((m: any, i: number) => (
+                      <div key={m._id} className={`junior-card reveal ${DELAY_CLASSES[i] || ''}`}>
+                        <div className="execom-card-content">
+                          <ExecomAvatar photo={m.photo} initials={m.initials} name={m.name} size="sm" />
+                          <div className="junior-name">{m.name}</div>
+                          <div className="junior-role">{m.team || m.role}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
       </section>
 
@@ -679,7 +692,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="membership">
+      <section id="membership" style={{ paddingBottom: 80 }}>
         <div className="section-inner">
           <div className="section-tag reveal">{settings.membershipTag || 'Enroll Now'}</div>
           <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.membershipTitle || 'Grab Your<br /><em>Membership</em>' }}></h2>
@@ -707,10 +720,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <ImpactChronicle stats={stats} events={events} />
 
       {/* ===================== INTERNSHIP LAUNCHPAD TEASER ===================== */}
-      <section id="launchpad" style={{ background: 'var(--black)', borderTop: '1px solid var(--border)' }}>
+      <section id="launchpad" style={{ background: 'var(--black)', paddingTop: 80 }}>
         <div className="section-inner">
           <div className="section-tag reveal">{settings.launchpadTag || 'Member Resources'}</div>
           <div className="launchpad-teaser-grid">
@@ -787,7 +799,7 @@ export default async function Home() {
                     position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
                     width: '120px', height: '120px',
                     background: 'radial-gradient(circle, rgba(140, 120, 240, 0.15) 0%, transparent 70%)',
-                    borderRadius: '50%', filter: 'blur(20px)', animation: 'heartbeat 3s ease-in-out infinite',
+                    borderRadius: '50%', opacity: 0.15, animation: 'pulseOpacity 3s ease-in-out infinite',
                     zIndex: 0, pointerEvents: 'none'
                   }}></div>
                   

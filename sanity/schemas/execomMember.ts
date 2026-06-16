@@ -26,24 +26,23 @@ export const execomMemberSchema = defineType({
     }),
     defineField({
       name: 'category',
-      title: 'Category',
+      title: 'Team / Category',
       type: 'string',
       options: {
         list: [
           { title: 'Faculty Advisor', value: 'faculty' },
           { title: 'Student Mentor', value: 'mentor' },
-          { title: 'Core Officer', value: 'core' },
-          { title: 'Team Lead', value: 'teamLead' },
+          { title: 'Core Team', value: 'core' },
+          { title: 'PR and Media Team', value: 'pr_media' },
+          { title: 'Design Team', value: 'design' },
+          { title: 'Content and Documentation Team', value: 'content_doc' },
+          { title: 'Event Management Team', value: 'event_management' },
+          { title: 'SHE Team', value: 'she' },
+          { title: 'Internship Launchpad Team', value: 'internship_launchpad' },
           { title: 'Junior ExeCom', value: 'junior' },
         ],
       },
       validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'team',
-      title: 'Team (for Team Leads & Junior ExeCom)',
-      description: 'e.g. "Event Management Team"',
-      type: 'string',
     }),
     defineField({
       name: 'photo',
@@ -68,7 +67,7 @@ export const execomMemberSchema = defineType({
     }),
     defineField({
       name: 'subMembers',
-      title: 'Sub-Members (for Team Leads only)',
+      title: 'Sub-Members (for Team Heads only)',
       type: 'array',
       of: [
         {

@@ -185,37 +185,10 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
     // Engine 1: Telemetry & Memory (FPS Monitor for butter smooth check)
     let frameCount = 0;
     let lastTime = performance.now();
-    let animFrame: number;
 
-    // Engine 4: Physical (Smooth scrolling + Momentum via Lenis)
-    // Dynamic import to avoid SSR issues with Lenis
-    let lenis: any = null;
-    const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    // Engine 4: Physical (Smooth scrolling) is handled securely by LenisProvider
+    // It broadcasts velocity updates back to this Brain core natively.
     
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (typeof ResizeObserver !== 'undefined' && !isTouch && !isIOS) {
-      import('lenis').then(({ default: Lenis }) => {
-        lenis = new Lenis({
-          duration: 1.2,
-          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          orientation: 'vertical',
-          gestureOrientation: 'vertical',
-          smoothWheel: true,
-          touchMultiplier: 2,
-        });
-
-        lenis.on('scroll', (e: any) => {
-          notifyEngine('Scroll', 'velocity', { velocity: e.velocity });
-          ScrollTrigger.update();
-        });
-
-        gsap.ticker.add((time) => {
-          if (lenis) lenis.raf(time * 1000);
-        });
-
-      }).catch(e => console.warn('Lenis failed to load:', e));
-    }
-
     let isLooping = true;
     const measureFPSAndPhysics = (time: number) => {
       if (!isLooping) return;
@@ -237,16 +210,15 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
         frameCount = 0;
         lastTime = now;
       }
-      animFrame = requestAnimationFrame(measureFPSAndPhysics);
     };
-    animFrame = requestAnimationFrame(measureFPSAndPhysics);
+    gsap.ticker.add(measureFPSAndPhysics);
 
     // Load Dissipation Engine: Tab Visibility
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Halt brain when tab is backgrounded
         isLooping = false;
-        cancelAnimationFrame(animFrame);
+        gsap.ticker.remove(measureFPSAndPhysics);
         notifyEngine('Memory', 'sleep');
         if (audioCtxRef.current && audioCtxRef.current.state === 'running') {
           audioCtxRef.current.suspend();
@@ -255,7 +227,7 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
         // Wake brain up
         isLooping = true;
         lastTime = performance.now();
-        animFrame = requestAnimationFrame(measureFPSAndPhysics);
+        gsap.ticker.add(measureFPSAndPhysics);
         notifyEngine('Memory', 'wake');
         if (audioStarted.current && audioCtxRef.current && audioCtxRef.current.state === 'suspended' && !intervention) {
           audioCtxRef.current.resume();
@@ -295,8 +267,8 @@ export default function BrainProvider({ children }: { children: React.ReactNode 
       document.removeEventListener('click', initAtmosphere);
       document.removeEventListener('scroll', initAtmosphere);
       if (audioCtxRef.current) audioCtxRef.current.close();
-      cancelAnimationFrame(animFrame);
-      if (lenis) lenis.destroy();
+      gsap.ticker.remove(measureFPSAndPhysics);
+
       document.body.removeEventListener('click', triggerHaptic);
     };
   }, []);

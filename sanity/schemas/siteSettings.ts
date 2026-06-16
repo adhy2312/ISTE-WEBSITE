@@ -346,12 +346,7 @@ export const siteSettingsSchema = defineType({
       type: 'string',
       initialValue: 'Experimental • Under Construction',
     }),
-    defineField({
-      name: 'aboutTag',
-      title: 'About Section Tag',
-      type: 'string',
-      initialValue: 'About Us',
-    }),
+
   ],
   preview: {
     select: { title: 'chapterCode' },

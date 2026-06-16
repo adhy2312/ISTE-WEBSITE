@@ -5,9 +5,11 @@ import Lenis from 'lenis';
 import { usePathname } from 'next/navigation';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
+import { useBrain } from '../brain/BrainProvider';
 
 export default function LenisProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const brain = useBrain();
 
   useEffect(() => {
     // We only enable Lenis if the user has no motion preference
@@ -25,7 +27,10 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
     });
 
     // Keep GSAP ScrollTrigger in sync with Lenis
-    lenis.on('scroll', ScrollTrigger.update);
+    lenis.on('scroll', (e: any) => {
+      brain.notifyEngine('Scroll', 'velocity', { velocity: e.velocity });
+      ScrollTrigger.update();
+    });
 
     gsap.ticker.add((time) => {
       lenis.raf(time * 1000);

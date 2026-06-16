@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
 import { useBrain } from '../brain/BrainProvider';
+import { gsap } from '../brain/engines/GSAPCore';
 
 export default function DigitalSoul() {
   const { soulState, perfMetrics, creativeState } = useBrain();
@@ -32,7 +33,6 @@ export default function DigitalSoul() {
     let targetY = soulY;
     let time = 0;
     let frameCount = 0;
-    let raf: number;
     const startTime = Date.now();
     let lastBg = '';
 
@@ -40,7 +40,6 @@ export default function DigitalSoul() {
       frameCount++;
       // Throttle to ~20fps (skip every 2 frames out of 3)
       if (frameCount % 3 !== 0) {
-        raf = requestAnimationFrame(loop);
         return;
       }
 
@@ -82,11 +81,10 @@ export default function DigitalSoul() {
         soul.style.opacity = state.isThinking ? '0.2' : '0.08';
       }
 
-      raf = requestAnimationFrame(loop);
     };
 
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    gsap.ticker.add(loop);
+    return () => gsap.ticker.remove(loop);
   }, []);
 
   return (

@@ -31,7 +31,24 @@ export default defineConfig({
             S.documentTypeListItem('announcement').title('Announcements'),
             S.documentTypeListItem('activeEvent').title('Active Events'),
             S.documentTypeListItem('event').title('All Events'),
-            S.documentTypeListItem('execomMember').title('ExeCom Members'),
+            S.listItem()
+              .title('ExeCom Management')
+              .child(
+                S.list()
+                  .title('ExeCom Teams')
+                  .items([
+                    S.listItem().title('Faculty Advisors').child(S.documentList().title('Faculty Advisors').filter('_type == "execomMember" && category == "faculty"')),
+                    S.listItem().title('Mentors').child(S.documentList().title('Mentors').filter('_type == "execomMember" && category == "mentor"')),
+                    S.listItem().title('Core Team').child(S.documentList().title('Core Team').filter('_type == "execomMember" && category == "core"')),
+                    S.listItem().title('PR and Media Team').child(S.documentList().title('PR and Media Team').filter('_type == "execomMember" && category == "pr_media"')),
+                    S.listItem().title('Design Team').child(S.documentList().title('Design Team').filter('_type == "execomMember" && category == "design"')),
+                    S.listItem().title('Content and Documentation Team').child(S.documentList().title('Content and Documentation Team').filter('_type == "execomMember" && category == "content_doc"')),
+                    S.listItem().title('Event Management Team').child(S.documentList().title('Event Management Team').filter('_type == "execomMember" && category == "event_management"')),
+                    S.listItem().title('SHE Team').child(S.documentList().title('SHE Team').filter('_type == "execomMember" && category == "she"')),
+                    S.listItem().title('Internship Launchpad Team').child(S.documentList().title('Internship Launchpad Team').filter('_type == "execomMember" && category == "internship_launchpad"')),
+                    S.listItem().title('Junior ExeCom').child(S.documentList().title('Junior ExeCom').filter('_type == "execomMember" && category == "junior"')),
+                  ])
+              ),
             S.documentTypeListItem('pillar').title('Who We Are (Pillars)'),
             S.documentTypeListItem('benefit').title('Member Benefits'),
             S.documentTypeListItem('stat').title('Stats'),

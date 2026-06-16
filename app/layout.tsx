@@ -8,7 +8,7 @@ import PhysicsEngine from './brain/PhysicsEngine';
 import NeuralNetwork from './brain/NeuralNetwork';
 import MemoryEngine from './brain/MemoryEngine';
 
-const IsteAssistant = dynamic(() => import('./components/IsteAssistant'));
+
 const MagneticCursor = dynamic(() => import('./components/MagneticCursor'));
 const DigitalSoul = dynamic(() => import('./components/DigitalSoul'));
 const EngineObservatory = dynamic(() => import('./components/EngineObservatory'));
@@ -20,7 +20,6 @@ const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngin
 const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
 const IOSAdaptiveEngine = dynamic(() => import('./engines/ios/IOSAdaptiveEngine'));
 const ClientPlatformBoundary = dynamic(() => import('./brain/ClientPlatformBoundary'));
-const BlueprintSplash = dynamic(() => import('./components/BlueprintSplash'));
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -168,7 +167,7 @@ export default async function RootLayout({
         className={`${outfit.variable} ${playfair.variable} ${orbitron.variable} ${anton.variable} ${jakarta.variable} font-sans`}
         suppressHydrationWarning
       >
-        <BlueprintSplash />
+
         <BrainProvider>
           <IOSAdaptiveEngine />
 
@@ -194,7 +193,7 @@ export default async function RootLayout({
           <PerformanceAmplifier />
           <InternshipEngine />
           {/* <PresenceEngine /> Disabled temporarily to completely isolate iOS crash factors */ }
-          {!isStudio && <IsteAssistant />}
+
           {!isStudio && <MagneticCursor />}
           {!isStudio && (process.env.NODE_ENV === 'development' || isAdmin) && <EngineObservatory />}
         </BrainProvider>

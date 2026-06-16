@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useBrain } from './BrainProvider'
+import { gsap } from './engines/GSAPCore'
 
 export default function PhysicsEngine() {
   const brain = useBrain()
@@ -57,16 +58,14 @@ export default function PhysicsEngine() {
       console.warn('[PhysicsEngine] Device orientation not supported or restricted');
     }
 
-    let raf: number
     let kineticCooldown = 0
     let lastPhysicsTime = 0
     const PHYSICS_INTERVAL = 1000 / 30 // 30fps cap
 
-    const loop = (timestamp: number) => {
-      raf = requestAnimationFrame(loop)
+    const loop = (time: number) => {
       // Throttle to 30fps
-      if (timestamp - lastPhysicsTime < PHYSICS_INTERVAL) return
-      lastPhysicsTime = timestamp
+      if (time * 1000 - lastPhysicsTime < PHYSICS_INTERVAL) return
+      lastPhysicsTime = time * 1000
       // Scroll velocity with friction decay
       const currentScroll = window.scrollY
       state.scrollVel = state.scrollVel * 0.8 + (currentScroll - state.lastScrollY) * 0.2
@@ -90,14 +89,14 @@ export default function PhysicsEngine() {
 
     }
 
-    raf = requestAnimationFrame(loop)
+    gsap.ticker.add(loop)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       try {
         window.removeEventListener('deviceorientation', handleOrientation)
       } catch(e) {}
-      cancelAnimationFrame(raf)
+      gsap.ticker.remove(loop)
     }
   }, []) // Empty deps — mounts once, never re-subscribes
 

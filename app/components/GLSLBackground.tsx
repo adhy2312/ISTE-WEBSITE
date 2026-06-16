@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { useBrain } from '../brain/BrainProvider';
+import { gsap } from '../brain/engines/GSAPCore';
 
 export default function GLSLBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -144,7 +145,6 @@ export default function GLSLBackground() {
     window.addEventListener('mousemove', handleMouseMove);
 
     // Render Loop
-    let animationFrameId: number;
     const render = (time: number) => {
       const displayWidth = window.innerWidth;
       const displayHeight = window.innerHeight;
@@ -164,13 +164,12 @@ export default function GLSLBackground() {
       gl.uniform1f(scrollVelLoc, scrollVel);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      animationFrameId = requestAnimationFrame(render);
     };
-    animationFrameId = requestAnimationFrame(render);
+    gsap.ticker.add(render);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
+      gsap.ticker.remove(render);
       gl.deleteProgram(program);
       gl.deleteShader(vertexShader);
       gl.deleteShader(fragmentShader);

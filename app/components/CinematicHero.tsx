@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { gsap } from '../brain/engines/GSAPCore'
 
 export default function CinematicHero() {
     const videoRef = useRef<HTMLVideoElement>(null)
@@ -9,7 +10,6 @@ export default function CinematicHero() {
         const video = videoRef.current
         if (!video) return
 
-        let raf: number
 
         const loop = () => {
             if (!video.duration) return
@@ -25,7 +25,6 @@ export default function CinematicHero() {
                 video.style.opacity = '1'
             }
 
-            raf = requestAnimationFrame(loop)
         }
 
         const handleEnded = () => {
@@ -37,10 +36,11 @@ export default function CinematicHero() {
         }
 
         video.addEventListener('ended', handleEnded)
-        raf = requestAnimationFrame(loop)
+
+        gsap.ticker.add(loop)
 
         return () => {
-            cancelAnimationFrame(raf)
+            gsap.ticker.remove(loop)
             video.removeEventListener('ended', handleEnded)
         }
     }, [])

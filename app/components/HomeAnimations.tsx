@@ -228,37 +228,8 @@ export default function HomeAnimations({ heroTypedText = "ISTE MBCET STUDENT'S C
         scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
       });
 
-      // Holographic 3D Tilt using GSAP Observer (No layout thrashing)
-      const cards = gsap.utils.toArray('.execom-card, .team-card, .junior-card, .internship-card') as HTMLElement[];
-      cards.forEach(card => {
-        Observer.create({
-          target: card,
-          type: "pointer",
-          onMove: (e) => {
-            const rect = card.getBoundingClientRect();
-            // Observer provides absolute pointer x and y coordinates natively
-            const ex = e.x || 0;
-            const ey = e.y || 0;
-            const x = ex - rect.left;
-            const y = ey - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -4;
-            const rotateY = ((x - centerX) / centerX) * 4;
-
-            gsap.to(card, {
-              rotationX: rotateX,
-              rotationY: rotateY,
-              transformPerspective: 1000,
-              ease: 'power2.out',
-              duration: 0.4
-            });
-          },
-          onHoverEnd: () => {
-            gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.7, ease: 'power3.out' });
-          }
-        });
-      });
+      // Holographic 3D Tilt Observer removed for performance.
+      // Replaced with high-performance pure CSS transforms in globals.css
     });
 
     // ==========================================
