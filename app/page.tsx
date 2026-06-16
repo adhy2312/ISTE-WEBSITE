@@ -50,6 +50,8 @@ const FALLBACK_STATS = [
 
 const DELAY_CLASSES = ['', 'd1', 'd2', 'd3', 'd1', 'd2', 'd3', 'd4', '', 'd1', 'd2', 'd3']
 
+export const revalidate = 60;
+
 export default async function Home() {
   const { isEnabled: preview } = await draftMode()
 
@@ -549,34 +551,65 @@ export default async function Home() {
             </>
           )}
 
-          {members.length === 0 ? (
-            <div className="reveal d1" style={{
-              padding: '80px 40px',
+          {core.length === 0 && teams.length === 0 && junior.length === 0 ? (
+            <div style={{
+              padding: '100px 40px',
               textAlign: 'center',
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.05) 100%)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '24px',
-              boxShadow: 'inset 0 0 80px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.2)',
-              margin: '40px 0',
+              background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%)',
+              border: '1px solid rgba(var(--c-main), 0.2)',
+              borderRadius: '32px',
+              boxShadow: '0 0 100px rgba(var(--c-main), 0.1), inset 0 0 40px rgba(var(--c-main), 0.05)',
+              margin: '60px auto',
+              maxWidth: '800px',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)'
             }}>
+              {/* Animated scanning line */}
+              <div style={{
+                position: 'absolute',
+                top: 0, left: '-100%', width: '50%', height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(var(--c-alt1), 0.1), transparent)',
+                transform: 'skewX(-20deg)',
+                animation: 'scan-line 4s linear infinite'
+              }} />
+              {/* Glowing core */}
               <div style={{
                 position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%)',
-                opacity: 0.2, pointerEvents: 'none'
+                width: '500px', height: '500px', 
+                background: 'radial-gradient(circle, rgba(var(--c-main), 0.15) 0%, transparent 60%)',
+                opacity: 0.6, pointerEvents: 'none',
+                animation: 'pulse-glow 6s ease-in-out infinite alternate'
               }} />
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', color: '#f8fafc', marginBottom: '16px', position: 'relative', zIndex: 1 }}>
+              {/* Grid overlay */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                backgroundSize: '30px 30px',
+                pointerEvents: 'none',
+                opacity: 0.5
+              }} />
+              
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '3.5rem', color: '#f8fafc', marginBottom: '24px', position: 'relative', zIndex: 1, letterSpacing: '-0.02em', textShadow: '0 0 40px rgba(var(--c-main),0.4)' }}>
                 Building the Future
               </h3>
-              <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '600px', margin: '0 auto', fontSize: '1.1rem', lineHeight: 1.6, position: 'relative', zIndex: 1 }}>
-                The next generation of leaders for the Executive Committee is currently being selected. The new team will be announced very soon.
+              <p style={{ color: 'rgba(255,255,255,0.7)', maxWidth: '500px', margin: '0 auto', fontSize: '1.2rem', lineHeight: 1.7, position: 'relative', zIndex: 1, fontWeight: 300 }}>
+                The next generation of leaders for the Executive Committee is currently being selected. A new era is about to begin.
               </p>
-              <div className="mt-8 relative z-10 flex justify-center">
-                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-sky-400">
+              
+              <div className="mt-12 relative z-10 flex justify-center">
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '12px',
+                  padding: '12px 28px', borderRadius: '100px',
+                  background: 'rgba(var(--c-main), 0.05)',
+                  border: '1px solid rgba(var(--c-main), 0.3)',
+                  boxShadow: '0 0 30px rgba(var(--c-main), 0.2), inset 0 0 20px rgba(var(--c-main), 0.1)',
+                  color: 'rgb(var(--c-alt1))', fontSize: '0.95rem', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase'
+                }}>
                   <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ animationDuration: '1.5s', backgroundColor: 'rgb(var(--c-main))' }}></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3" style={{ backgroundColor: 'rgb(var(--c-main))', boxShadow: '0 0 10px rgb(var(--c-main))' }}></span>
                   </span>
                   Selection Ongoing
                 </div>
