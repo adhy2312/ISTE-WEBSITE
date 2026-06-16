@@ -138,8 +138,7 @@ try:
     import pybreaker # type: ignore
     api_breaker = pybreaker.CircuitBreaker(
         fail_max=3,       # Open circuit after 3 consecutive failures
-        reset_timeout=60, # Wait 60 seconds before trying again (Half-Open)
-        state_storage=pybreaker.CircuitMemoryStorage()
+        reset_timeout=60  # Wait 60 seconds before trying again (Half-Open)
     )
     BREAKER_OK = True
 except ImportError:
