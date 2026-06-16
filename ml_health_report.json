@@ -1,0 +1,11 @@
+{
+  "last_trained": "2026-06-16T16:07:23.218748Z",
+  "telemetry_events_processed": 2,
+  "cache_regenerated": true,
+  "model_health": "OPTIMAL",
+  "commonFlaws": [
+    "Passive voice",
+    "Lack of measurable metrics",
+    "Generic objective statements"
+  ]
+}
