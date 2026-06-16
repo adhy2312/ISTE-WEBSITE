@@ -44,7 +44,7 @@ export const execomMembersQuery = groq`
     team,
     order,
     photo {
-      asset->,
+      asset->{..., metadata { lqip }},
       hotspot,
       crop,
     },
@@ -54,7 +54,7 @@ export const execomMembersQuery = groq`
       name,
       initials,
       photo {
-        asset->,
+        asset->{..., metadata { lqip }},
         hotspot,
         crop,
       },
@@ -80,7 +80,7 @@ export const testimonialsQuery = groq`
     authorRole,
     avatarSeed,
     photo {
-      asset->,
+      asset->{..., metadata { lqip }},
       hotspot,
       crop,
     },
@@ -121,7 +121,7 @@ export const internshipsQuery = groq`
     aiRecommendation,
     order,
     logo {
-      asset->,
+      asset->{..., metadata { lqip }},
       hotspot,
       crop,
     },

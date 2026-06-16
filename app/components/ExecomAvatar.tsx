@@ -1,7 +1,8 @@
+import Image from 'next/image'
 import { urlForImage } from '@/lib/sanity/image'
 
 interface SanityImage {
-  asset: { _ref?: string; url?: string; _id?: string }
+  asset: { _ref?: string; url?: string; _id?: string; metadata?: { lqip?: string } }
   hotspot?: { x: number; y: number; width: number; height: number }
   crop?: { top: number; bottom: number; left: number; right: number }
 }
@@ -37,10 +38,18 @@ export default function ExecomAvatar({ photo, photoUrl, initials, name, size = '
   }
 
   if (imgUrl) {
+    const lqip = photo?.asset?.metadata?.lqip;
     return (
       <div className={`execom-avatar execom-avatar--photo execom-avatar--${size}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imgUrl} alt={name} width={px} height={px} loading="lazy" />
+        <Image 
+          src={imgUrl} 
+          alt={name} 
+          width={px} 
+          height={px} 
+          loading="lazy" 
+          placeholder={lqip ? "blur" : "empty"}
+          blurDataURL={lqip || undefined}
+        />
       </div>
     )
   }

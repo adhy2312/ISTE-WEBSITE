@@ -22,7 +22,7 @@ export interface InternshipData {
   applyLink?: string;
   deadlineLabel?: string;
   status?: string;
-  logo?: { asset?: { url?: string } };
+  logo?: { asset?: { url?: string; metadata?: { lqip?: string } } };
   matchScore?: number;
   [key: string]: unknown;
 }

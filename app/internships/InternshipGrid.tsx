@@ -160,6 +160,8 @@ export default function InternshipGrid({ internships }: { internships: Internshi
                         alt={intern.company || 'Company logo'}
                         fill
                         className="object-contain"
+                        placeholder={intern.logo?.asset?.metadata?.lqip ? "blur" : "empty"}
+                        blurDataURL={intern.logo?.asset?.metadata?.lqip || undefined}
                       />
                     ) : (
                       <div className="intern-logo-placeholder">
