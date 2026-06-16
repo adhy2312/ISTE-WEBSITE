@@ -1,3 +1,5 @@
 {
-  "ignore": ["scripts"]
+  "ignore": ["scripts"],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none"
 }
