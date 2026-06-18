@@ -41,18 +41,20 @@ test.describe('ISTE MBCET Internships Page', () => {
       // If network never idles (e.g., WebSocket), continue anyway
     });
 
+    // Wait for the "hunting" animation (800ms) to complete so skeletons are replaced with real cards
+    await page.waitForTimeout(1000);
+
     // If cards exist, ensure they have an apply link — not a structural requirement
-    const cards = page.locator('[data-testid="internship-card"], .internship-card');
+    const cards = page.locator('.internship-card:not(.skeleton-card)');
     const cardCount = await cards.count();
 
     if (cardCount > 0) {
       // At least the first card should be visible
       await expect(cards.first()).toBeVisible();
 
-      // Each card should have a link
+      // Each card should have a link. Use auto-retrying expect.
       const firstLink = cards.first().locator('a[href]');
-      const linkCount = await firstLink.count();
-      expect(linkCount).toBeGreaterThan(0);
+      await expect(firstLink).toHaveCount(1);
     }
     // If no cards — engine may not have synced yet — test passes (non-blocking)
   });
