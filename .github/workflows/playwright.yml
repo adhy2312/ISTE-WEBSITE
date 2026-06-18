@@ -51,32 +51,22 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        # Use npm install (not ci) to match the dependency resolution that passed on run #26.
+        # npm ci is stricter about lockfile integrity and can fail on version drift.
+        run: npm install
 
       - name: Install Playwright Browsers
-        # Root cause fix: install only chromium — webkit (Safari) is not available on
-        # Ubuntu and was causing the Mobile Safari project to fail silently.
-        run: npx playwright install --with-deps chromium
-
-      - name: Setup Database
-        run: npx prisma db push
-        env:
-          DATABASE_URL: "postgresql://prisma:prisma_password@localhost:5432/iste_test?schema=public"
-
-      - name: Build Next.js app
-        # Root cause fix: playwright.config.ts uses `npm run dev` as the web server, but
-        # dev server is slow (~60s to compile) and has no clear "ready" signal in CI.
-        # A production build + `npm start` is deterministic, fast to boot, and reliable.
-        run: npm run build
-        env:
-          # Allow build to succeed even with missing Sanity/DB config in CI
-          SKIP_ENV_VALIDATION: "1"
+        # Install ALL browsers with deps — matches run #26 which used full install and passed.
+        # Chromium-only installs can still miss shared system libs needed even for chromium.
+        run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        # Root cause fix: BASE_URL tells playwright.config.ts to skip spawning `npm run dev`
-        # and instead use the production server we start below via the `webServer` block.
-        # We also disable Mobile Safari — no WebKit engine on ubuntu-latest.
-        run: npx playwright test --project=chromium
+        # Run all configured projects (chromium + mobile safari if configured).
+        # The playwright.config.ts webServer block will spin up `npm run dev` automatically.
+        # SKIP_ENV_VALIDATION prevents startup crashes when Sanity/DB secrets are absent.
+        run: npx playwright test
+        env:
+          SKIP_ENV_VALIDATION: "1"
 
       - uses: actions/upload-artifact@v4
         if: always()

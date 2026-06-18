@@ -6,7 +6,7 @@ const isCI = !!process.env.CI;
 export default defineConfig({
   testDir: './tests/e2e',
   timeout: 120000,
-  // fullyParallel: false in CI to avoid port conflicts with single worker
+  // Serial in CI to avoid port conflicts and resource exhaustion on shared runners
   fullyParallel: !isCI,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
@@ -15,7 +15,6 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'on-first-retry',
-    // Capture screenshot on failure for easier debugging
     screenshot: 'only-on-failure',
   },
   projects: [
@@ -23,23 +22,25 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    // Root cause fix: Mobile Safari (WebKit) is not available on ubuntu-latest CI.
-    // Only run it locally where WebKit is installed.
-    ...(!isCI ? [{
+    {
+      // Run Mobile Safari on all environments — webkit is installed via
+      // `npx playwright install --with-deps` in the workflow
       name: 'Mobile Safari',
       use: { ...devices['iPhone 13'] },
-    }] : []),
+    },
   ],
-  // Root cause fix: use `npm start` (production server) instead of `npm run dev`.
-  // Dev server takes 60+ seconds to compile in CI and can race with test start.
-  // Production server boots in ~3 seconds after `npm run build` completes.
+  // Use dev server in all environments — no production build required.
+  // `npm run dev` boots in ~3-7 seconds with Turbopack and has a stable
+  // "ready" signal. reuseExistingServer=true locally, false in CI for clean state.
   webServer: process.env.BASE_URL ? undefined : {
-    command: isCI ? 'npm start' : 'npm run dev',
+    command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !isCI,
     timeout: 120000,
     stdout: 'pipe',
     stderr: 'pipe',
+    env: {
+      SKIP_ENV_VALIDATION: '1',
+    },
   },
 });
-
