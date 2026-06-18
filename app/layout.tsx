@@ -20,6 +20,11 @@ const ColorExtractionEngine = dynamic(() => import('./brain/ColorExtractionEngin
 const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
 const IOSAdaptiveEngine = dynamic(() => import('./engines/ios/IOSAdaptiveEngine'));
 const ClientPlatformBoundary = dynamic(() => import('./brain/ClientPlatformBoundary'));
+const CookieConsent = dynamic(() => import('./components/CookieConsent'));
+
+// Vercel observability — loaded async so they don't block the critical path
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-serif', display: 'swap' });
@@ -196,6 +201,13 @@ export default async function RootLayout({
 
           {!isStudio && <MagneticCursor />}
           {!isStudio && (process.env.NODE_ENV === 'development' || isAdmin) && <EngineObservatory />}
+
+          {/* Compliance */}
+          {!isStudio && <CookieConsent />}
+
+          {/* Vercel Observability */}
+          <Analytics />
+          <SpeedInsights />
         </BrainProvider>
       </body>
     </html>

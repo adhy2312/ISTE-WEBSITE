@@ -3,8 +3,11 @@ name = "rust_engine"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-crate-type = ["cdylib", "rlib"]
+# Produces a standalone CLI binary (not a cdylib/rlib).
+# The CI build step does `cp target/release/rust_engine ../scripts/bin/rust_engine`
+# which requires a real executable — cdylib would produce .so/.dll, not a binary.
+[[bin]]
+name = "rust_engine"
+path = "src/main.rs"
 
 [dependencies]
-wasm-bindgen = "0.2"

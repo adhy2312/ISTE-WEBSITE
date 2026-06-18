@@ -8,7 +8,7 @@ on:
 permissions:
   contents: write
 
-concurrency: 
+concurrency:
   group: internship-engine
   cancel-in-progress: false
 
@@ -26,6 +26,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # ── Binary cache: keyed by go/rust source hashes ──────────────────────
       - name: Cache Engines
         id: cache-engines
         uses: actions/cache@v4
@@ -33,11 +34,15 @@ jobs:
           path: scripts/bin
           key: ${{ runner.os }}-engines-${{ hashFiles('go_engine/**', 'rust_engine/**') }}
 
+      # ── Only set up toolchains and build when cache is cold ───────────────
       - name: Set up Go
         if: steps.cache-engines.outputs.cache-hit != 'true'
         uses: actions/setup-go@v5
         with:
           go-version: '1.22'
+          # Root cause fix: go.sum was missing, causing "Dependencies file not found"
+          # cache warning and no caching. Point setup-go at the right go.sum path.
+          cache-dependency-path: go_engine/go.sum
 
       - name: Set up Rust
         if: steps.cache-engines.outputs.cache-hit != 'true'
@@ -47,9 +52,20 @@ jobs:
         if: steps.cache-engines.outputs.cache-hit != 'true'
         run: |
           mkdir -p scripts/bin
-          cd go_engine && go build -o ../scripts/bin/main && cd ..
+          
+          # ── Go Engine (telemetry HTTP daemon) ─────────────────────────────
+          # Root cause fix: the Go engine is a long-running HTTP server (ListenAndServe).
+          # We only BUILD the binary here — the Python engine starts it as a subprocess.
+          # Running it directly in CI would block indefinitely.
+          cd go_engine
+          go mod tidy         # Generates go.sum if it doesn't exist
+          go build -o ../scripts/bin/main .
+          cd ..
+          
+          # ── Rust Engine (resume parseability CLI) ─────────────────────────
+          # Root cause fix: old Cargo.toml declared crate-type = ["cdylib","rlib"] which
+          # produces .so/.dll — not a runnable binary. Fixed: [[bin]] target in Cargo.toml.
           cd rust_engine && cargo build --release && cp target/release/rust_engine ../scripts/bin/rust_engine && cd ..
-
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -58,17 +74,21 @@ jobs:
           cache: 'pip'
           cache-dependency-path: scripts/requirements.txt
 
-      - name: Install dependencies
+      - name: Install Python dependencies
+        # Root cause fix: huggingface_hub was unpinned, causing pip to thrash between
+        # versions 0.36.2 and 1.19.0 — a transitive conflict between sentence-transformers
+        # and transformers. Now pinned to 0.23.4 in requirements.txt.
         run: pip install -r scripts/requirements.txt
 
-      - name: Install playwright browsers and system deps
+      - name: Install Playwright browsers and system deps
+        # Root cause fix: playwright==1.44.0 had a Chromium binary hash mismatch on
+        # Ubuntu 24.04 (GitHub Actions runner image 20260615+). Upgraded to 1.50.0.
         run: python -m playwright install --with-deps chromium
 
-      - name: Defensive Execution Permissions
-        run: chmod +x scripts/bin/* || true
+      - name: Set executable permissions on built binaries
+        run: chmod +x scripts/bin/* 2>/dev/null || true
 
       - name: Run Engine
-        if: always()
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
@@ -77,13 +97,18 @@ jobs:
           SCRAPER_PROXY_URL: ${{ secrets['SCRAPER_PROXY_URL'] }}
           DATABASE_URL: ${{ secrets['DATABASE_URL'] }}
         run: |
+          # Determine mode: every 12th hour runs a full discovery pass
           HOUR=$(date +%H)
           if [ $((10#$HOUR % 12)) -eq 0 ]; then
             MODE="full"
           else
             MODE="revalidate_only"
           fi
-          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" python scripts/internship_engine_v10.py --mode $MODE
+          echo "▶ Running engine in mode: $MODE"
+          
+          # xvfb-run provides a virtual display so Chromium can render headlessly
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" \
+            python scripts/internship_engine_v10.py --mode $MODE
 
       - name: Report Silent Failures
         if: always()
@@ -93,6 +118,8 @@ jobs:
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             cat isolated_errors.log >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ✅ Engine completed with no isolated errors" >> $GITHUB_STEP_SUMMARY
           fi
 
 
@@ -106,26 +133,30 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
           cache-dependency-path: scripts/requirements.txt
-          
+
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
-        
+
       - name: Run ML Learner (Autonomous Engine)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python scripts/ml_learner.py
-        
+
       - name: Commit Updated ML Cache
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add skill_embeddings_cache.json ml_health_report.json adaptive_core_v10.pth || true
-          git commit -m "chore(ai): 🤖 auto-update ML embeddings and health report" || echo "No changes to commit"
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore(ai): 🤖 auto-update ML embeddings and health report"
+          # Root cause fix: concurrent runs could cause non-fast-forward push failures.
+          # Rebase before pushing to handle any commits made since checkout.
+          git pull --rebase origin main
           git push

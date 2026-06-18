@@ -6,13 +6,20 @@ fake-useragent==1.5.1
 python-dotenv==1.0.1
 
 # ── Browser automation ───────────────────────────────────────────────────────
-playwright==1.44.0
+# 1.44.0 has a Chromium binary hash mismatch on Ubuntu 24.04 (GitHub Actions runner).
+# Upgrading to 1.50.0 resolves the playwright install --with-deps failure.
+playwright==1.50.0
 playwright-stealth==1.0.6
 
 # ── ML / NLP ─────────────────────────────────────────────────────────────────
 torch==2.3.1
+# huggingface_hub is pinned here to prevent pip from thrashing between the version
+# required by sentence-transformers>=0.15.1 and transformers==4.41.2>=0.21.0.
+# 0.23.4 satisfies both constraints without any breakage.
+huggingface_hub==0.23.4
 sentence-transformers==3.0.1
 transformers==4.41.2
+tokenizers==0.19.1
 numpy==1.26.3
 pandas==2.2.2
 

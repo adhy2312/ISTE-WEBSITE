@@ -7,7 +7,7 @@ import Link from 'next/link'
 import HomeAnimations from '@/app/components/HomeAnimations'
 import InternshipClientEngine from './InternshipClientEngine'
 import InternshipGrid from './InternshipGrid'
-import ResumeAnalyzer from './ResumeAnalyzer'
+
 import AliveClock from '@/app/components/AliveClock'
 import GLSLBackground from '@/app/components/GLSLBackground'
 export interface InternshipData {
@@ -223,8 +223,7 @@ export default async function InternshipsPage() {
             </>
           )}
 
-          {/* AI Resume Analyzer Section */}
-          <ResumeAnalyzer liveInternships={open} />
+
         </div>
       </section>
 
