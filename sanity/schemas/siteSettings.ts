@@ -6,6 +6,41 @@ export const siteSettingsSchema = defineType({
   type: 'document',
   // Singleton — handled in structure builder
   fields: [
+    // --- BRANDING ---
+    defineField({
+      name: 'siteTitle',
+      title: 'Site Title',
+      type: 'string',
+      initialValue: 'ISTE MBCET Student Chapter',
+    }),
+    defineField({
+      name: 'primaryColor',
+      title: 'Primary Color (Hex)',
+      description: 'Used for main buttons and accents (e.g. #8c78f0)',
+      type: 'string',
+    }),
+    defineField({
+      name: 'accentColor',
+      title: 'Secondary Accent Color (Hex)',
+      type: 'string',
+    }),
+    defineField({
+      name: 'logoImage',
+      title: 'Site Logo',
+      type: 'image',
+      options: { hotspot: true },
+    }),
+    defineField({
+      name: 'faviconImage',
+      title: 'Favicon',
+      type: 'image',
+    }),
+    defineField({
+      name: 'ogImage',
+      title: 'Social Share Image (OG)',
+      type: 'image',
+    }),
+    // --- HERO ---
     defineField({
       name: 'heroHeadline',
       title: 'Hero Headline',
@@ -29,6 +64,20 @@ export const siteSettingsSchema = defineType({
       title: 'Hero Typed Text',
       description: 'The animated typing text in the hero. e.g. "ISTE MBCET STUDENT\'S CHAPTER"',
       type: 'string',
+    }),
+    defineField({
+      name: 'heroBackgroundStyle',
+      title: 'Hero Background Style',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Aurora (Default)', value: 'aurora' },
+          { title: 'Grid', value: 'grid' },
+          { title: 'Orbital', value: 'orbital' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'aurora',
     }),
     defineField({
       name: 'heroPrimaryCtaLabel',

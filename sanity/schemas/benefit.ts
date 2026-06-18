@@ -13,6 +13,18 @@ export const benefitSchema = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'imageIcon',
+      title: 'Custom Icon Image (optional)',
+      description: 'Overrides the Lucide icon above if provided',
+      type: 'image',
+    }),
+    defineField({
+      name: 'accentColor',
+      title: 'Accent Color (Hex)',
+      description: 'Optional custom glow color for this benefit card',
+      type: 'string',
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',

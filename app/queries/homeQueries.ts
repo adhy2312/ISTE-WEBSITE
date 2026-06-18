@@ -72,18 +72,12 @@ export const statsQuery = groq`
   }
 `
 
-export const testimonialsQuery = groq`
-  *[_type == "testimonial"] | order(order asc) {
+export const faqsQuery = groq`
+  *[_type == "faq"] | order(order asc) {
     _id,
-    quote,
-    authorName,
-    authorRole,
-    avatarSeed,
-    photo {
-      asset->{..., metadata { lqip }},
-      hotspot,
-      crop,
-    },
+    question,
+    answer,
+    category,
     order,
   }
 `
@@ -182,16 +176,27 @@ export const activeEventsQuery = groq`
   }
 `
 
+export const homePageBuilderQuery = groq`
+  *[_type == "homePage"][0]
+`
+
+export const navigationMenuQuery = groq`
+  *[_type == "navigationMenu"][0]
+`
+
+
 export const homePageQuery = groq`
   {
+    "homePage": ${homePageBuilderQuery},
+    "navigationMenu": ${navigationMenuQuery},
     "activeEvents": ${activeEventsQuery},
     "events": ${eventsQuery},
     "execomMembers": ${execomMembersQuery},
     "stats": ${statsQuery},
-    "testimonials": ${testimonialsQuery},
     "settings": ${siteSettingsQuery},
     "featuredInternships": ${featuredInternshipsQuery},
     "pillars": ${pillarsQuery},
     "benefits": ${benefitsQuery},
+    "faqs": ${faqsQuery},
   }
 `

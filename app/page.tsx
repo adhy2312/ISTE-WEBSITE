@@ -9,6 +9,7 @@ import TeamCard from '@/app/components/TeamCard'
 import dynamic from 'next/dynamic'
 const MembershipForm = dynamic(() => import('@/app/components/MembershipForm'))
 import { PortableText } from '@portabletext/react'
+import { faqsQuery } from '@/app/queries/homeQueries'
 import AliveClock from '@/app/components/AliveClock'
 const NucleusCore = dynamic(() => import('@/app/components/NucleusCore'))
 import {
@@ -69,6 +70,8 @@ export default async function Home() {
   const featuredInternships: any[] = sanityData?.featuredInternships || []
   const pillars: any[] = sanityData?.pillars || []
   const benefits: any[] = sanityData?.benefits || []
+  const homePage = sanityData?.homePage || { sections: [] }
+  const navigationMenu = sanityData?.navigationMenu || {}
 
   const heroTypedText = settings.heroTypedText || "ISTE MBCET STUDENT'S CHAPTER"
   const heroDescription = settings.heroDescription || "The official student chapter of the Indian Society for Technical Education at Mar Baselios College of Engineering and Technology — where engineers build the future, faster."
@@ -146,125 +149,9 @@ export default async function Home() {
 
 
 
-  return (
-    <>
-      <HomeAnimations heroTypedText={heroTypedText} />
-
-
-
-      <div className="grid-lines" aria-hidden="true">
-        <div className="grid-line"></div>
-        <div className="grid-line"></div>
-        <div className="grid-line"></div>
-        <div className="grid-line"></div>
-        <div className="grid-line"></div>
-      </div>
-
-      <nav id="navbar" aria-label="Main Navigation" role="navigation">
-        <a href="#hero" className="nav-logo" aria-label="ISTE MBCET Home">
-          <Image src="/iste.png" alt="ISTE SC MBCET Logo" width={40} height={40} className="logo-img" priority />
-          <span>ISTE SC MBCET</span>
-        </a>
-        <ul className="nav-links" role="menubar">
-          <li role="none"><a role="menuitem" href="#about">About</a></li>
-          <li role="none"><a role="menuitem" href="#who">Who We Are</a></li>
-          <li role="none"><a role="menuitem" href="#benefits">Benefits</a></li>
-          <li role="none"><a role="menuitem" href="#execom">ExeCom</a></li>
-          <li role="none"><a role="menuitem" href="#events">Events</a></li>
-          <li role="none"><Link role="menuitem" href="/internships" className="nav-link-highlight">Launchpad ✦</Link></li>
-        </ul>
-        <a href="#membership" className="nav-cta" aria-label="Navigate to Membership Form">{navCta}</a>
-        <button className="nav-hamburger" id="hamburger" aria-label="Open mobile menu" aria-expanded="false" aria-controls="mob-menu">
-          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
-        </button>
-      </nav>
-
-      {/* ===== MOBILE MENU OVERLAY ===== */}
-      <div className="mob-menu" id="mob-menu" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
-        <div className="mob-menu-inner">
-          <button className="mob-close" id="mob-close" aria-label="Close menu">✕</button>
-          <nav className="mob-nav" aria-label="Mobile Navigation">
-            <a href="#about" className="mob-link" id="ml-1">About</a>
-            <a href="#who" className="mob-link" id="ml-2">Who We Are</a>
-            <a href="#benefits" className="mob-link" id="ml-3">Benefits</a>
-            <a href="#execom" className="mob-link" id="ml-4">ExeCom</a>
-            <a href="#events" className="mob-link" id="ml-5">Events</a>
-            <Link href="/internships" className="mob-link mob-link--accent" id="ml-6">Internship Launchpad ✦</Link>
-          </nav>
-          <a href="#membership" className="mob-cta" aria-label="Navigate to Membership Form">{navCta} →</a>
-          <div className="mob-footer">
-            <a href="https://www.instagram.com/iste_mbcet/" aria-label="ISTE MBCET Instagram">Instagram</a>
-            <a href="https://www.linkedin.com/company/istescmbcet/" aria-label="ISTE MBCET LinkedIn">LinkedIn</a>
-          </div>
-        </div>
-      </div>
-
-      <section id="hero">
-        {/* Aurora Gradient Ribbon */}
-        <div className="aurora-ribbon" aria-hidden="true">
-          <div className="aurora-inner"></div>
-        </div>
-
-        {/* Orbital Lines SVG */}
-        <svg className="orbital-lines" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <ellipse className="orbit-ellipse-1" cx="600" cy="320" rx="380" ry="120" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-          <ellipse className="orbit-ellipse-2" cx="600" cy="400" rx="500" ry="180" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-          {/* Orbiting dot 1 */}
-          <circle className="orbit-dot-1" r="4" fill="rgba(255,255,255,0.3)" />
-          {/* Orbiting dot 2 */}
-          <circle className="orbit-dot-2" r="3" fill="rgba(127,140,255,0.5)" />
-        </svg>
-
-
-
-
-        {/* Hero Main Content */}
-        <div className="hero-content">
-          <h1 className="hero-headline" id="hero-headline">
-            {/* SEO Fallback: Server-rendered text for crawlers, GSAP clears this on mount */}
-            <span id="typed-out">{heroTypedText}</span>
-            <span className="type-cursor" id="tcursor"></span>
-          </h1>
-          <div className="hero-divider" id="hero-div"></div>
-          <p className="hero-sub" id="hero-sub">
-            {heroDescription}
-          </p>
-
-          <div className="hero-ctas">
-            <a href="#membership" className="hero-btn-primary">
-              {heroPrimaryCta}
-              <span className="hero-btn-arrow">→</span>
-            </a>
-            <a href="#events" className="hero-btn-secondary">
-              {heroSecondaryCta} <span>→</span>
-            </a>
-          </div>
-        </div>
-
-        {/* Stats floater */}
-        <div className="hero-stat-floater" aria-hidden="true">
-          <div className="stat-floater-num">{stats[0]?.value || 300}<span>+</span></div>
-          <div className="stat-floater-label">{settings.heroStatsLabel || 'members are already part of the chapter'}</div>
-        </div>
-
-        {/* Ever-looping Marquee Strip */}
-        <div className="hero-ticker">
-          <div className="hero-ticker-track">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="hero-ticker-set">
-                {tickerItems.map((item: string, idx: number) => (
-                  <span key={idx}>
-                    <span className={`ticker-item ${idx % 2 === 0 ? 'ticker-italic' : ''}`}>{item}</span>
-                    <span className="ticker-dash">—</span>
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Dynamic Active Event Section */}
+  
+  const renderActiveEvents = () => {
+    return (
       <section id="active-events" style={{ borderBottom: '1px solid var(--border)', paddingTop: 40, paddingBottom: 60 }}>
         <div className="section-inner">
           <div className="section-tag reveal">{settings.activeEventsTag || 'Live Now'}</div>
@@ -339,7 +226,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
 
+  const renderAbout = () => {
+    return (
       <section id="about">
         <div className="section-inner about-grid">
           <div>
@@ -370,7 +261,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
 
+  const renderWho = () => {
+    return (
       <section id="who">
         <div className="section-inner">
           <div className="who-header">
@@ -408,7 +303,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
 
+  const renderStats = () => {
+    return (
       <section id="stats">
         <div className="section-inner">
           <div className="stats-grid">
@@ -425,7 +324,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
 
+  const renderBenefits = () => {
+    return (
       <section id="benefits">
         <div className="section-inner">
           <div className="section-tag reveal">{settings.benefitsTag || 'Member Benefits'}</div>
@@ -478,7 +381,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
 
+  const renderExecom = () => {
+    return (
       <section id="execom">
         <div className="section-inner">
           <div className="section-tag reveal">{settings.execomTag || 'Leadership 2026-27'}</div>
@@ -683,7 +590,11 @@ export default async function Home() {
           )}
         </div>
       </section>
+    )
+  }
 
+  const renderEvents = () => {
+    return (
       <section id="events">
         <div className="section-inner">
           <div className="section-tag reveal">{settings.eventsTag || 'Events'}</div>
@@ -722,7 +633,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
 
+  const renderMembership = () => {
+    return (
       <section id="membership" style={{ paddingBottom: 80 }}>
         <div className="section-inner">
           <div className="section-tag reveal">{settings.membershipTag || 'Enroll Now'}</div>
@@ -750,9 +665,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
 
-
-      {/* ===================== INTERNSHIP LAUNCHPAD TEASER ===================== */}
+  const renderLaunchpad = () => {
+    return (
       <section id="launchpad" style={{ background: 'var(--black)', paddingTop: 80 }}>
         <div className="section-inner">
           <div className="section-tag reveal">{settings.launchpadTag || 'Member Resources'}</div>
@@ -851,6 +768,223 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    )
+  }
+
+  const renderFaq = () => {
+    const faqs = sanityData?.faqs || []
+    if (faqs.length === 0) return null
+    return (
+      <section id="faq" key="faq" style={{ padding: '80px 0' }}>
+        <div className="section-inner">
+          <div className="section-tag reveal">{settings.faqTag || 'Got Questions?'}</div>
+          <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.faqTitle || 'Frequently Asked<br /><em>Questions</em>' }}></h2>
+          <div className="faq-list mt-8">
+            {faqs.map((faq: any, i: number) => (
+              <div key={faq._id} className={`faq-item reveal ${DELAY_CLASSES[i] || ''}`} style={{ marginBottom: 24, padding: 24, background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: 12 }}>{faq.question}</h3>
+                <p style={{ color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  const sectionRenderers: Record<string, () => React.ReactNode> = {
+    hero: () => null, // Hero is rendered statically at top
+    activeEvents: renderActiveEvents,
+    about: renderAbout,
+    who: renderWho,
+    stats: renderStats,
+    benefits: renderBenefits,
+    execom: renderExecom,
+    events: renderEvents,
+    membership: renderMembership,
+    launchpad: renderLaunchpad,
+    faq: renderFaq,
+  }
+
+  const defaultOrder = ['activeEvents', 'about', 'who', 'stats', 'benefits', 'execom', 'events', 'membership', 'launchpad', 'faq']
+  let sectionsToRender = []
+
+  if (homePage?.sections?.length > 0) {
+    sectionsToRender = homePage.sections
+      .filter((s: any) => s.visible !== false)
+      .map((s: any) => s.sectionId)
+  } else {
+    sectionsToRender = defaultOrder
+  }
+
+  const navLinks = navigationMenu?.mainLinks || [
+    { label: 'About', href: '#about' },
+    { label: 'Who We Are', href: '#who' },
+    { label: 'Benefits', href: '#benefits' },
+    { label: 'ExeCom', href: '#execom' },
+    { label: 'Events', href: '#events' },
+    { label: 'Launchpad ✦', href: '/internships', isHighlighted: true },
+  ]
+  const footerCols = navigationMenu?.footerColumns || []
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          :root {
+            ${settings.primaryColor ? '--c-main: ' + settings.primaryColor.replace('#', '') + ';' : ''}
+            ${settings.accentColor ? '--c-alt1: ' + settings.accentColor.replace('#', '') + ';' : ''}
+          }
+        `
+      }} />
+      <HomeAnimations heroTypedText={heroTypedText} />
+
+
+
+      <div className="grid-lines" aria-hidden="true">
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+      </div>
+
+      <nav id="navbar" aria-label="Main Navigation" role="navigation">
+        <a href="#hero" className="nav-logo" aria-label="ISTE MBCET Home">
+          <Image src="/iste.png" alt="ISTE SC MBCET Logo" width={40} height={40} className="logo-img" priority />
+          <span>ISTE SC MBCET</span>
+        </a>
+        <ul className="nav-links" role="menubar">
+          {navLinks.map((link: any, i: number) => (
+            <li role="none" key={i}>
+              {link.isHighlighted ? (
+                <Link role="menuitem" href={link.href} className="nav-link-highlight">
+                  {link.label} {link.highlightSuffix || ''}
+                </Link>
+              ) : (
+                <a role="menuitem" href={link.href}>{link.label}</a>
+              )}
+            </li>
+          ))}
+        </ul>
+        <a href={navigationMenu?.ctaHref || "#membership"} className="nav-cta" aria-label="Navigate to Membership Form">{navigationMenu?.ctaLabel || navCta}</a>
+        <button className="nav-hamburger" id="hamburger" aria-label="Open mobile menu" aria-expanded="false" aria-controls="mob-menu">
+          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      {/* ===== MOBILE MENU OVERLAY ===== */}
+      <div className="mob-menu" id="mob-menu" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
+        <div className="mob-menu-inner">
+          <button className="mob-close" id="mob-close" aria-label="Close menu">✕</button>
+          <nav className="mob-nav" aria-label="Mobile Navigation">
+            {navLinks.map((link: any, i: number) => (
+              link.isHighlighted ? (
+                <Link href={link.href} key={i} className="mob-link mob-link--accent" id={`ml-${i+1}`}>{link.label} {link.highlightSuffix || ''}</Link>
+              ) : (
+                <a href={link.href} key={i} className="mob-link" id={`ml-${i+1}`}>{link.label}</a>
+              )
+            ))}
+          </nav>
+          <a href={navigationMenu?.ctaHref || "#membership"} className="mob-cta" aria-label="Navigate to Membership Form">{navigationMenu?.ctaLabel || navCta} →</a>
+          <div className="mob-footer">
+            <a href="https://www.instagram.com/iste_mbcet/" aria-label="ISTE MBCET Instagram">Instagram</a>
+            <a href="https://www.linkedin.com/company/istescmbcet/" aria-label="ISTE MBCET LinkedIn">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+
+      <section id="hero">
+        {/* Aurora Gradient Ribbon */}
+        <div className="aurora-ribbon" aria-hidden="true">
+          <div className="aurora-inner"></div>
+        </div>
+
+        {/* Orbital Lines SVG */}
+        <svg className="orbital-lines" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <ellipse className="orbit-ellipse-1" cx="600" cy="320" rx="380" ry="120" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+          <ellipse className="orbit-ellipse-2" cx="600" cy="400" rx="500" ry="180" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+          {/* Orbiting dot 1 */}
+          <circle className="orbit-dot-1" r="4" fill="rgba(255,255,255,0.3)" />
+          {/* Orbiting dot 2 */}
+          <circle className="orbit-dot-2" r="3" fill="rgba(127,140,255,0.5)" />
+        </svg>
+
+
+
+
+        {/* Hero Main Content */}
+        <div className="hero-content">
+          <h1 className="hero-headline" id="hero-headline">
+            {/* SEO Fallback: Server-rendered text for crawlers, GSAP clears this on mount */}
+            <span id="typed-out">{heroTypedText}</span>
+            <span className="type-cursor" id="tcursor"></span>
+          </h1>
+          <div className="hero-divider" id="hero-div"></div>
+          <p className="hero-sub" id="hero-sub">
+            {heroDescription}
+          </p>
+
+          <div className="hero-ctas">
+            <a href="#membership" className="hero-btn-primary">
+              {heroPrimaryCta}
+              <span className="hero-btn-arrow">→</span>
+            </a>
+            <a href="#events" className="hero-btn-secondary">
+              {heroSecondaryCta} <span>→</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Stats floater */}
+        <div className="hero-stat-floater" aria-hidden="true">
+          <div className="stat-floater-num">{stats[0]?.value || 300}<span>+</span></div>
+          <div className="stat-floater-label">{settings.heroStatsLabel || 'members are already part of the chapter'}</div>
+        </div>
+
+        {/* Ever-looping Marquee Strip */}
+        <div className="hero-ticker">
+          <div className="hero-ticker-track">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="hero-ticker-set">
+                {tickerItems.map((item: string, idx: number) => (
+                  <span key={idx}>
+                    <span className={`ticker-item ${idx % 2 === 0 ? 'ticker-italic' : ''}`}>{item}</span>
+                    <span className="ticker-dash">—</span>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Dynamic Active Event Section */}
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+
+      {/* ===================== INTERNSHIP LAUNCHPAD TEASER ===================== */}
+      
+
+      {/* CMS Driven Sections */}
+      {sectionsToRender.map((sectionId: string) => {
+        const renderFunc = sectionRenderers[sectionId]
+        if (renderFunc) return renderFunc()
+        return null
+      })}
 
       <footer>
         <div className="footer-watermark">{settings.footerVersion || 'v11.2'}</div>

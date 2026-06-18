@@ -26,6 +26,23 @@ export default defineConfig({
                   .schemaType('siteSettings')
                   .documentId('siteSettings')
               ),
+            S.listItem()
+              .title('Home Page Builder')
+              .id('homePage')
+              .child(
+                S.document()
+                  .schemaType('homePage')
+                  .documentId('homePage')
+              ),
+            S.listItem()
+              .title('Navigation Menu')
+              .id('navigationMenu')
+              .child(
+                S.document()
+                  .schemaType('navigationMenu')
+                  .documentId('navigationMenu')
+              ),
+
             S.divider(),
             // Regular document types
             S.documentTypeListItem('announcement').title('Announcements'),
@@ -52,7 +69,8 @@ export default defineConfig({
             S.documentTypeListItem('pillar').title('Who We Are (Pillars)'),
             S.documentTypeListItem('benefit').title('Member Benefits'),
             S.documentTypeListItem('stat').title('Stats'),
-            S.documentTypeListItem('testimonial').title('Testimonials'),
+            S.documentTypeListItem('faq').title('FAQs'),
+
             S.divider(),
             S.documentTypeListItem('internship').title('Internship Launchpad'),
           ]),

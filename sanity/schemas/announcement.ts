@@ -40,10 +40,34 @@ export const announcementSchema = defineType({
       initialValue: true,
     }),
     defineField({
+      name: 'showInNavbar',
+      title: 'Show as Navbar Banner?',
+      type: 'boolean',
+      initialValue: true,
+    }),
+    defineField({
+      name: 'showAsPopup',
+      title: 'Show as Entrance Popup?',
+      type: 'boolean',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'ctaLabel',
+      title: 'Action Button Label',
+      description: 'e.g. "Register Now"',
+      type: 'string',
+    }),
+    defineField({
       name: 'link',
       title: 'Action Link (Optional)',
       description: 'Where should clicking the announcement take them?',
       type: 'url',
+    }),
+    defineField({
+      name: 'expiresAt',
+      title: 'Expiry Date',
+      description: 'Auto-hide this announcement after a specific date',
+      type: 'datetime',
     }),
   ],
   preview: {
