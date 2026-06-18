@@ -1,7 +1,7 @@
 {
-  "last_trained": "2026-06-18T19:24:31.027093Z",
+  "last_trained": "2026-06-18T22:03:08.777330Z",
   "telemetry_events_processed": 2,
-  "cache_regenerated": false,
+  "cache_regenerated": true,
   "model_health": "OPTIMAL",
   "commonFlaws": [
     "Passive voice",
