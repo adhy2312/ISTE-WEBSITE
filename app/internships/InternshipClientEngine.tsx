@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { useBrain } from '@/app/brain/BrainProvider'
 import TypographyEngine from '@/app/brain/engines/TypographyEngine'
 import { gsap, useGSAP } from '@/app/brain/engines/GSAPCore'
+import type { InternshipData } from './page'
 
 const AGENTS = [
   { id: 'discovery', name: 'Quantum Discovery Engine', role: 'Scanning Global Subnets for Anomalies' },
@@ -11,19 +12,69 @@ const AGENTS = [
   { id: 'semantic', name: 'Neural Semantic Decoder', role: 'Extracting High-Value Requirements' },
 ]
 
-export default function InternshipClientEngine() {
+interface Props {
+  internships?: InternshipData[]
+}
+
+export default function InternshipClientEngine({ internships = [] }: Props) {
   const { notifyEngine, internshipState } = useBrain()
   const [activeTab, setActiveTab] = useState('radar')
   const [ticker, setTicker] = useState(0)
+  const [liveLogs, setLiveLogs] = useState<string[]>([])
+  const [isLive, setIsLive] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const scanlineRef = useRef<HTMLDivElement>(null)
+  const feedEndRef = useRef<HTMLDivElement>(null)
+
+  // Domain analytics from real internship data
+  const domainStats = useMemo(() => {
+    if (!internships.length) return []
+    const counts: Record<string, number> = {}
+    internships.forEach(i => {
+      if (i.domain) counts[i.domain] = (counts[i.domain] || 0) + 1
+    })
+    const max = Math.max(...Object.values(counts), 1)
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([domain, count]) => ({ domain, count, pct: Math.round((count / max) * 100) }))
+  }, [internships])
 
   useEffect(() => {
     notifyEngine('Internship', 'page_viewed')
     const i = setInterval(() => setTicker(t => t + 1), 3000)
     return () => clearInterval(i)
   }, [notifyEngine])
+
+  // Live SSE telemetry connection
+  useEffect(() => {
+    const es = new EventSource('/api/telemetry/stream')
+    setIsLive(false)
+
+    es.onopen = () => setIsLive(true)
+
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.message) {
+          setLiveLogs(prev => [data.message, ...prev].slice(0, 30))
+          notifyEngine('Internship', 'agent_log', data.message)
+        }
+      } catch { /* ignore parse errors */ }
+    }
+
+    es.onerror = () => {
+      setIsLive(false)
+    }
+
+    return () => es.close()
+  }, [notifyEngine])
+
+  // Auto-scroll feed to newest
+  useEffect(() => {
+    feedEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [liveLogs])
 
   // Canvas Node Network
   useEffect(() => {
@@ -34,6 +85,7 @@ export default function InternshipClientEngine() {
 
     let width = canvas.width = canvas.offsetWidth
     let height = canvas.height = canvas.offsetHeight
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const particles: any[] = []
 
     for (let i = 0; i < 40; i++) {
@@ -72,8 +124,8 @@ export default function InternshipClientEngine() {
           }
         }
       })
-      }
-      gsap.ticker.add(render)
+    }
+    gsap.ticker.add(render)
 
     const handleResize = () => {
       width = canvas.width = canvas.offsetWidth
@@ -86,17 +138,15 @@ export default function InternshipClientEngine() {
     }
   }, [activeTab])
 
-  // GSAP Futuristic Entrance & Interactions
+  // GSAP Entrance Animations
   useGSAP(() => {
     if (!containerRef.current) return
 
-    // Master container entrance
     gsap.fromTo(containerRef.current,
       { y: 50, opacity: 0, scale: 0.98, rotationX: 10 },
       { y: 0, opacity: 1, scale: 1, rotationX: 0, duration: 1.2, ease: 'expo.out' }
     )
 
-    // Animated scanline
     gsap.to(scanlineRef.current, {
       top: '100%',
       duration: 3,
@@ -106,13 +156,11 @@ export default function InternshipClientEngine() {
       yoyo: true
     })
 
-    // Content entrance when tab changes
     gsap.fromTo('.gsap-tab-content',
       { opacity: 0, y: 20, filter: 'blur(10px)' },
       { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, ease: 'power3.out', stagger: 0.1 }
     )
 
-    // Numbers glitch effect
     gsap.to('.big-num', {
       scrambleText: { text: '{original}', chars: '01', speed: 0.3 },
       duration: 1.5,
@@ -120,6 +168,8 @@ export default function InternshipClientEngine() {
       stagger: 0.2
     })
   }, [activeTab])
+
+  const allLogs = [...liveLogs, ...internshipState.logs].slice(0, 30)
 
   return (
     <div className="intel-dashboard" ref={containerRef}>
@@ -130,12 +180,16 @@ export default function InternshipClientEngine() {
 
       <div className="dash-header relative z-10">
         <div className="dh-left">
-          <div className="dh-status-pulse"></div>
+          <div className={`dh-status-pulse ${isLive ? 'live' : 'standby'}`}></div>
           <h2>AUTONOMOUS INTELLIGENCE CORE</h2>
+          {isLive && (
+            <span className="live-badge">LIVE</span>
+          )}
         </div>
         <div className="dh-nav">
           <button className={activeTab === 'radar' ? 'active' : ''} onClick={() => setActiveTab('radar')}>LIVE RADAR</button>
-          <button className={activeTab === 'agents' ? 'active' : ''} onClick={() => setActiveTab('agents')}>SYSTEM ARCHITECTURE</button>
+          <button className={activeTab === 'analytics' ? 'active' : ''} onClick={() => setActiveTab('analytics')}>ANALYTICS</button>
+          <button className={activeTab === 'agents' ? 'active' : ''} onClick={() => setActiveTab('agents')}>SYSTEM NODES</button>
         </div>
       </div>
 
@@ -143,20 +197,18 @@ export default function InternshipClientEngine() {
         {activeTab === 'radar' && (
           <div className="radar-view gsap-tab-content">
             <div className="rv-main">
-              <TypographyEngine text="Data Ingestion Stream" type="fade-stagger" element="h3" delay={0.1} />
+              <TypographyEngine text="Live Data Ingestion Stream" type="fade-stagger" element="h3" delay={0.1} />
               <div className="feed-container futuristic-border">
-                {internshipState.logs.length === 0 ? (
-                  <div className="feed-waiting glitch-text" data-text="Awaiting telemetry...">Awaiting telemetry...</div>
+                {allLogs.length === 0 ? (
+                  <div className="feed-waiting glitch-text" data-text="Connecting to telemetry...">Connecting to telemetry...</div>
                 ) : (
-                  internshipState.logs.map((log, i) => (
-                    <div key={i} className="feed-item" style={{ animationDelay: `${Math.min(i * 0.05, 0.5)}s` }}>
-                      <span className="fi-time">[{new Date().toLocaleTimeString()}]</span>
+                  allLogs.map((log, i) => (
+                    <div key={i} className={`feed-item ${log.startsWith('[SYS]') ? 'sys-log' : log.includes('ERROR') ? 'err-log' : ''}`} style={{ animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
                       <span className="fi-msg terminal-text">{log}</span>
                     </div>
                   ))
                 )}
-                <div className="feed-item"><span className="fi-time">[SYS]</span> <span className="fi-msg text-emerald-400">Neural filters calibrated. Quantum handshakes verified.</span></div>
-                <div className="feed-item"><span className="fi-time">[SYS]</span> <span className="fi-msg text-blue-400">Blocking non-authoritative domains with strict CSP bounds.</span></div>
+                <div ref={feedEndRef} />
               </div>
             </div>
             <div className="rv-sidebar gsap-tab-content">
@@ -165,16 +217,56 @@ export default function InternshipClientEngine() {
                 <div className="corner-accent bottom-right"></div>
                 <h4>Data Integrity</h4>
                 <div className="big-num text-cyan-300">99.9%</div>
-                <div className="sub-num">Cryptographic Confidence Index</div>
+                <div className="sub-num">Cryptographic Confidence</div>
               </div>
               <div className="stat-card futuristic-border">
                 <div className="corner-accent top-left"></div>
                 <div className="corner-accent bottom-right"></div>
                 <h4>Active Opportunities</h4>
-                <div className="big-num text-emerald-300">{internshipState.foundCount > 0 ? internshipState.foundCount : 12}</div>
-                <div className="sub-num">Verified Regional Hyper-Matches</div>
+                <div className="big-num text-emerald-300">{internshipState.foundCount > 0 ? internshipState.foundCount : internships.length || 0}</div>
+                <div className="sub-num">Verified Regional Matches</div>
+              </div>
+              <div className="stat-card futuristic-border">
+                <div className="corner-accent top-left"></div>
+                <div className="corner-accent bottom-right"></div>
+                <h4>Stream Status</h4>
+                <div className={`big-num ${isLive ? 'text-green-400' : 'text-yellow-400'}`} style={{ fontSize: '1.2rem', letterSpacing: '0.08em' }}>
+                  {isLive ? '● CONNECTED' : '○ STANDBY'}
+                </div>
+                <div className="sub-num">Sanity Telemetry Feed</div>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="analytics-view gsap-tab-content">
+            <TypographyEngine text="Internship Domain Distribution" type="fade-stagger" element="h3" delay={0.1} />
+            {domainStats.length === 0 ? (
+              <div className="feed-waiting" style={{ marginTop: 32 }}>No domain data available yet.</div>
+            ) : (
+              <div className="domain-chart">
+                {domainStats.map(({ domain, count, pct }, i) => (
+                  <div key={domain} className="domain-row" style={{ animationDelay: `${i * 0.1}s` }}>
+                    <div className="domain-label">{domain}</div>
+                    <div className="domain-bar-track">
+                      <div
+                        className="domain-bar-fill"
+                        style={{
+                          width: `${pct}%`,
+                          background: `hsl(${200 + i * 25}, 80%, 60%)`,
+                          boxShadow: `0 0 8px hsl(${200 + i * 25}, 80%, 60%, 0.4)`,
+                        }}
+                      />
+                    </div>
+                    <div className="domain-count">{count}</div>
+                  </div>
+                ))}
+                <div className="analytics-footer">
+                  <span>Total verified internships: <strong style={{ color: '#60a5fa' }}>{internships.length}</strong></span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -268,6 +360,8 @@ export default function InternshipClientEngine() {
           padding: 24px 32px;
           border-bottom: 1px solid rgba(59, 130, 246, 0.15);
           background: rgba(10, 15, 26, 0.8);
+          flex-wrap: wrap;
+          gap: 12px;
         }
         .dh-left {
           display: flex;
@@ -277,14 +371,37 @@ export default function InternshipClientEngine() {
         .dh-status-pulse {
           width: 8px;
           height: 8px;
+          border-radius: 50%;
           background: #3b82f6;
           box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6;
           animation: pulse 2s infinite;
+          transition: background 0.4s, box-shadow 0.4s;
+        }
+        .dh-status-pulse.live {
+          background: #4ade80;
+          box-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80;
+        }
+        .dh-status-pulse.standby {
+          background: #f59e0b;
+          box-shadow: 0 0 10px #f59e0b;
         }
         @keyframes pulse {
-          0% { opacity: 1; box-shadow: 0 0 10px #3b82f6; }
-          50% { opacity: 0.4; box-shadow: 0 0 2px #3b82f6; }
-          100% { opacity: 1; box-shadow: 0 0 10px #3b82f6; }
+          0% { opacity: 1; }
+          50% { opacity: 0.4; }
+          100% { opacity: 1; }
+        }
+
+        .live-badge {
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          background: rgba(74, 222, 128, 0.15);
+          color: #4ade80;
+          border: 1px solid rgba(74, 222, 128, 0.4);
+          padding: 2px 8px;
+          border-radius: 4px;
+          animation: pulse 1.5s infinite;
         }
 
         .dh-left h2 {
@@ -333,7 +450,7 @@ export default function InternshipClientEngine() {
           grid-template-columns: 2fr 1fr;
           gap: 32px;
         }
-        .rv-main h3, .agent-view h3 {
+        .rv-main h3, .agent-view h3, .analytics-view h3 {
           margin-top: 0;
           color: #bfdbfe;
           font-family: var(--font-mono);
@@ -345,61 +462,134 @@ export default function InternshipClientEngine() {
 
         .feed-container {
           padding: 20px;
-          height: 250px;
+          height: 280px;
           overflow-y: auto;
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 6px;
+          scroll-behavior: smooth;
         }
         .feed-container::-webkit-scrollbar { width: 4px; }
         .feed-container::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 2px; }
 
-        .feed-item {
+        .feed-waiting {
           font-family: var(--font-mono);
           font-size: 0.75rem;
-          padding: 8px 12px;
-          background: rgba(0,0,0,0.3);
-          border-left: 2px solid rgba(59,130,246,0.5);
+          color: #64748b;
+          text-align: center;
+          padding: 60px 0;
+          animation: blink 1.5s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        .feed-item {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          padding: 6px 10px;
+          background: rgba(0,0,0,0.25);
+          border-left: 2px solid rgba(59,130,246,0.4);
           display: flex;
           gap: 16px;
-          animation: typeIn 0.3s steps(20, end) forwards;
+          animation: typeIn 0.3s ease forwards;
           opacity: 0;
+          color: #94a3b8;
+          word-break: break-all;
+        }
+        .feed-item.sys-log { 
+          border-left-color: rgba(74, 222, 128, 0.5);
+          color: #6ee7b7;
+        }
+        .feed-item.err-log { 
+          border-left-color: rgba(248, 113, 113, 0.5);
+          color: #fca5a5;
         }
         @keyframes typeIn {
-          from { opacity: 0; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
-          to { opacity: 1; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+          from { opacity: 0; transform: translateX(-8px); }
+          to { opacity: 1; transform: translateX(0); }
         }
 
-        .fi-time { color: #60a5fa; min-width: 85px; }
-        .terminal-text { color: #e2e8f0; word-break: break-all; }
+        .terminal-text { word-break: break-all; }
 
         .stat-card {
-          padding: 24px;
-          margin-bottom: 20px;
+          padding: 20px;
+          margin-bottom: 16px;
         }
         .stat-card h4, .agent-node h5 {
           margin: 0;
           font-family: var(--font-mono);
           color: #94a3b8;
-          font-size: 0.75rem;
+          font-size: 0.7rem;
           letter-spacing: 0.1em;
-          margin-bottom: 12px;
+          text-transform: uppercase;
+          margin-bottom: 10px;
         }
         .big-num {
           font-family: var(--font-mono);
-          font-size: 2.5rem;
+          font-size: 2.2rem;
           font-weight: 300;
           line-height: 1;
           text-shadow: 0 0 20px currentColor;
         }
         .sub-num {
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: #64748b;
-          margin-top: 12px;
+          color: #475569;
+          margin-top: 8px;
         }
 
+        /* Domain Analytics */
+        .analytics-view { width: 100%; }
+        .domain-chart {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .domain-row {
+          display: grid;
+          grid-template-columns: 140px 1fr 40px;
+          align-items: center;
+          gap: 16px;
+          animation: typeIn 0.4s ease forwards;
+          opacity: 0;
+        }
+        .domain-label {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          color: #94a3b8;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .domain-bar-track {
+          height: 6px;
+          background: rgba(255,255,255,0.05);
+          border-radius: 3px;
+          overflow: hidden;
+        }
+        .domain-bar-fill {
+          height: 100%;
+          border-radius: 3px;
+          transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .domain-count {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: #60a5fa;
+          text-align: right;
+        }
+        .analytics-footer {
+          margin-top: 24px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(59, 130, 246, 0.1);
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          color: #475569;
+        }
+
+        /* Agents */
         .agent-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -424,6 +614,7 @@ export default function InternshipClientEngine() {
           background: transparent;
           border: 1px solid #3b82f6;
           transition: all 0.2s ease;
+          border-radius: 50%;
         }
         .node-indicator.active { 
           background: #3b82f6; 
@@ -441,7 +632,8 @@ export default function InternshipClientEngine() {
         @media (max-width: 768px) {
           .radar-view, .agent-grid { grid-template-columns: 1fr; }
           .dh-nav { width: 100%; justify-content: center; }
-          .dash-header { flex-direction: column; gap: 20px; }
+          .dash-header { flex-direction: column; gap: 12px; }
+          .domain-row { grid-template-columns: 100px 1fr 32px; }
         }
       `}</style>
     </div>

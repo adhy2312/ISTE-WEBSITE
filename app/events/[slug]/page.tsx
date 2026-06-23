@@ -6,6 +6,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { PortableText } from '@portabletext/react'
 import HomeAnimations from '@/app/components/HomeAnimations'
+import dynamic from 'next/dynamic'
+const EventCountdown = dynamic(() => import('@/app/components/EventCountdown'), { ssr: false })
+const GalleryLightbox = dynamic(() => import('@/app/components/GalleryLightbox'), { ssr: false })
 
 import { Metadata } from 'next'
 
@@ -151,21 +154,25 @@ export default async function EventPage({ params }: { params: { slug: string } }
           </div>
         )}
 
+        {/* Countdown Timer — shown for upcoming events with a date */}
+        {event.status === 'upcoming' && event.date && (
+          <div className="reveal d2">
+            <EventCountdown targetDate={event.date} eventTitle={event.title} />
+          </div>
+        )}
+
+        {/* Interactive Gallery Lightbox */}
         {event.gallery && event.gallery.length > 0 && (
-          <div className="interactive-gallery reveal d3">
-            {event.gallery.map((img: any, i: number) => (
-              <div key={i} className="gallery-item">
-                <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1', overflow: 'hidden', borderRadius: '12px' }}>
-                  <Image 
-                    src={urlForImage(img).width(800).height(800).url()} 
-                    alt={`${event.title} gallery image ${i + 1}`} 
-                    fill
-                    className="object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            ))}
+          <div className="reveal d3">
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#64748b', marginBottom: '16px' }}>
+              Gallery — {event.gallery.length} Photo{event.gallery.length !== 1 ? 's' : ''}
+            </div>
+            <GalleryLightbox
+              images={event.gallery.map((img: any, i: number) => ({
+                url: urlForImage(img).width(1200).height(900).url(),
+                alt: `${event.title} — photo ${i + 1}`,
+              }))}
+            />
           </div>
         )}
 

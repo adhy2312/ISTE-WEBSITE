@@ -3,13 +3,22 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import Image from 'next/image'
 import type { InternshipData } from './page'
-import { Search } from 'lucide-react'
+import { Search, Code2, BrainCircuit, CheckCircle2 } from 'lucide-react'
 import { gsap, useGSAP } from '@/app/brain/engines/GSAPCore'
 
 export default function InternshipGrid({ internships }: { internships: InternshipData[] }) {
   const [isHunting, setIsHunting] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [quizState, setQuizState] = useState<'idle' | 'active' | 'completed'>('idle')
+  const [quizScore, setQuizScore] = useState(0)
+  const [currentQuestion, setCurrentQuestion] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const quizQuestions = [
+    { q: "Which of the following is a React hook?", options: ["useFetch", "useEffect", "useData", "useQuery"], a: 1 },
+    { q: "What does API stand for?", options: ["Application Programming Interface", "Advanced Program Integration", "Automated Process Instance", "Applied Protocol Interface"], a: 0 },
+    { q: "Which tool is used for containerization?", options: ["Git", "Docker", "Jenkins", "Ansible"], a: 1 }
+  ];
 
   // Simulate "Hunting/Deciphering" on search query changes
   useEffect(() => {
@@ -20,14 +29,29 @@ export default function InternshipGrid({ internships }: { internships: Internshi
   }, [searchQuery, isHunting])
 
   const filtered = useMemo(() => {
-    if (!searchQuery) return internships;
-    const lower = searchQuery.toLowerCase()
-    return internships.filter(i => 
-      (i.role?.toLowerCase() || '').includes(lower) ||
-      (i.company?.toLowerCase() || '').includes(lower) ||
-      (i.domain?.toLowerCase() || '').includes(lower)
-    )
-  }, [internships, searchQuery])
+    let result = internships;
+    if (searchQuery) {
+      const lower = searchQuery.toLowerCase()
+      result = result.filter(i => 
+        (i.role?.toLowerCase() || '').includes(lower) ||
+        (i.company?.toLowerCase() || '').includes(lower) ||
+        (i.domain?.toLowerCase() || '').includes(lower)
+      )
+    }
+    
+    // Apply personalized match scores if quiz completed
+    if (quizState === 'completed') {
+      result = result.map(i => {
+        // Deterministic pseudo-random match score based on user's quiz score and job id
+        const hash = String(i._id).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const baseScore = 50 + (quizScore * 10); // 50 to 80
+        const variation = (hash % 20) - 10; // -10 to +10
+        return { ...i, matchScore: Math.min(100, Math.max(0, baseScore + variation)) }
+      }).sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    }
+
+    return result;
+  }, [internships, searchQuery, quizState, quizScore])
 
   useGSAP(() => {
     if (!isHunting && filtered.length > 0 && containerRef.current) {
@@ -60,6 +84,82 @@ export default function InternshipGrid({ internships }: { internships: Internshi
 
   return (
     <div className="internship-grid-container" style={{ width: '100%' }}>
+      
+      {/* Skill Quiz Widget */}
+      <div className="quiz-widget" style={{ 
+        maxWidth: '600px', margin: '0 auto 32px auto', 
+        background: 'rgba(59, 130, 246, 0.05)', 
+        border: '1px solid rgba(59, 130, 246, 0.2)', 
+        borderRadius: '16px', overflow: 'hidden' 
+      }}>
+        {quizState === 'idle' && (
+          <div style={{ padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa' }}>
+                <BrainCircuit size={24} />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--white)' }}>Skill Match Calibration</h4>
+                <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--g400)' }}>Take a 1-min quiz to unlock personalized match scores.</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => { setQuizState('active'); setQuizScore(0); setCurrentQuestion(0); }}
+              style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, transition: 'all 0.2s' }}
+              onMouseOver={e => e.currentTarget.style.background = '#2563eb'}
+              onMouseOut={e => e.currentTarget.style.background = '#3b82f6'}
+            >
+              Start Calibrating
+            </button>
+          </div>
+        )}
+
+        {quizState === 'active' && (
+          <div style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', fontSize: '0.8rem', color: 'var(--g400)', fontFamily: 'var(--font-mono)' }}>
+              <span>Question {currentQuestion + 1} of {quizQuestions.length}</span>
+              <span>Score: {quizScore}</span>
+            </div>
+            <h4 style={{ margin: '0 0 20px', fontSize: '1.1rem', color: 'var(--white)' }}>{quizQuestions[currentQuestion].q}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {quizQuestions[currentQuestion].options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    if (idx === quizQuestions[currentQuestion].a) setQuizScore(s => s + 1);
+                    if (currentQuestion < quizQuestions.length - 1) {
+                      setCurrentQuestion(c => c + 1);
+                    } else {
+                      setQuizState('completed');
+                      setIsHunting(true); // Retrigger animation
+                    }
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)',
+                    padding: '12px 16px', borderRadius: '8px', color: 'var(--g100)', textAlign: 'left',
+                    cursor: 'pointer', transition: 'all 0.2s'
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)'; }}
+                  onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {quizState === 'completed' && (
+          <div style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '16px', background: 'rgba(34, 197, 94, 0.05)' }}>
+            <div style={{ color: '#4ade80' }}><CheckCircle2 size={32} /></div>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#4ade80' }}>Calibration Complete</h4>
+              <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--g300)' }}>Your personalized match scores have been applied to the grid below.</p>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Command-K Style Search Bar */}
       <div style={{
         position: 'relative',

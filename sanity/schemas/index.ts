@@ -11,6 +11,7 @@ import { faqSchema } from './faq'
 import telemetryLog from './telemetry_log'
 import { homePageSchema } from './homePage'
 import { navigationMenuSchema } from './navigationMenu'
+import { memberProjectSchema } from './memberProject'
 
 export const schemaTypes = [
   activeEventSchema,
@@ -26,4 +27,5 @@ export const schemaTypes = [
   telemetryLog,
   homePageSchema,
   navigationMenuSchema,
+  memberProjectSchema,
 ]

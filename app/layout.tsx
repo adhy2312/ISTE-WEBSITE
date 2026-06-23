@@ -21,6 +21,7 @@ const InternshipEngine = dynamic(() => import('./brain/InternshipEngine'));
 const IOSAdaptiveEngine = dynamic(() => import('./engines/ios/IOSAdaptiveEngine'));
 const ClientPlatformBoundary = dynamic(() => import('./brain/ClientPlatformBoundary'));
 const CookieConsent = dynamic(() => import('./components/CookieConsent'));
+const ThemeSwitcher = dynamic(() => import('./components/ThemeSwitcher'), { ssr: false });
 
 // Vercel observability — loaded async so they don't block the critical path
 import { Analytics } from '@vercel/analytics/next';
@@ -204,6 +205,9 @@ export default async function RootLayout({
 
           {/* Compliance */}
           {!isStudio && <CookieConsent />}
+
+          {/* Theme Switcher — global floating control */}
+          {!isStudio && <ThemeSwitcher />}
 
           {/* Vercel Observability */}
           <Analytics />

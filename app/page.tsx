@@ -231,32 +231,48 @@ export default async function Home() {
 
   const renderAbout = () => {
     return (
-      <section id="about">
-        <div className="section-inner about-grid">
+      <section id="about" style={{ position: 'relative', overflow: 'hidden', padding: '120px 0' }}>
+        {/* Cinematic Scrollytelling Background Glow */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+          width: '800px', height: '800px',
+          background: 'radial-gradient(circle, rgba(var(--c-main), 0.08) 0%, transparent 60%)',
+          zIndex: 0, pointerEvents: 'none'
+        }}></div>
+
+        <div className="section-inner about-grid" style={{ position: 'relative', zIndex: 1 }}>
           <div>
             <div className="section-tag reveal">{settings.aboutTag || 'About Us'}</div>
             <h2 className="section-title reveal d1" dangerouslySetInnerHTML={{ __html: settings.aboutTitle || 'Shaping <em>Engineers</em><br />of Tomorrow' }}></h2>
 
-            {settings.aboutBody?.length ? (
-              <div className="section-body-wrapper reveal d2" style={{ marginTop: 24 }}>
-                <PortableText value={settings.aboutBody} />
-              </div>
-            ) : (
-              <>
-                <p className="section-body reveal d2" style={{ marginTop: 24 }}>
-                  ISTE — the Indian Society for Technical Education — is India&apos;s premier national teachers association working
-                  to enhance the quality of technical education. The MBCET Student Chapter brings this vision to life at
-                  Mar Baselios College of Engineering and Technology, Nalanchira, Thiruvananthapuram.
-                </p>
-                <p className="section-body reveal d3" style={{ marginTop: 16 }}>
-                  Founded with a mission to bridge the gap between academic knowledge and industry demands, our chapter equips
-                  students with the skills, networks, and opportunities that transcend the classroom — cultivating a generation
-                  of technically excellent and professionally ready engineers.
-                </p>
-              </>
-            )}
+            <div className="scrollytelling-container" style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+              {settings.aboutBody?.length ? (
+                <div className="section-body-wrapper cinematic-text">
+                  <PortableText value={settings.aboutBody} />
+                </div>
+              ) : (
+                <>
+                  <p className="cinematic-text" style={{ fontSize: '1.25rem', lineHeight: 1.8, color: 'var(--g100)' }}>
+                    ISTE — the Indian Society for Technical Education — is India&apos;s premier national teachers association working
+                    to enhance the quality of technical education. The MBCET Student Chapter brings this vision to life at
+                    Mar Baselios College of Engineering and Technology, Nalanchira, Thiruvananthapuram.
+                  </p>
+                  <p className="cinematic-text" style={{ fontSize: '1.25rem', lineHeight: 1.8, color: 'var(--g300)' }}>
+                    Founded with a mission to bridge the gap between academic knowledge and industry demands, our chapter equips
+                    students with the skills, networks, and opportunities that transcend the classroom — cultivating a generation
+                    of technically excellent and professionally ready engineers.
+                  </p>
+                </>
+              )}
+            </div>
+            
+            <div className="reveal d3" style={{ marginTop: '40px' }}>
+              <Link href="/#membership" className="btn-primary">
+                Become a Member
+              </Link>
+            </div>
           </div>
-          <div className="about-visual reveal d2">
+          <div className="about-visuals reveal d2">
             <NucleusCore />
           </div>
         </div>

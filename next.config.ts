@@ -11,7 +11,7 @@ const cspDirectives = [
   `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
   `font-src 'self' https://fonts.gstatic.com`,
   `img-src 'self' data: blob: https://cdn.sanity.io https://api.dicebear.com https://images.unsplash.com https://lh3.googleusercontent.com`,
-  `connect-src 'self' https://cdn.sanity.io https://o*.ingest.sentry.io https://vitals.vercel-insights.com wss: ${isDev ? 'ws://localhost:*' : ''}`,
+  `connect-src 'self' https://cdn.sanity.io https://api.sanity.io https://o*.ingest.sentry.io https://vitals.vercel-insights.com https://api.github.com wss: ${isDev ? 'ws://localhost:*' : ''}`,
   `media-src 'self' blob:`,
   `frame-src 'self' https://vercel.live`,
   `worker-src 'self' blob:`,
